@@ -1,0 +1,170 @@
+/**
+  * This file is part of VoteBox.
+  * 
+  * VoteBox is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  * 
+  * VoteBox is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+  * along with VoteBox.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package actionparser;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
+import sexpression.ASExpression;
+import sexpression.stream.ASEInputStreamReader;
+import sexpression.stream.InvalidVerbatimStreamException;
+
+/**
+ * Tool which parses the output of Launcher run VoteBox sessions and displays the "ballot result"
+ * using the appropriate graphics.
+ * 
+ * Simplifies determining results.
+ * 
+ * @author Montrose
+ *
+ */
+public class BallotResultParser {
+
+	ArrayList<RaceResult> races;
+	
+	/**
+	 * Parses a log file for the results of the race.
+	 * 
+	 * @param infile - log file
+	 */
+	public void parseFile(File infile){
+		ASEInputStreamReader reader=null;
+		ASExpression dat=null;
+		
+		InputStream in=null;
+		//setup input stream
+		try{
+			in = new FileInputStream(infile);
+		}catch(FileNotFoundException e){
+			try{
+				System.out.println("Trying lower case: "+ infile.getParent() +File.separator + infile.getName().toLowerCase() +"("+infile.getName()+")");
+				infile=new File(infile.getParent() +File.separator +infile.getName().toLowerCase());
+				in=new FileInputStream(infile);
+			}catch(FileNotFoundException f){
+			System.out.println("Could not find file: "+ infile);
+			return;
+			}
+		}
+		
+		reader = new ASEInputStreamReader(in);
+		
+		int available=0;
+		try{
+			available=in.available();
+		}catch(IOException e){}
+		
+		if(available!=0){
+			try{
+				dat=reader.read();
+				available=in.available();
+			}
+			catch(InvalidVerbatimStreamException e){System.out.println("FAIL: Invalid Verbatim Stream: " + e.getMessage());}
+			catch(IOException e){System.out.println("FAIL: IO exception: "+ e.getMessage());}
+			//System.out.println(dat);
+			races= RaceResult.parseRaces(dat);
+		}
+	}
+	
+	/**
+	 * @return List of RaceResults.
+	 */
+	public ArrayList<RaceResult> getVotes(){
+		return races;
+	}
+
+	/**
+	 * Usage:
+	 * 	java actionparser.BallotResultParser [log file] [ballot file]
+	 * 
+	 * Any ommitted arguments will be prompted for.
+	 * 
+	 * @param args - runtime arguments
+	 */
+	public static void main(String[] args) {
+		BallotResultParser bp=new BallotResultParser();
+		
+		File log = null;
+		File ballot = null;
+		
+		if(args.length >= 1)
+			log = new File(args[0]);
+		
+		if(args.length >= 2)
+			ballot = new File(args[1]);
+		
+		if(args.length >= 3){
+			System.out.println("Usage:\n\tjava actionparser.BallotResultParser [log file] [ballot file]");
+			System.exit(-1);
+		}
+		
+		JFileChooser chooser = new JFileChooser();
+		
+		if(log == null){
+			chooser.setDialogTitle("Select log file");
+			int ret = chooser.showOpenDialog(null);
+			
+			if(ret != JFileChooser.APPROVE_OPTION)
+				return;
+			
+			log = chooser.getSelectedFile();
+		}
+		
+		if(ballot == null){
+			chooser.setDialogTitle("Select ballot (.zip) file");
+			chooser.setFileFilter(new FileFilter(){
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory() || f.getName().toLowerCase().endsWith(".zip");
+				}
+
+				@Override
+				public String getDescription() {
+					return "Ballot (.zip) Files";
+				}
+			});
+			
+			int ret = chooser.showOpenDialog(null);
+			
+			if(ret != JFileChooser.APPROVE_OPTION)
+				return;
+			
+			ballot = chooser.getSelectedFile();
+		}
+		
+		if(!log.exists()){
+			System.out.println("Log file \""+log+"\" cannot be found.");
+			System.exit(-1);
+		}
+		
+		if(!ballot.exists()){
+			System.out.println("Ballot file \""+ballot+"\" cannot be found");
+			System.exit(-1);
+		}
+		
+		bp.parseFile(log);
+		
+		(new ResultView(bp.getVotes(), ballot)).setVisible(true);
+	}
+
+}
