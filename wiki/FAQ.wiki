@@ -76,7 +76,7 @@ A: This would require a significant development effort.  The present ballot prep
 
 Q: What are the license terms for !VoteBox?
 
-A: ???
+A: !VoteBox is licensed under the GPL version 3.
 
 Q: Why did you choose this license instead of some other license?
 
