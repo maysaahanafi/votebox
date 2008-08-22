@@ -6,7 +6,7 @@
 _Written by: Corey Shaw, Kevin Montrose_
 
 == Overview and Layout ==
-~~Image(Preptool - Manual Example.PNG, 400)~~
+http://votebox.googlecode.com/files/Preptool%20-%20Manual%20Example.PNG
 
 To launch the program, simply double-click on the preptool.jar file, and a window looking like the above screenshot will pop up.  On the top is a toolbar with some buttons to manipulate the entire ballot.  On the left side of the window is a list of all the cards in the ballot, and some buttons to manipulate those cards.  And on the right side of the window there is a panel for editing the current card (it starts out blank but changes when you select a card), and below it, a panel to preview the current card.
 
@@ -42,7 +42,7 @@ _Note: Don't forget to add the translations of the parties' names and abbreviati
 _Note: It's okay for more than one candidate to have the same party (such as Independent)_
 
 === Challenge/Fontsize/Etc. ===
-~~Image(Preptool - Preferences.PNG, 400)~~
+http://votebox.googlecode.com/files/Preptool%20-%20Preferences.PNG
 
 To generate a ballot in the challenge-commit model - that is, to include a cast/challenge button pair page at the end of the ballot - use the menu option under preferences named "Commit-Challenge".  The base font size and the number of races to include on each review screen may be configured with the remaining options in the preferences menu.
 
