@@ -1,11 +1,11 @@
 #labels Phase-Design
 = !VoteBox Software Specification: Supervisor =
 
-'''Daniel Sandler, Corey Shaw'''
+_Daniel Sandler, Corey Shaw_
 
-''Written by: Corey Shaw''
+_Written by: Corey Shaw_
 
-''Edited by: Kevin Montrose''
+_Edited by: Kevin Montrose_
 
 == Usage ==
 
