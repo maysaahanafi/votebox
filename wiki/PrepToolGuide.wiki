@@ -1,6 +1,5 @@
 #labels Phase-Deploy,Featured
 = !VoteBox Software Specification: User Guide =
-[[PageOutline]]
 
 *Kyle Derr, Daniel Sandler, Corey Shaw, Ted Torous*
 
