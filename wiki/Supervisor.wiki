@@ -9,16 +9,6 @@ _Edited by: Kevin Montrose_
 
 == Usage ==
 
-Compiling and running the supervisor is easily accomplished using the provided ant script.  In the directory `hfvotebox`, type
-{{{
- $ ant build
-}}}
-to compile, and type
-{{{
- $ ant supervisor -Did <serial>
-}}}
-to run the supervisor with serial number `<serial>`.  There is also a '`clean`' target that will clean the build directory.
-
 With the jar built by ant, you can simply
 {{{
  $ java -jar supervisor.jar <serial>
