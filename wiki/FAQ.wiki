@@ -1,0 +1,4 @@
+#summary Questions and answers about the VoteBox project and system.
+#labels Featured
+
+= FAQ =
