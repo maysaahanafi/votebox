@@ -9,6 +9,8 @@ A: !VoteBox is built around a family of "end to end" cryptographic techniques.  
 
 !VoteBox uses a number of other cryptographic techniques, such as homomorphic tallying, to add the votes together.  This allows any observer to tally the votes themselves, based only on seeing the encrypted vote records, and verify that the official decryption of them is correct.  Likewise, !VoteBox is engineered to make lots of copies.  There are copies of every vote on every !VoteBox machine in the precinct, and it's even safe to allow third-parties to connect to the network and listen in.  This makes !VoteBox  resilient in the face of a variety of different failure modes.
 
+We describe these issues in much greater detail in our [http://www.usenix.org/events/sec08/tech/sandler.html USENIX Security '08 paper].
+
 Q: How do I explain this to my (unsophisticated) grandparents?  Why should they believe it?
 
 A: To some extent, you'd have plenty of trouble trying to explain why they should trust traditional voting technologies.  The cryptographic and data replication mechanisms within !VoteBox provide excellent integrity mechanisms without compromising voter privacy.  The auditing procedure can be performed by anybody, using an independent implementation of the !VoteBox protocol.  That means your grandparents can rely on an organization that they do trust, such as their favorite political party or candidate, the League of Women Voters, and so forth.  These organizations can now perform much more sophisticated audits than they could ever conduct in the past as "poll watchers."
