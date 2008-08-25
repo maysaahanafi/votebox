@@ -1,0 +1,19 @@
+#labels Phase-Deploy
+= !VoteBox Software Specification: User Interface Module =
+'''Kyle Derr, Daniel Sandler, Ted Torous'''
+
+Readers are encouraged to use the [http://votebox.cs.rice.edu/doxygen/ Doxygen Docs] as a more specific guide to the program's API.
+
+== Usage ==
+
+Using already built jar file
+{{{
+java -jar votebox.jar [serial number]
+}}}
+or
+{{{
+java -Djava.library.path=path/to/directory/with/libSDL_wrap/file -jar votebox.jar [serial number]
+}}}
+to make the SDL view available (note that SDL must still be selected in the appropriate configuration file).
+
+Additional configuration options are outlined in [Configuration].
