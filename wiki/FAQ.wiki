@@ -82,7 +82,7 @@ A: This would require a significant development effort.  The present ballot prep
 
 Q: What are the license terms for !VoteBox?
 
-A: !VoteBox is licensed under the GPL version 3.
+A: !VoteBox is licensed under the [http://gplv3.fsf.org/ GPL version 3].
 
 Q: Why did you choose this license instead of some other license?
 
@@ -102,7 +102,7 @@ A: At Rice, we do research, and !VoteBox is a great platform for studying securi
 
 Q: Where does !VoteBox fit into the regulatory world for electronic voting systems?
 
-A: !VoteBox fits roughly into what the newest VVSG (voluntary voting system guidelines) documents call the "Innovation Class."  If/when a !VoteBox-like system is going through the certification process, it will require a different sort of scrutiny than is normally applied as part of voting systems certification.  For traditional voting systems, not subject to the innovation class, standard certification is still necessary (and it's still not very reassuring).
+A: !VoteBox fits roughly into what the newest [http://vvsg.org/ VVSG] (voluntary voting system guidelines) documents call the "Innovation Class."  If/when a !VoteBox-like system is going through the certification process, it will require a different sort of scrutiny than is normally applied as part of voting systems certification.  For traditional voting systems, not subject to the innovation class, standard certification is still necessary (and it's still not very reassuring).
 
 In other words, the existence of !VoteBox and the fact that it doesn't strictly need a voter-verified paper trail shouldn't be taken as any kind of endorsement or statement as to whether current voting machines can similarly get away with it.  (They can't.)
 
