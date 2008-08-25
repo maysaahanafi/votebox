@@ -16,9 +16,9 @@ http://votebox.googlecode.com/files/Simple%20Election%20Diagram.png
  * You then activate a console (which will number all !VoteBoxes), select a ballot, and open the polls.
   * http://votebox.googlecode.com/files/Supervisor%20-%20activate.png
   * http://votebox.googlecode.com/files/Votebox%20-%20numbered.png
-  * http://votebox.googlecode.com/files/Supervisor%20-%20select%20ballot.png
+  * http://votebox.googlecode.com/files/Supervisor%20-%20Select%20Ballot.png
   * http://votebox.googlecode.com/files/Supervisor%20-%20polls%20open.png
  * Until closing the polls, authorize !VoteBoxes to allow a vote to be cast from it.
-  * http://votebox.googlecode.com/files/VoteBox%20-%20voting.png
+  * http://votebox.googlecode.com/files/Votebox%20-%20Voting.png
  * Once polls are closed, a tally will be displayed.
   * http://votebox.googlecode.com/files/Supervisor%20-%20tally.png
