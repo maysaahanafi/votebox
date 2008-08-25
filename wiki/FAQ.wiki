@@ -3,6 +3,12 @@
 
 == Understanding the !VoteBox Security Model ==
 
+Q: Can you explain the VoteBox security model?  How is VoteBox different from conventional electronic voting machines?
+
+A: VoteBox is built around a family of "end to end" cryptographic techniques.  In normal usage, a voter's interaction with !VoteBox is almost exactly the same as their interaction would be with a normal electronic voting system, with the exception that the voter is asked, after the summary screen, whether he or she would like to "cast" or "challenge" the ballot.  By this time, the !VoteBox has already transmitted the voter's encrypted vote to every other !VoteBox system in the local precinct, and has thus "committed" to it.  When a vote is "cast," another message is broadcast saying as much and the voter is done.  When a vote is "challenged," then the !VoteBox reveals a key that can be used to decrypt the vote.  (These "challenged" votes are not included in the final election tally.)  Because a !VoteBox has no idea, in advance, whether it will be challenged, it must behave correctly on the chance it might be caught misbehaving.
+
+!VoteBox uses a number of other cryptographic techniques, such as homomorphic tallying, to add the votes together.  This allows any observer to tally the votes themselves, based only on seeing the encrypted vote records, and verify that the official decryption of them is correct.  Likewise, !VoteBox is engineered to make lots of copies.  There are copies of every vote on every !VoteBox machine in the precinct, and it's even safe to allow third-parties to connect to the network and listen in.  This makes !VoteBox  resilient in the face of a variety of different failure modes.
+
 Q: How do I explain this to my (unsophisticated) grandparents?  Why should they believe it?
 
 A: To some extent, you'd have plenty of trouble trying to explain why they should trust traditional voting technologies.  The cryptographic and data replication mechanisms within !VoteBox provide excellent integrity mechanisms without compromising voter privacy.  The auditing procedure can be performed by anybody, using an independent implementation of the !VoteBox protocol.  That means your grandparents can rely on an organization that they do trust, such as their favorite political party or candidate, the League of Women Voters, and so forth.  These organizations can now perform much more sophisticated audits than they could ever conduct in the past as "poll watchers."
@@ -72,7 +78,7 @@ Q: In Election Centers, there may be hundreds of different ballot styles that mi
 
 A: This would require a significant development effort.  The present ballot preparation tool would need to be extended to deal with these issues and generate all the different ballot styles.  The supervisor console would need to present an appropriate menu to the poll workers to then select the proper ballot.  The vote tallying system would need to identify which ballots should be included in any given tally.  The !VoteBox voting booth, itself, would not require any changes.
 
-'''Licensing and Future Plans'''
+==Licensing and Future Plans==
 
 Q: What are the license terms for !VoteBox?
 
@@ -80,7 +86,7 @@ A: !VoteBox is licensed under the GPL version 3.
 
 Q: Why did you choose this license instead of some other license?
 
-A: ???
+A: There is no perfect license model.  GPL-style licenses encourage sharing and reuse of code, which is the essence of our mission as researchers.  We considered BSD or Apache-style licenses, which would allow companies to reuse our code without being required to share the results, and decided against such a license at this time.
 
 Q: Are you planning to commercialize !VoteBox?
 
@@ -98,6 +104,6 @@ Q: Where does !VoteBox fit into the regulatory world for electronic voting syste
 
 A: !VoteBox fits roughly into what the newest VVSG (voluntary voting system guidelines) documents call the "Innovation Class."  If/when a !VoteBox-like system is going through the certification process, it will require a different sort of scrutiny than is normally applied as part of voting systems certification.  For traditional voting systems, not subject to the innovation class, standard certification is still necessary (and it's still not very reassuring).
 
-In other words, the existence of !VoteBox and the fact that it doesn't actually need a voter-verified paper trail shouldn't be taken as any kind of endorsement or statement as to whether current voting machines can similarly get away with it.  (They can't.)
+In other words, the existence of !VoteBox and the fact that it doesn't strictly need a voter-verified paper trail shouldn't be taken as any kind of endorsement or statement as to whether current voting machines can similarly get away with it.  (They can't.)
 
-If a voting machine vendor wants to argue that they fit into the innovation class, they're going to have a substantial burden to convince us that their systems are secure.  Systems like !VoteBox do not need to rely on trade secrecy for their security.  The "bad guys" are welcome to know everything there is to know about how !VoteBox works, and that won't have any impact on whether or not it's secure.  Such vendors need to convincingly prove that their systems are "software independent", which means that it is impossible for somebody to undetectably tamper with the software of the system in such a way that they can undetectably tamper with the tallies at the end of the election.
+If a voting machine vendor wants to argue that they fit into the innovation class, they're going to have a substantial burden to convince us that their systems are secure.  Systems like !VoteBox rely on strong mathematics for their security.  The "bad guys" are welcome to know everything there is to know about how !VoteBox works, and it won't help them attack an election built around !VoteBox.  Any vendor wishing to sell such a system would need to convincingly prove that their systems are "software independent", which means that it is impossible for somebody to undetectably tamper with the software of the system in such a way that they can undetectably tamper with the tallies at the end of the election.
