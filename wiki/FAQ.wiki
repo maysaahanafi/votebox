@@ -58,7 +58,7 @@ A: We're not asking you to trust computers.  We're asking you to trust mathemati
 
 Q: When I download !VoteBox, what am I getting?
 
-A: The !VoteBox distribution includes four applications: the ballot preparation tool, the !VoteBox voting booth, the !VoteBox supervisor console, and a web-based vote validation tool.  The web-based vote validation tool is itself two executables, a "tap" on the VoteBox network and a seperate webserver.
+A: The !VoteBox distribution includes four applications: the ballot preparation tool, the !VoteBox voting booth, the !VoteBox supervisor console, and a web-based vote validation tool.  The web-based vote validation tool is itself two executables, a "tap" on the !VoteBox network and a seperate web server.
 
 Q: What major features might I want in a real election that are missing from !VoteBox?
 
