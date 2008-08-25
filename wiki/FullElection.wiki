@@ -9,7 +9,7 @@ http://votebox.googlecode.com/files/Full%20Election%20Diagram.png
  * Place supervisor.jar, votebox.jar, tap.jar, and challenge.jar on four different, networked machines.
   * Note that the simpler the network, the better.  Ideally, the network will be homogenous with respect to IP version as well.
  * Start the Supervisor, !VoteBox, Tap, and !ChallengeWebServer programs.
-  * Instructions for launching each can be found [wiki:VoteBoxSupervisor here], [wiki:VoteBoxRunTime here], [wiki:VoteBoxTap here], and [wiki:VoteBoxWebServer here] respectively.
+  * Instructions for launching each can be found [Supervisor here], [VoteBox here], [Tap here], and [ChallengeWebServer here] respectively.
  * While the machines are discovering each other, you will see these screens on the Supervisor Console and any !VoteBoxes.
   * http://votebox.googlecode.com/files/Supervisor%20-%20waiting.png
   * http://votebox.googlecode.com/files/Votebox%20-%20waiting.png
