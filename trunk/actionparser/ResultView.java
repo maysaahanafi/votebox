@@ -86,11 +86,13 @@ public class ResultView extends JFrame {
 
 				if(title != null)
 					indented.add(Box.createHorizontalStrut(30));
+				
+				if(raceMap.get(resStr) != null){
+					indented.add(new JLabel(new ImageIcon(raceMap.get(resStr))));
+					indented.add(Box.createHorizontalGlue());
 
-				indented.add(new JLabel(new ImageIcon(raceMap.get(resStr))));
-				indented.add(Box.createHorizontalGlue());
-
-				center.add(indented);
+					center.add(indented);
+				}//if
 			}
 		}//for
 		
