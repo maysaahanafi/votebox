@@ -16,14 +16,26 @@
  */
 package actionparser;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 
 import sexpression.ASExpression;
@@ -102,6 +114,40 @@ public class BallotResultParser {
 	 * @param args - runtime arguments
 	 */
 	public static void main(String[] args) {
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(){
+			public void uncaughtException(Thread t, Throwable e) {
+				final JDialog dialog = new JDialog();
+				dialog.setTitle("An unexpected error occured");
+				dialog.setSize(800,600);
+				dialog.setLayout(new BorderLayout());
+				dialog.add(new JLabel("Please include the following as well as the involved _ballot & .zip files in a bug report."), BorderLayout.NORTH);
+				
+				JTextArea area = new JTextArea();
+				StringWriter writer = new StringWriter();
+				e.printStackTrace(new PrintWriter(writer));
+				
+				area.setText(writer.toString());
+				area.setEditable(false);
+				
+				dialog.add(new JScrollPane(area), BorderLayout.CENTER);
+				
+				JButton done = new JButton("Done, Exit Program");
+				
+				dialog.add(done, BorderLayout.SOUTH);
+				
+				done.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e) {
+						dialog.setVisible(false);
+						System.exit(-1);
+					}
+				});
+			
+				dialog.setModal(true);
+				dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+				dialog.setVisible(true);
+			}
+		});
+		
 		BallotResultParser bp=new BallotResultParser();
 		
 		File log = null;
