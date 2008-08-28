@@ -1,5 +1,5 @@
 #summary Description of the Supervisor, a machine that connects to the Auditorium network (along with VoteBox booths) and allows administrators to conduct an election.
-#labels Phase-Design
+#labels Phase-Design,HowTo
 
 = !VoteBox Software Specification: Supervisor =
 
