@@ -1,4 +1,6 @@
+#summary Instructions on starting the VoteBox challenge web server, used in a FullElection.
 #labels Phase-Deploy
+
 == Usage ==
 
 {{{
