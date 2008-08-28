@@ -1,9 +1,11 @@
+#summary Instructions for running a VoteBox election with the ballot challenge system.
 #labels Phase-Deploy
-== Full Election ==
+
+== Instructions for a "full" !VoteBox election ==
 
 A "full election" is one where all the features of !VoteBox are employed.  More precisely, a full election involves a Supervisor, a Tap, a !ChallengeWebServer, and at least one !VoteBox.  Additionally, the Commit-Challenge model and encryption must be enabled in both the supervisor and votebox configuration files.  The [Configuration sample] configuration files meet these requirments.  The precompiled ballot used in this walkthrough can be found [http://votebox.googlecode.com/files/presidential-only.zip here] (the origianl .bal can be found [http://votebox.googlecode.com/files/presidential-only.bal here]).  Note that these images are from a few seperate execution of the !VoteBox system, observed jumps in time are not in error.
 
-http://votebox.googlecode.com/files/Full%20Election%20Diagram.png
+http://votebox.cs.rice.edu/images/election-challenge-diagram.png
 
 == Walkthrough ==
  * Place supervisor.jar, votebox.jar, tap.jar, and challenge.jar on four different, networked machines.
