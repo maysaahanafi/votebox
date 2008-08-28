@@ -1,5 +1,5 @@
 #summary Instructions for running a VoteBox election with the ballot challenge system.
-#labels Phase-Deploy
+#labels Phase-Deploy,HowTo
 
 == Instructions for a "full" !VoteBox election ==
 
