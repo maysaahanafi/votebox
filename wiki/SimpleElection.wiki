@@ -3,7 +3,7 @@
 
 = Running a Simple !VoteBox election =
 
-A simple election is one featuring only Supervisor and !VoteBox machines (encryption is optional as well).  Any configuration files _without_ `USE_COMMIT_CHALLENGE_MODEL` set to `true` can be used in a SimpleElection (they must, however, be consistent between Supervisor and !VoteBoxes).  The [PRUI PreRendered] `ballot.zip` used in this example can be found [http://votebox.googlecode.com/files/presidential-only-simple.bal.zip here]; the [PrepToolGuide Ballot Creator] `.bal` file used to generate it is [http://votebox.googlecode.com/files/presidential-only.bal here].
+A simple election is one featuring only [Supervisor Supervisor] and !VoteBox machines (encryption is optional as well).  Any configuration files _without_ `USE_COMMIT_CHALLENGE_MODEL` set to `true` can be used in a SimpleElection (they must, however, be consistent between Supervisor and !VoteBoxes).  The [PRUI PreRendered] `ballot.zip` used in this example can be found [http://votebox.googlecode.com/files/presidential-only-simple.bal.zip here]; the [PrepToolGuide Ballot Creator] `.bal` file used to generate it is [http://votebox.googlecode.com/files/presidential-only.bal here].
 
 http://votebox.cs.rice.edu/images/simple-election-diagram.png
 
