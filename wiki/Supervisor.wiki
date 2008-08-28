@@ -1,6 +1,8 @@
 #summary Description of the Supervisor, a machine that connects to the Auditorium network (along with VoteBox booths) and allows administrators to conduct an election.
 #labels Phase-Design,HowTo
 
+http://votebox.cs.rice.edu/images/supervisor-icon.png
+
 = !VoteBox Software Specification: Supervisor =
 
 _Daniel Sandler, Corey Shaw_
@@ -18,7 +20,7 @@ With the jar built by ant, you can simply
 
 == Introduction ==
 
-http://votebox.googlecode.com/files/Supervisor%20-%20Open%20Polls.png
+http://votebox.cs.rice.edu/images/supervisor-eg-small.png
 
 The supervisor is designed to be the poll worker's access to the rest of the VoteBox network.  It shows a list of all known machines on the network and their statuses, along with controls to open or close the polls, and authorize voters.
 
