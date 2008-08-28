@@ -1,4 +1,6 @@
+#summary Description of the Supervisor, a machine that connects to the Auditorium network and allows administrators to run a !VoteBox election.
 #labels Phase-Design
+
 = !VoteBox Software Specification: Supervisor =
 
 _Daniel Sandler, Corey Shaw_
