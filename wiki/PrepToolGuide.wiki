@@ -14,9 +14,9 @@ http://votebox.googlecode.com/files/Preptool%20-%20Manual%20Example.PNG
 
 To launch the program, double-click on its icon:
 
- * VoteBox Ballot Creator.app (on Mac OS X)
- * VoteBox Ballot Creator.exe (on Windows)
- * preptool.jar (other platforms)
+ * `VoteBox Ballot Creator.app` (on Mac OS X)
+ * `VoteBox Ballot Creator.exe` (on Windows)
+ * `preptool.jar` (other platforms)
 
 The main ballot creator window (see above screenshot) will appear.  On the top is a toolbar with some buttons to manipulate the entire ballot.  On the left side of the window is a list of all the cards in the ballot, and some buttons to manipulate those cards.  And on the right side of the window there is a panel for editing the current card (it starts out blank but changes when you select a card), and below it, a panel to preview the current card.
 
