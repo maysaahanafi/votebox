@@ -1,5 +1,5 @@
 #summary Instructions for using the VoteBox Ballot Creator to generate pre-rendered ballots.
-#labels Phase-Deploy,Featured
+#labels Phase-Deploy,Featured,HowTo
 
 = !VoteBox Software Specification: Ballot Creator User Guide =
 
