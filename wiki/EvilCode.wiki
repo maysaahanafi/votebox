@@ -1,5 +1,7 @@
+#summary Description of human factors code in VoteBox (that should not be active in a real election).
 #labels Phase-Implementation
-== Evil Code ==
+
+== What is "evil" code in VoteBox? ==
 
 !VoteBox contains code meant to facilitate human factors testing.  This code allows for the observation, and subsequent recording, of all user input across multiple voting sessions.  This capability goes against the principle of voter annonminity; in a proper election setting, a user being able to identify themselves via side channels (such as this user input recording) would open the system to voter intimidation and vote buying attacks.
 
