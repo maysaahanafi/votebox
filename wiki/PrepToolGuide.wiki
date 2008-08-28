@@ -1,4 +1,6 @@
+#summary Instructions for using the VoteBox Ballot Creator to generate pre-rendered ballots.
 #labels Phase-Deploy,Featured
+
 = !VoteBox Software Specification: Ballot Creator User Guide =
 
 _Written by: Corey Shaw, Kevin Montrose_
