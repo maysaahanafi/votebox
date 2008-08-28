@@ -1,8 +1,8 @@
 #labels Phase-Deploy
 == Simple Election == 
-A simple election is one featuring only Supervisor and !VoteBox machines (encryption is optional as well).  Any configuration files WITHOUT USE_COMMIT_CHALLENGE_MODEL set to true can be used in a Simple Election (they must, however, be consistent between Supervisor and !VoteBoxes).  The precompile ballot used in this example can be found [http://votebox.googlecode.com/files/presidential-only-simple.bal.zip here], the .bal used to generate it is [http://votebox.googlecode.com/files/presidential-only.bal here].
+A simple election is one featuring only Supervisor and !VoteBox machines (encryption is optional as well).  Any configuration files _without_ `USE_COMMIT_CHALLENGE_MODEL` set to `true` can be used in a SimpleElection (they must, however, be consistent between Supervisor and !VoteBoxes).  The PreRendered `ballot.zip` used in this example can be found [http://votebox.googlecode.com/files/presidential-only-simple.bal.zip here]; the PrepTool `.bal` file used to generate it is [http://votebox.googlecode.com/files/presidential-only.bal here].
 
-http://votebox.googlecode.com/files/Simple%20Election%20Diagram.png
+http://votebox.cs.rice.edu/images/simple-election-diagram.png
 
 == Walkthrough ==
  * Place supervisor.jar & votebox.jar on seperate machines.  Any number of each may be in use, provided there is no more than one per machine and at least one of each on the network.
