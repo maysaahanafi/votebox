@@ -1,14 +1,24 @@
 #labels Phase-Deploy,Featured
-= !VoteBox Software Specification: User Guide =
-
-*Kyle Derr, Daniel Sandler, Corey Shaw, Ted Torous*
+= !VoteBox Software Specification: Ballot Creator User Guide =
 
 _Written by: Corey Shaw, Kevin Montrose_
 
-== Overview and Layout ==
+== Introduction ==
+
+The *!VoteBox Ballot Creator*, or more informally the "ballot prep tool", is a
+graphical Java program used to PreRender ballots for use with VoteBox.
+
 http://votebox.googlecode.com/files/Preptool%20-%20Manual%20Example.PNG
 
-To launch the program, simply double-click on the preptool.jar file, and a window looking like the above screenshot will pop up.  On the top is a toolbar with some buttons to manipulate the entire ballot.  On the left side of the window is a list of all the cards in the ballot, and some buttons to manipulate those cards.  And on the right side of the window there is a panel for editing the current card (it starts out blank but changes when you select a card), and below it, a panel to preview the current card.
+== Overview and Layout ==
+
+To launch the program, double-click on its icon:
+
+ * VoteBox Ballot Creator.app (on Mac OS X)
+ * VoteBox Ballot Creator.exe (on Windows)
+ * preptool.jar (other platforms)
+
+The main ballot creator window (see above screenshot) will appear.  On the top is a toolbar with some buttons to manipulate the entire ballot.  On the left side of the window is a list of all the cards in the ballot, and some buttons to manipulate those cards.  And on the right side of the window there is a panel for editing the current card (it starts out blank but changes when you select a card), and below it, a panel to preview the current card.
 
 === Manipulating Ballots ===
 On the toolbar there are five buttons for manipulating ballots: New Ballot, Open Ballot, Save Ballot, Export to !VoteBox, and Preview in !VoteBox.  The New Ballot button starts a blank ballot, that has no cards or parties, and defaults to only having English selected.  (See the [#Languages Languages] and [#Parties Parties] subsections for how to add more of these.)  Save Ballot will save your ballot to disk as a .bal file, which you can then load later with the Open Ballot button.  Export to !VoteBox will take the ballot and export it in a special format so that it can be loaded into !VoteBox.  Preview in !VoteBox will export the entire ballot to a temporary directory, and then launch it in !VoteBox so you can see what the finished product will be.
