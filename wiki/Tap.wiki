@@ -1,4 +1,6 @@
+#summary Instructions on starting the VoteBox Tap, used in a FullElection.
 #labels Phase-Deploy
+
 == Usage ==
 
 {{{
