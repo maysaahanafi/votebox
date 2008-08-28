@@ -1,4 +1,6 @@
+#summary How to launch VoteBox from the command line.
 #labels Phase-Deploy
+
 = !VoteBox Software Specification: User Interface Module =
 '''Kyle Derr, Daniel Sandler, Ted Torous'''
 
