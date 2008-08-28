@@ -6,7 +6,7 @@ _Written by: Corey Shaw, Kevin Montrose_
 == Introduction ==
 
 The *!VoteBox Ballot Creator*, or more informally the "ballot prep tool", is a
-graphical Java program used to PreRender ballots for use with VoteBox.
+graphical Java program used to [PRUI pre-render] ballots for use with VoteBox.
 
 http://votebox.googlecode.com/files/Preptool%20-%20Manual%20Example.PNG
 
