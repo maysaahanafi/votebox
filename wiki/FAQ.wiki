@@ -1,4 +1,6 @@
+#summary (Frequently) asked questions about the VoteBox project.
 #labels Featured
+
 = Frequently Asked Questions =
 
 == Understanding the !VoteBox Security Model ==
