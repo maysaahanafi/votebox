@@ -1,5 +1,5 @@
 #summary Instructions for conducting an election with a Supervisor and a network of !VoteBox booths.
-#labels Phase-Deploy
+#labels Phase-Deploy,HowTo,Featured
 
 = Running a Simple !VoteBox election =
 
