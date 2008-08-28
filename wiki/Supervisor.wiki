@@ -18,6 +18,8 @@ With the jar built by ant, you can simply
 
 == Introduction ==
 
+http://votebox.googlecode.com/files/Supervisor%20-%20Open%20Polls.png
+
 The supervisor is designed to be the poll worker's access to the rest of the VoteBox network.  It shows a list of all known machines on the network and their statuses, along with controls to open or close the polls, and authorize voters.
 
 When the supervisor initially starts up, it attempts to connect to an Auditorium network if one exists.  This is done using the discovery protocol, and requires all machines to be on the same subnet.  If it finds any machines, it then broadcasts its own status so that other machines on the network can figure out what this new machine is.  Once connected, a supervisor can then be [#Activation activated], and then all of the above controls become available.  If the supervisor does not find any machines on the network, it simply waits until another machine attempts to connect to it.
