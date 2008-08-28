@@ -1,4 +1,6 @@
+#summary Example .conf files for various VoteBox components.
 #labels Phase-Deploy
+
 == Example vb.conf ==
 
 {{{
