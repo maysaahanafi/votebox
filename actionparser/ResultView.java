@@ -22,7 +22,13 @@
 
 package actionparser;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
@@ -50,6 +56,7 @@ import tap.BallotImageHelper;
  */
 public class ResultView extends JFrame {
 	private static final long serialVersionUID = 1L;
+	private static final String NONE_STRING = "(NO CHOICE)";
 
 	/**
 	 * Constructs a new ResultView
@@ -64,6 +71,8 @@ public class ResultView extends JFrame {
 		Map<String, Image> titleMap = BallotImageHelper.loadBallotTitles(ballotFile);
 		Map<String, Image> raceMap = loadBallotRaces(ballotFile.getAbsolutePath(), null);
 		
+		raceMap.put("(none)", generateNoneImage());
+		
 		JPanel center = new JPanel();
 		
 		BoxLayout layout = new BoxLayout(center, BoxLayout.Y_AXIS);
@@ -74,6 +83,9 @@ public class ResultView extends JFrame {
 			
 			if(titleMap != null && res.get_res().size() > 0)
 				title = titleMap.get(res.get_res().get(0));
+			
+			if(title == null && titleMap != null)
+				title = titleMap.get(res.get_UID());
 			
 			if(title != null){
 				JPanel titlePanel = new JPanel();
@@ -93,6 +105,8 @@ public class ResultView extends JFrame {
 				if(title != null)
 					indented.add(Box.createHorizontalStrut(30));
 				
+				System.out.println(resStr +" for "+res.get_UID());
+				
 				if(raceMap.get(resStr) != null){
 					indented.add(new JLabel(new ImageIcon(raceMap.get(resStr))));
 					indented.add(Box.createHorizontalGlue());
@@ -107,6 +121,19 @@ public class ResultView extends JFrame {
 		add(new JScrollPane(center));
 		
 		setSize(1024, 768);
+	}
+	
+	protected Image generateNoneImage(){
+		BufferedImage img = new BufferedImage(300,40, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = img.getGraphics();
+		g.setFont(g.getFont().deriveFont(16));
+		g.setColor(Color.black);
+		
+		Rectangle2D rect = g.getFont().getStringBounds(NONE_STRING, new FontRenderContext(new AffineTransform(), true, true));
+		
+		g.drawString(NONE_STRING, 0, (int)(40/2 + rect.getHeight()/2));
+		
+		return img;
 	}
 	
 	/**

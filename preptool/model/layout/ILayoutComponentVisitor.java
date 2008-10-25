@@ -85,5 +85,14 @@ public interface ILayoutComponentVisitor<P,R> {
 	 * @return the result
 	 */
 	public R forToggleButtonGroup(ToggleButtonGroup tbg, P... param);
+	
+	/**
+	 * Renders a VVPAT compatible verison of the ReviewButton
+	 * @param rb the ReviewButton
+	 * @param param the parameters
+	 * @return the result
+	 */
+	public R forVVPATReviewButton(ReviewButton rb, P... param);
+	
 
 }

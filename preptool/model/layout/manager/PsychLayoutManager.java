@@ -71,6 +71,12 @@ public class PsychLayoutManager extends ALayoutManager {
      */
     private static final int RACE_DESCRIPTION_WIDTH = 600;
 
+    /**
+     * Width of each candidate or contest on the VVPAT (RenderButton).
+     */
+    private static final int VVPAT_CAND_WIDTH = 239;
+    private static final int VVPAT_FONT_SIZE_MULTIPLE = 7;
+    
 	/**
 	 * Width of each candidate or contest on the review screen (RenderButton).
 	 */
@@ -602,7 +608,7 @@ public class PsychLayoutManager extends ALayoutManager {
 				rb.getText(), fontsize, rb.isBold(), rb.isBoxed(),
 				REVIEW_SCREEN_CAND_WIDTH,
 				rb.getBackgroundColor());
-
+            
 			// render party information [dsandler]
 			String aux = rb.getAuxText();
 			if (aux != null && REVIEW_SCREEN_SHOW_PARTY && !aux.equals("")) {
@@ -666,6 +672,41 @@ public class PsychLayoutManager extends ALayoutManager {
                 Boolean... param) {
             return null;
         }
+
+		public BufferedImage forVVPATReviewButton(ReviewButton rb, Boolean... param) {
+			int size = 1;
+            int fontsize = (int) ((size + 1) * (VVPAT_FONT_SIZE_MULTIPLE - 1)) - 2;
+
+            BufferedImage buttonImg = RenderingUtils.renderButton(
+				rb.getText(), fontsize, rb.isBold(), rb.isBoxed(),
+				VVPAT_CAND_WIDTH,
+				rb.getBackgroundColor());
+            
+			// render party information [dsandler]
+			/*String aux = rb.getAuxText();
+			if (aux != null && REVIEW_SCREEN_SHOW_PARTY && !aux.equals("")) {
+				if (REVIEW_SCREEN_PARENTHESIZE_PARTY) 
+					aux = "(" + aux + ")";
+
+				Graphics2D graf = buttonImg.createGraphics();
+				graf.setRenderingHint(
+					RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				
+				Font font = new Font(RenderingUtils.FONT_NAME, Font.PLAIN, fontsize);
+				graf.setFont(font);
+				graf.setColor(Color.BLACK);
+
+				Rectangle2D partyTextBounds = font.getStringBounds(aux,
+						new FontRenderContext(null, true, true));
+
+				// draw it right-aligned
+				graf.drawString(aux,
+					(int)(buttonImg.getWidth() - partyTextBounds.getWidth() - 10), 
+					(int)(partyTextBounds.getHeight() + 8));
+			}*/
+
+			return buttonImg;
+		}
     };
 
     /**
@@ -756,6 +797,10 @@ public class PsychLayoutManager extends ALayoutManager {
                 Object... param) {
             return null;
         }
+
+		public Dimension forVVPATReviewButton(ReviewButton rb, Object... param) {
+			return null;
+		}
     };
 
     /**
@@ -1612,6 +1657,7 @@ public class PsychLayoutManager extends ALayoutManager {
     		if (position < ballot.getCards().size())
     			numReviewPages++;
     	}
+    	
     	return reviewPages;
     }
 

@@ -87,6 +87,17 @@ public class AuditoriumParams implements IAuditoriumParams,
     //Default challenge ballot file.  If "", must be specified explicitly somehow.
     public static final String DEFAULT_BALLOT_FILE = "";
     
+    //Default printer for VVPAT. If "", do not use VVPAT.
+    public static final String PRINTER_FOR_VVPAT = "";
+    
+    //Default page size for VVPAT.  Based off of Star TPS800 model printer.
+    public static final int PAPER_WIDTH_FOR_VVPAT = 249;
+    public static final int PAPER_HEIGHT_FOR_VVPAT = 322;
+    
+    //Default imageable area for VVPAT.  Based off of Star TPS800 model printer.
+    public static final int PRINTABLE_WIDTH_FOR_VVPAT = 239;
+    public static final int PRINTABLE_HEIGHT_FOR_VVPAT = 311;
+    
     private final HashMap<String, String> _config;
 
     /**
@@ -240,6 +251,49 @@ public class AuditoriumParams implements IAuditoriumParams,
 			return (String)_config.get("DEFAULT_BALLOT_FILE");
 		
 		return DEFAULT_BALLOT_FILE;
+	}
+	
+	public String getPrinterForVVPAT() {
+		if(_config.containsKey("PRINTER_FOR_VVPAT"))
+			return (String)_config.get("PRINTER_FOR_VVPAT");
+		
+		return PRINTER_FOR_VVPAT;
+	}
+	
+	public int getPaperHeightForVVPAT() {
+		try{
+			if(_config.containsKey("PAPER_HEIGHT_FOR_VVPAT"))
+				return Integer.parseInt(_config.get("PAPER_HEIGHT_FOR_VVPAT"));
+		}catch(NumberFormatException e){}
+		
+		return PAPER_HEIGHT_FOR_VVPAT;
+	}
+
+	public int getPaperWidthForVVPAT() {
+		try{
+			if(_config.containsKey("PAPER_WIDTH_FOR_VVPAT"))
+				return Integer.parseInt(_config.get("PAPER_WIDTH_FOR_VVPAT"));
+		}catch(NumberFormatException e){}
+		
+		return PAPER_WIDTH_FOR_VVPAT;
+	}
+
+	public int getPrintableHeightForVVPAT() {
+		try{
+			if(_config.containsKey("PRINTABLE_HEIGHT_FOR_VVPAT"))
+				return Integer.parseInt(_config.get("PRINTABLE_HEIGHT_FOR_VVPAT"));
+		}catch(NumberFormatException e){}
+		
+		return PRINTABLE_HEIGHT_FOR_VVPAT;
+	}
+
+	public int getPrintableWidthForVVPAT() {
+		try{
+			if(_config.containsKey("PRINTABLE_WIDTH_FOR_VVPAT"))
+				return Integer.parseInt(_config.get("PRINTABLE_WIDTH_FOR_VVPAT"));
+		}catch(NumberFormatException e){}
+		
+		return PRINTABLE_WIDTH_FOR_VVPAT;
 	}
 	
     /**

@@ -23,6 +23,9 @@
 package votebox.middle.datacollection;
 
 import java.awt.BorderLayout;
+
+import javax.print.PrintService;
+import javax.print.attribute.standard.PrinterName;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
@@ -36,6 +39,9 @@ import javax.swing.filechooser.FileFilter;
 
 import java.awt.GridBagConstraints;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import javax.swing.JCheckBox;
 
@@ -74,6 +80,12 @@ public class LauncherView extends JFrame {
 	private JCheckBox debugCheckBox = null;
 
 	private JLabel debugLabel = null;
+	
+	private JTextField vvpatField = null;
+	
+	private JLabel vvpatLabel = null;
+	
+	private JButton vvpatBrowseButton = null;
 
 	/**
 	 * This is the default constructor
@@ -141,7 +153,8 @@ public class LauncherView extends JFrame {
 							.launch(getBallotLocationField().getText(),
 									getDirectoryField().getText(),
 									getFilenameField().getText(),
-									getDebugCheckBox().isSelected());
+									getDebugCheckBox().isSelected(),
+									getVVPATField().getText());
 				}
 			});
 		}
@@ -155,16 +168,31 @@ public class LauncherView extends JFrame {
 	 */
 	private JPanel getCenterPanel() {
 		if (centerPanel == null) {
+			GridBagConstraints gridBagConstraintsVL = new GridBagConstraints();
+			gridBagConstraintsVL.gridx = 0;
+			gridBagConstraintsVL.anchor = GridBagConstraints.WEST;
+			gridBagConstraintsVL.gridy = 3;
+			vvpatLabel = new JLabel();
+			vvpatLabel.setText("VVPAT Printer Name:");
+			GridBagConstraints gridBagConstraintsV = new GridBagConstraints();
+			gridBagConstraintsV.fill = GridBagConstraints.BOTH;
+			gridBagConstraintsV.gridx = 1;
+			gridBagConstraintsV.anchor = GridBagConstraints.WEST;
+			gridBagConstraintsV.gridy = 3;
+			GridBagConstraints gridBagConstraintsVB = new GridBagConstraints();
+			gridBagConstraintsVB.gridx = 2;
+			gridBagConstraintsVB.gridy = 3;
+			
 			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
 			gridBagConstraints22.gridx = 0;
 			gridBagConstraints22.anchor = GridBagConstraints.WEST;
-			gridBagConstraints22.gridy = 3;
+			gridBagConstraints22.gridy = 4;
 			debugLabel = new JLabel();
 			debugLabel.setText("Windowed instead of full-screen:");
 			GridBagConstraints gridBagConstraints12 = new GridBagConstraints();
 			gridBagConstraints12.gridx = 1;
 			gridBagConstraints12.anchor = GridBagConstraints.WEST;
-			gridBagConstraints12.gridy = 3;
+			gridBagConstraints12.gridy = 4;
 			GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
 			gridBagConstraints31.gridx = 0;
 			gridBagConstraints31.anchor = GridBagConstraints.WEST;
@@ -224,10 +252,47 @@ public class LauncherView extends JFrame {
 			centerPanel.add(ballotLabel, gridBagConstraints31);
 			centerPanel.add(getDebugCheckBox(), gridBagConstraints12);
 			centerPanel.add(debugLabel, gridBagConstraints22);
+			centerPanel.add(vvpatLabel, gridBagConstraintsVL);
+			centerPanel.add(getVVPATField(), gridBagConstraintsV);
+			centerPanel.add(getVVPATBrowseButton(), gridBagConstraintsVB);
 		}
 		return centerPanel;
 	}
 
+	private JButton getVVPATBrowseButton(){
+		if(vvpatBrowseButton == null){
+			vvpatBrowseButton = new JButton("Find Printer");
+			vvpatBrowseButton.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					PrinterJob job = PrinterJob.getPrinterJob();
+					
+					boolean accepted = job.printDialog();
+					
+					if(!accepted) return;
+					
+					PrintService service = job.getPrintService();
+					vvpatField.setText(""+service.getAttribute(PrinterName.class).getValue());
+				}
+			});
+		}
+		
+		return vvpatBrowseButton;
+	}
+	
+	/**
+	 * This method initializes vvpatField.
+	 * 
+	 * @return javax.swing.JTextField
+	 */
+	private JTextField getVVPATField(){
+		if(vvpatField == null){
+			vvpatField = new JTextField();
+			vvpatField.setEditable(false);
+		}
+		
+		return vvpatField;
+	}
+	
 	/**
 	 * This method initializes directoryField
 	 * 

@@ -9,9 +9,12 @@
 	<taskdef name="preprocess" classname="ant.PreProcessorTask"/>
 	<typedef name="define" classname="ant.Define"/>
 	<typedef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+	
+	<!--
 	<taskdef name="doxygen" classname="org.doxygen.tools.DoxygenTask"/>
 	<taskdef classpath="orangevolt-ant-tasks-1.3.8.jar" resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 	<taskdef name="license" classname="ant.LicenseTask"/>
+	-->
 	
 	<property name="src" 		location="." />
 

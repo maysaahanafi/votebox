@@ -59,6 +59,47 @@ public class BallotImageHelper {
 	}
 	
 	/**
+	 * Loads the VVPAT ready files from the ballot.
+	 * 
+	 * @param ballotFile - the ballot file
+	 * @return a map of "image-id" (L**, B**, etc.) to vvpat ready images.
+	 */
+	public static Map<String, Image> loadImagesForVVPAT(File ballotFile){
+		return loadImagesForVVPAT(ballotFile.getAbsolutePath());
+	}
+	
+	/**
+	 * Loads the VVPAT ready files from the ballot.
+	 * 
+	 * @param ballotPath - the path to the ballot file
+	 * @return a map of "image-id" (L**, B**, etc.) to vvpat ready images.
+	 */
+	public static Map<String, Image> loadImagesForVVPAT(String ballotPath){
+		Map<String, Image> vvpatMap = new HashMap<String, Image>();
+		try{
+			ZipFile file = new ZipFile(ballotPath);
+			Enumeration<? extends ZipEntry> entries = file.entries();
+			
+			while(entries.hasMoreElements()){
+				ZipEntry entry = entries.nextElement();
+				
+				if(entry.getName().endsWith(".png") && entry.getName().contains("/vvpat/")){
+					String id = entry.getName();
+					id = id.substring(id.lastIndexOf("/vvpat/")+ 7);
+					id = id.substring(0, id.indexOf("_"));
+					
+					vvpatMap.put(id, ImageIO.read(file.getInputStream(entry)));
+				}
+			}
+		}catch(Exception e){
+			System.out.println("BallotImageHelper ERROR: "+e.getMessage());
+			return null;
+		}
+		
+		return vvpatMap;
+	}
+	
+	/**
 	 * Loads a map of "race-id" to "title label" from a ballot.
 	 * 
 	 * @param ballotPath - path to the ballot file
@@ -80,6 +121,9 @@ public class BallotImageHelper {
 						for(SelectableCardElement element : card.getElements()){
 							titleMap.put(element.getUniqueID(), labelImg);
 						}//for
+						
+						//So a lookup on the CARD will get the title image
+						titleMap.put(card.getUniqueID(), labelImg);
 					}//if
 				}catch(IncorrectTypeException e){
 					//Fail silently, and move on
@@ -103,6 +147,7 @@ public class BallotImageHelper {
 	 * Loads the image associated with the given label uid.
 	 * 
 	 * @param label - string in the form L??, as a valid uid.
+	 * @param ballot - the path to the ballot file
 	 * @return the corresponding image.
 	 */
 	private static Image loadLabel(String label, String ballot) {

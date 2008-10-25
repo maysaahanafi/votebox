@@ -150,4 +150,29 @@ public interface IAuditoriumParams {
      * @return the ballot file to be used for images by the challenge web server (if not specified on the command line).
      */
     public String getChallengeBallotFile();
+    
+    /**
+     * @return the name of the VVPAT printer to use, if any
+     */
+    public String getPrinterForVVPAT();
+    
+    /**
+     * @return the width of the page (in 1/72nds of an inch) in use on the VVPAT printer.
+     */
+    public int getPaperWidthForVVPAT();
+    
+    /**
+     * @return the height of the page (in 1/72nds of an inch) in use on the VVPAT printer.
+     */
+    public int getPaperHeightForVVPAT();
+    
+    /**
+     * @return the width of the printable area (in 1/72nds of an inch) of the page on the VVPAT printer.
+     */
+    public int getPrintableWidthForVVPAT();
+    
+    /**
+     * @return the height of the printable area (in 1/72nds of an inch) of the page on the VVPAT printer.
+     */
+    public int getPrintableHeightForVVPAT();
 }

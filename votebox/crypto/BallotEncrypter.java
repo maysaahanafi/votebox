@@ -30,9 +30,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.uconn.cse.adder.AdderInteger;
+import edu.uconn.cse.adder.Polynomial;
+import edu.uconn.cse.adder.PublicKey;
+import edu.uconn.cse.adder.Vote;
+import edu.uconn.cse.adder.VoteProof;
+
 import auditorium.Key;
 
 import sexpression.*;
+import votebox.crypto.interop.Converter;
 import votebox.middle.IBallotVars;
 import votebox.middle.ballot.*;
 
@@ -46,6 +53,36 @@ public class BallotEncrypter {
     private BallotEncrypter() {
     }
 
+    /**
+     * Take an unenctyped ballot and make it encrypted, while also generating a NIZK.
+     * 
+     * @param ballot 
+     *          This is the pre-encrypt ballot in the form ((race-id counter) ...)
+     * @param publicKey
+     *          this is an Adder-style public key
+     * @return An ListExpression of the form ([vote] [proof])
+     */
+    public ListExpression encryptWithProof(ListExpression ballot, PublicKey pubKey){
+    	List<AdderInteger> choices = new ArrayList<AdderInteger>();
+    	
+    	for(int i = 0; i < ballot.size(); i++){
+    		ListExpression choice = (ListExpression)ballot.get(i);
+    		choices.add(new AdderInteger(new Integer(choice.get(1).toString())));
+    	}//for
+    	
+    	Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
+    	PublicKey finalPubKey = new PublicKey(pubKey.getP(), pubKey.getG(),
+    			(new AdderInteger(AdderInteger.ONE, pubKey.getP())).multiply(
+    					pubKey.getG().pow(poly.evaluate(new AdderInteger(AdderInteger.ZERO, pubKey.getQ())))), pubKey.getF());
+    	
+    	Vote vote = finalPubKey.encrypt(choices);
+    	VoteProof proof = new VoteProof();
+    	//This may need to be (....., 1, 1); docs are ambiguous
+    	proof.compute(vote, pubKey, choices, 0, 1);
+    	
+    	return new ListExpression(Converter.toSExpression(vote), Converter.toSExpression(proof));
+    }
+    
     /**
      * Take an unencrypted ballot form and make it encrypted.
      * 

@@ -258,6 +258,20 @@ public abstract class ALayoutManager implements ILayoutManager {
                                 + "_1_" + langShortName + ".png"));
                         ImageIO.write(img, "png", new File(location + uid
                                 + "_focused_1_" + langShortName + ".png"));
+                        
+                        /**
+                         * Renders the VVPAT equivalent of the review button.
+                         */
+                        BufferedImage smaller = getImageVisitor().forVVPATReviewButton(rb);
+                        File file = new File(location);
+                        file = new File(file, "vvpat");
+                        if(!file.exists())
+                        	file.mkdirs();
+                        
+                        file = new File(file, uid+"_"+langShortName+".png");
+                        
+                        ImageIO.write(smaller, "png", file);
+                        
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -323,6 +337,10 @@ public abstract class ALayoutManager implements ILayoutManager {
                     tb.execute(this);
                 return null;
             }
+
+			public Void forVVPATReviewButton(ReviewButton rb, Object... param) {
+				throw new RuntimeException("VVPAT Review Button cannot be generated at this time.");
+			}
         };
         final int totalIDs = nextUID;
         int graphicsDrawn = 0;

@@ -22,18 +22,34 @@
 
 package votebox;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.print.PrintService;
+import javax.print.attribute.standard.PrinterName;
 import javax.swing.Timer;
 
 import sexpression.*;
+import tap.BallotImageHelper;
 import votebox.crypto.*;
 import votebox.events.*;
 import votebox.middle.*;
@@ -75,6 +91,8 @@ public class VoteBox {
     private int pageBeforeOverride;
     private Timer killVBTimer;
     private Timer statusTimer;
+    
+    private File _currentBallotFile;
     
     /**
      * Equivalent to new VoteBox(-1).
@@ -217,6 +235,8 @@ public class VoteBox {
                             BallotEncrypter.SINGLETON.getRecentRandom()));
 
                     BallotEncrypter.SINGLETON.clear();
+                    
+                    //printBallotSpoiled();
                 }
             });
         	
@@ -246,6 +266,8 @@ public class VoteBox {
 						auditorium.announce(new CommitBallotEvent(mySerial,
 								StringExpression.makeString(nonce),
 								BallotEncrypter.SINGLETON.encrypt(ballot, _constants.getKeyStore().loadKey("public"))));
+						
+						//printCommittedBallot(ballot);
 					} catch (AuditoriumCryptoException e) {
 						Bugout.err("Crypto error trying to commit ballot: "+e.getMessage());
 						e.printStackTrace();
@@ -278,6 +300,8 @@ public class VoteBox {
         					StringExpression.makeString(nonce)));
         			
         			BallotEncrypter.SINGLETON.clear();
+        			
+        			//printBallotCastConfirmation();
 				}
         		
         	});
@@ -323,6 +347,9 @@ public class VoteBox {
         			}
 
         			BallotEncrypter.SINGLETON.clear();
+        			
+        			//printCommittedBallot((ListExpression)arg);
+        			//printBallotCastConfirmation();
         		}
         	});
         }//if
@@ -344,6 +371,8 @@ public class VoteBox {
                             override = false;
                             broadcastStatus();
                             inactiveUI.setVisible(true);
+                            
+                            //printBallotSpoiled();
                         } else
                             throw new RuntimeException(
                                     "Received an override-cancel-confirm event at the incorrect time");
@@ -388,6 +417,8 @@ public class VoteBox {
                     override = false;
                     broadcastStatus();
                     inactiveUI.setVisible(true);
+                    
+                    //printBallotCastConfirmation();
                 } else
                     throw new RuntimeException(
                             "Received an override-cast-confirm event at the incorrect time");
@@ -412,8 +443,189 @@ public class VoteBox {
             }
         });
     }
+    
+    /**
+     * If a VVPAT is connected,
+     *   print a message indicating that this ballot is "spoiled" and will not be counted."
+     */
+    /*protected void printBallotSpoiled() {
+    	
+    	//TODO: Change this to use prerendered images (pulled from ballot, probably) rather than bringing Java font rendering code into
+    	//      VoteBox
+		Printable spoiled = new Printable(){
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+				if(pageIndex != 0) return Printable.NO_SUCH_PAGE;
+				
+				String text = "BALLOT SPOILED";
+				FontRenderContext context = new FontRenderContext(new AffineTransform(), false, true);
+				
+				Rectangle2D bounds = graphics.getFont().getStringBounds(text, context);
+				
+				while(bounds.getWidth() < pageFormat.getImageableWidth()){
+					text = "*" + text+ "*";
+					bounds = graphics.getFont().getStringBounds(text, context);
+				}
+				
+				graphics.drawString(text, (int)pageFormat.getImageableX(), (int)bounds.getHeight());
+				
+				return Printable.PAGE_EXISTS;
+			}
+		};
+		
+		printOnVVPAT(spoiled);
+	}*/
+
+	/**
+     * If a VVPAT is connected,
+     *   print a "confirmation" of the ballot being counted.
+     */
+    /*protected void printBallotCastConfirmation() {
+    	//TODO: Make this use prerendered elements instead of Font
+    	Printable confirmed = new Printable(){
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+				if(pageIndex != 0) return Printable.NO_SUCH_PAGE;
+				
+				String text = "--BALLOT CAST--";
+				FontRenderContext context = new FontRenderContext(new AffineTransform(), false, true);
+				
+				Rectangle2D bounds = graphics.getFont().getStringBounds(text, context);
+				
+				int x = (int)(pageFormat.getImageableWidth()/2  - bounds.getWidth() / 2);
+				
+				graphics.drawString(text, x + (int)pageFormat.getImageableX(), (int)bounds.getHeight());
+				
+				return Printable.PAGE_EXISTS;
+			}
+		};
+		
+		printOnVVPAT(confirmed);
+	}*/
 
     /**
+     * If a VVPAT is connected,
+     *   print the voter's choices.
+     *   
+     * @param ballot - the choices to print, in the form ((race-id choice) ...)
+     */
+	/*protected void printCommittedBallot(ListExpression ballot) {
+		final Map<String, Image> choiceToImage = BallotImageHelper.loadImagesForVVPAT(_currentBallotFile);
+		
+		final List<String> choices = new ArrayList<String>();
+		for(int i = 0; i < ballot.size(); i++){
+			ListExpression choice = (ListExpression)ballot.get(i);
+			if(choice.get(1).toString().equals("1"))
+				choices.add(choice.get(0).toString());
+		}
+		
+		int totalSize = 0;
+		for(int i = 0; i < choices.size(); i++)
+			totalSize += choiceToImage.get(choices.get(i)).getHeight(null);
+		
+		final int fTotalSize = totalSize;
+		
+		Printable printedBallot = new Printable(){
+
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+				int numPages = fTotalSize / (int)pageFormat.getImageableHeight();
+				if(fTotalSize % (int)pageFormat.getImageableHeight() != 0)
+					numPages++;
+				
+				if(pageIndex >= numPages)
+					return Printable.NO_SUCH_PAGE;
+				
+				int choiceIndex = 0;
+				int totalSize = 0;
+				while(pageIndex != 0){
+					totalSize += choiceToImage.get(choices.get(choiceIndex)).getHeight(null);
+					
+					if(totalSize > pageFormat.getImageableHeight()){
+						totalSize = 0;
+						choiceIndex--;
+						pageIndex--;
+					}
+					
+					choiceIndex++;
+				}
+				
+				totalSize = 0;
+				while(totalSize < pageFormat.getImageableHeight() && choiceIndex < choices.size()){
+					Image img = choiceToImage.get(choices.get(choiceIndex));
+					
+					graphics.drawImage(img,
+							(int)pageFormat.getImageableX(),
+							totalSize,
+							null);
+					
+					totalSize += img.getHeight(null);
+					choiceIndex++;
+				}
+				
+				return Printable.PAGE_EXISTS;
+			}
+			
+		};
+		
+		printOnVVPAT(printedBallot);
+	}*/
+
+	/**
+	 * Prints onto the attached VVPAT printer, if possible.
+	 * @param print - the Printable to print.
+	 */
+	/*protected void printOnVVPAT(Printable toPrint){
+		//VVPAT not ready
+		if(_constants.getPrinterForVVPAT().equals("")) return;
+		
+		PrintService[] printers = PrinterJob.lookupPrintServices();
+		
+		PrintService vvpat = null;
+		
+		for(PrintService printer : printers){
+			PrinterName name = printer.getAttribute(PrinterName.class);
+			if(name.getValue().equals(_constants.getPrinterForVVPAT())){
+				vvpat = printer;
+				break;
+			}//if
+		}//for
+		
+		if(vvpat == null){
+			Bugout.msg("VVPAT is configured, but not detected as ready.");
+			return;
+		}
+		
+		PrinterJob job = PrinterJob.getPrinterJob();
+		
+		try {
+			job.setPrintService(vvpat);
+		} catch (PrinterException e) {
+			Bugout.err("VVPAT printing failed: "+e.getMessage());
+			return;
+		}
+		
+		Paper paper = new Paper();
+		paper.setSize(_constants.getPaperWidthForVVPAT(), _constants.getPaperHeightForVVPAT());
+		
+		int imageableWidth = _constants.getPrintableWidthForVVPAT();
+		int imageableHeight = _constants.getPrintableHeightForVVPAT();
+		
+		int leftInset = (_constants.getPaperWidthForVVPAT() - _constants.getPrintableWidthForVVPAT()) / 2;
+		int topInset = (_constants.getPaperHeightForVVPAT() - _constants.getPrintableHeightForVVPAT()) / 2;
+		
+		paper.setImageableArea(leftInset, topInset, imageableWidth, imageableHeight);
+		PageFormat pageFormat = new PageFormat();
+		pageFormat.setPaper(paper);
+		
+		job.setPrintable(toPrint, pageFormat);
+		
+		try {
+			job.print();
+		} catch (PrinterException e) {
+			Bugout.err("VVPAT printing failed: "+e.getMessage());
+			return;
+		}
+	}*/
+	
+	/**
      * Starts Auditorium, registers the listener, and connects to the network.
      */
     public void start() {
@@ -440,8 +652,7 @@ public class VoteBox {
         }
 
         auditorium.addListener(new VoteBoxEventListener() {
-
-        	public void ballotCounted(BallotCountedEvent e){
+			public void ballotCounted(BallotCountedEvent e){
         		if (e.getNode() == mySerial
                         && Arrays.equals(e.getNonce(), nonce)) {
                     if (!finishedVoting)
@@ -540,7 +751,9 @@ public class VoteBox {
                     path.mkdirs();
                     
                     try {
-                        FileOutputStream fout = new FileOutputStream(new File(path, "ballot.zip"));
+                    	_currentBallotFile = new File(path, "ballot.zip");
+                    	
+                        FileOutputStream fout = new FileOutputStream(_currentBallotFile);
                         byte[] ballot = e.getBallot();
                         fout.write(ballot);
                         
