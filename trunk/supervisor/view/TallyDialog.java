@@ -23,6 +23,7 @@
 package supervisor.view;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -206,8 +207,15 @@ public class TallyDialog extends JDialog {
 					return panel;
 				}//if
 				
-				if(value != null && value instanceof Image)
-					return new JLabel(new ImageIcon((Image)value));
+				if(value != null && value instanceof Image){
+					Image img = (Image)value;
+					
+					JLabel label = new JLabel(new ImageIcon(img));
+					
+					label.setMinimumSize(new Dimension(img.getWidth(null), img.getHeight(null)));
+					
+					return label;
+				}//if
 				
 				return new JLabel(""+value);
 			}//getTreeCellRendererComponent

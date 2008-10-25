@@ -32,7 +32,11 @@ import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
+import auditorium.IAuditoriumParams;
+import auditorium.IKeyStore;
+
 import sexpression.ASExpression;
+import sexpression.ListExpression;
 import votebox.middle.driver.Driver;
 import votebox.middle.view.AWTViewFactory;
 
@@ -66,7 +70,7 @@ public class Launcher {
      * @param debug Passed to AWTViewFactory to determine windowed/fullscreen mode.
      */
     public void launch(final String ballotLocation, String logDir,
-			String logFilename, boolean debug) {
+			String logFilename, boolean debug, final String vvpat) {
 
 		// Unzip the ballot to a temporary directory
 		File baldir;
@@ -151,6 +155,135 @@ public class Launcher {
 		                // EVIL
 		                DataLogger.DumpBallot( (ASExpression)arg );
 		                //#endif
+		                
+		                Driver.printCommittedBallot(new IAuditoriumParams(){
+
+							public String getBroadcastAddress() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public boolean getCastBallotEncryptionEnabled() {
+								// TODO Auto-generated method stub
+								return false;
+							}
+
+							public String getChallengeBallotFile() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public int getChallengePort() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public int getDefaultSerialNumber() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public int getDiscoverPort() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public int getDiscoverReplyPort() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public int getDiscoverReplyTimeout() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public int getDiscoverTimeout() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public String getEloTouchScreenDevice() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public int getHttpPort() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public int getJoinTimeout() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public IKeyStore getKeyStore() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public int getListenPort() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							public String getLogLocation() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public int getPaperHeightForVVPAT() {
+								// TODO Auto-generated method stub
+								return 322;
+							}
+
+							public int getPaperWidthForVVPAT() {
+								// TODO Auto-generated method stub
+								return 249;
+							}
+
+							public int getPrintableHeightForVVPAT() {
+								// TODO Auto-generated method stub
+								return 312;
+							}
+
+							public int getPrintableWidthForVVPAT() {
+								// TODO Auto-generated method stub
+								return 239;
+							}
+
+							public String getPrinterForVVPAT() {
+								// TODO Auto-generated method stub
+								return vvpat;
+							}
+
+							public String getReportAddress() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public String getRuleFile() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							public boolean getUseCommitChallengeModel() {
+								// TODO Auto-generated method stub
+								return false;
+							}
+
+							public boolean getUseEloTouchScreen() {
+								// TODO Auto-generated method stub
+								return false;
+							}
+
+							public int getViewRestartTimeout() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+		                	
+		                }, (ListExpression)arg, new File(ballotLocation));
 		                
 		                vbcopy.getView().nextPage();
 		            }

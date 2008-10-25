@@ -61,6 +61,8 @@ public class TestParams implements IAuditoriumParams {
     public static final int DEFAULT_CHALLENGE_PORT = -1;
     public static final int DEFAULT_HTTP_PORT = 80;
     public static final String DEFAULT_BALLOT_FILE = "";
+    public static final String DEFAULT_PRINTER_FOR_VVPAT = "";
+    
 
     public String getBroadcastAddress() {
         return BROADCAST_ADDRESS;
@@ -140,5 +142,25 @@ public class TestParams implements IAuditoriumParams {
 	
 	public String getChallengeBallotFile(){
 		return DEFAULT_BALLOT_FILE;
+	}
+
+	public String getPrinterForVVPAT() {
+		return DEFAULT_PRINTER_FOR_VVPAT;
+	}
+
+	public int getPaperHeightForVVPAT() {
+		return 0;
+	}
+
+	public int getPaperWidthForVVPAT() {
+		return 0;
+	}
+
+	public int getPrintableHeightForVVPAT() {
+		return 0;
+	}
+
+	public int getPrintableWidthForVVPAT() {
+		return 0;
 	}
 }
