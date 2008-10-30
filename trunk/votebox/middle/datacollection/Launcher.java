@@ -147,16 +147,14 @@ public class Launcher {
 		new Thread(new Runnable() {
 
 			public void run() {
-		        // Register for the cast ballot event
-				vbcopy.run(new Observer() {
-		            public void update(Observable o, Object arg) {
-		            	
-		            	//#ifdef EVIL
-		                // EVIL
-		                DataLogger.DumpBallot( (ASExpression)arg );
-		                //#endif
-		                
-		                Driver.printCommittedBallot(new IAuditoriumParams(){
+		        // Register for the cast ballot event, and "review page encountered" event
+				vbcopy.run(new Observer(){
+					public void update(Observable o, Object arg){
+						System.out.println("Preparing to print");
+						
+						Object[] obj = (Object[])arg;
+						
+						Driver.printCommittedBallot(new IAuditoriumParams(){
 
 							public String getBroadcastAddress() {
 								// TODO Auto-generated method stub
@@ -282,13 +280,23 @@ public class Launcher {
 								// TODO Auto-generated method stub
 								return 0;
 							}
-		                	
-		                }, (ListExpression)arg, new File(ballotLocation));
-		                
-		                vbcopy.getView().nextPage();
-		            }
-		        });
-				_view.setRunning(false);
+
+						}, (ListExpression)obj[1], new File(ballotLocation));
+					}
+				},
+
+				new Observer() {
+					public void update(Observable o, Object arg) {
+
+						//#ifdef EVIL
+						// EVIL
+						DataLogger.DumpBallot( (ASExpression)arg );
+						//#endif
+
+						vbcopy.getView().nextPage();
+					}
+				});
+				_view.setRunning(true);
 			}
 		}).start();
 

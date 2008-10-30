@@ -53,6 +53,7 @@ import sexpression.ASExpression;
 import sexpression.ListExpression;
 import tap.BallotImageHelper;
 import votebox.middle.IBallotVars;
+import votebox.middle.IncorrectTypeException;
 import votebox.middle.Properties;
 import votebox.middle.ballot.Ballot;
 import votebox.middle.ballot.BallotParser;
@@ -139,7 +140,6 @@ public class Driver {
 		public int numSelections() {
 			return _ballot.getNumSelections();
 		}
-
 	};
 
 	public Driver(String path, IViewFactory factory, boolean encryptionEnabled) {
@@ -148,7 +148,7 @@ public class Driver {
 		_encryptionEnabled = encryptionEnabled;
 	}
 
-	public void run(Observer castBallotObserver) {
+	public void run(Observer reviewScreenObserver, Observer castBallotObserver) {
 		IBallotVars vars;
 		try {
 			vars = new GlobalVarsReader(_path).parse();
@@ -173,11 +173,14 @@ public class Driver {
 		if(castBallotObserver != null)
 			_view.registerForCastBallot(castBallotObserver);
 		
+		if(reviewScreenObserver != null)
+			_view.registerForReview(reviewScreenObserver);
+		
 		_view.run();
 	}
 	
 	public void run(){
-		run(null);
+		run(null, null);
 	}
 
 	public void kill() {
@@ -211,16 +214,22 @@ public class Driver {
 		final List<String> choices = new ArrayList<String>();
 		for(int i = 0; i < ballot.size(); i++){
 			ListExpression choice = (ListExpression)ballot.get(i);
-			//System.out.println("\tchoice "+i+": "+choice);
+		    System.out.println("\tchoice "+i+": "+choice);
 			
-			if(choice.size() != 2)
+			if(choice.size() != 2){
+				choices.add(choice.get(0).toString());
 				continue;
+			}
 			
-			if(!(choice.get(1) instanceof ListExpression))
+			if(!(choice.get(1) instanceof ListExpression)){
+				choices.add(choice.get(0).toString());
 				continue;
+			}//if
 			
-			if(((ListExpression)choice.get(1)).size() < 1)
+			if(((ListExpression)choice.get(1)).size() < 1){
+				choices.add(choice.get(0).toString());
 				continue;
+			}//if
 			
 			if(((ListExpression)choice.get(1)).get(0).toString().trim().length() > 0)
 				choices.add(((ListExpression)choice.get(1)).get(0).toString());

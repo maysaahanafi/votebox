@@ -39,6 +39,11 @@ import preptool.model.XMLTools;
 public class Page {
 
 	/**
+	 * Indiciates whether or not a page is a review screen.
+	 */
+	private boolean isReviewPage = false;
+	
+	/**
 	 * The array of components on this Page
 	 */
 	private ArrayList<ALayoutComponent> components;
@@ -98,6 +103,14 @@ public class Page {
 			Element compElt = comp.toXML(doc);
 			pageElt.appendChild(compElt);
 		}
+		
+		if(isReviewPage)
+			XMLTools.addProperty(doc, pageElt, "IsReviewPage", "String", "yes");
+		
 		return pageElt;
+	}
+
+	public void markAsReviewPage() {
+		isReviewPage = true;
 	}
 }

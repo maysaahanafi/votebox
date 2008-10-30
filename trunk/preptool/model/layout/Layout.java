@@ -23,6 +23,7 @@
 package preptool.model.layout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 import org.w3c.dom.Document;
@@ -57,7 +58,7 @@ public class Layout {
      * The page number of the challenge-response page
      */
     private int responsePage;
-
+    
 	/**
 	 * Constructs a blank layout with an empty list of Pages
 	 */
@@ -124,11 +125,11 @@ public class Layout {
         XMLTools.addProperty(doc, layoutElt, "OverrideCancelPage", "Integer", overrideCancelPage);
         XMLTools.addProperty(doc, layoutElt, "OverrideCastPage", "Integer", overrideCastPage);
         XMLTools.addProperty(doc, layoutElt, "ResponsePage", "Integer", responsePage);
+        
 		for (Page p : pages) {
 			Element pageElt = p.toXML(doc);
 			layoutElt.appendChild(pageElt);
 		}
 		return layoutElt;
 	}
-
 }
