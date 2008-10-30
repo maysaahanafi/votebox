@@ -101,6 +101,15 @@ public class RenderPage {
     }
 
     /**
+     * Accessor for this RenderPage's properties.
+     * 
+     * @return properties for this RenderPage
+     */
+    public Properties getProperties(){
+    	return _properties;
+    }
+    
+    /**
      * Set the parent pointer on all the children.
      */
     private void setChildren() {

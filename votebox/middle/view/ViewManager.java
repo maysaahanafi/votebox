@@ -59,6 +59,7 @@ public class ViewManager implements IViewManager {
     private final ObservableEvent _overrideCancelDeny;
     private final ObservableEvent _overrideCastConfirm;
     private final ObservableEvent _overrideCastDeny;
+    private final ObservableEvent _reviewScreenEncountered;
 
     private IFocusable _currentFocusedElement = null;
     private Layout _layout = null;
@@ -101,6 +102,7 @@ public class ViewManager implements IViewManager {
         _overrideCancelDeny = new ObservableEvent();
         _overrideCastConfirm = new ObservableEvent();
         _overrideCastDeny = new ObservableEvent();
+        _reviewScreenEncountered = new ObservableEvent();
 
         registerQueues();
         setMediaSizes();
@@ -145,6 +147,23 @@ public class ViewManager implements IViewManager {
         _layout.initFromViewManager( _page, this, _ballotLookupAdapter,
         		_ballotAdapter, _factory, _variables );
         _layout.draw( pagenum, _view );
+        
+        try{
+        	String isReviewPage = _layout.getPages().get(pagenum).getProperties().getString("IsReviewPage"); 
+
+        	System.out.println("Properties:");
+        	System.out.println("\t"+_layout.getPages().get(pagenum).getProperties());
+        	
+        	if(isReviewPage != null)
+        		System.out.println("\t\t"+isReviewPage);
+        	
+        	if(isReviewPage != null && isReviewPage.equals("yes")){
+        		System.out.println("Notifying observers...");
+        		_reviewScreenEncountered.notifyObservers(new Object[]{pagenum, _ballotLookupAdapter.getCastBallot()});
+        	}//if
+        }catch(IncorrectTypeException e){
+        	e.printStackTrace();
+        }
     }
 
     /**
@@ -780,4 +799,14 @@ public class ViewManager implements IViewManager {
             }
         }
     }
+
+    /**
+     * Regsters an observer for when a review screen is encountered.
+     * 
+     * @param reviewScreenObserver - observer to register
+     */
+	public void registerForReview(Observer reviewScreenObserver) {
+		System.out.println("Registering for Review...");
+		_reviewScreenEncountered.addObserver(reviewScreenObserver);
+	}
 }

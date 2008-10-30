@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.GridBagConstraints;
@@ -36,6 +37,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -676,36 +678,24 @@ public class PsychLayoutManager extends ALayoutManager {
 		public BufferedImage forVVPATReviewButton(ReviewButton rb, Boolean... param) {
 			int size = 1;
             int fontsize = (int) ((size + 1) * (VVPAT_FONT_SIZE_MULTIPLE - 1)) - 2;
-
+            
             BufferedImage buttonImg = RenderingUtils.renderButton(
 				rb.getText(), fontsize, rb.isBold(), rb.isBoxed(),
 				VVPAT_CAND_WIDTH,
 				rb.getBackgroundColor());
             
-			// render party information [dsandler]
-			/*String aux = rb.getAuxText();
-			if (aux != null && REVIEW_SCREEN_SHOW_PARTY && !aux.equals("")) {
-				if (REVIEW_SCREEN_PARENTHESIZE_PARTY) 
-					aux = "(" + aux + ")";
+            BufferedImage xImg = RenderingUtils.renderButton("[X]", fontsize, false, false, 25, rb.getBackgroundColor());
+            
+            BufferedImage textPlusX = new BufferedImage(buttonImg.getWidth() + xImg.getWidth() + 10, 
+            		(int)Math.max(buttonImg.getHeight(), xImg.getHeight()), BufferedImage.TYPE_INT_ARGB);
+            
+            Graphics g = textPlusX.getGraphics();
+            g.setColor(rb.getBackgroundColor());
+            g.fillRect(0, 0, textPlusX.getWidth(), textPlusX.getHeight());
+            g.drawImage(xImg, 0, textPlusX.getHeight()/2 - xImg.getHeight()/2, null);
+            g.drawImage(buttonImg, xImg.getWidth() + 10, textPlusX.getHeight()/2 - buttonImg.getHeight()/2, null);
 
-				Graphics2D graf = buttonImg.createGraphics();
-				graf.setRenderingHint(
-					RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				
-				Font font = new Font(RenderingUtils.FONT_NAME, Font.PLAIN, fontsize);
-				graf.setFont(font);
-				graf.setColor(Color.BLACK);
-
-				Rectangle2D partyTextBounds = font.getStringBounds(aux,
-						new FontRenderContext(null, true, true));
-
-				// draw it right-aligned
-				graf.drawString(aux,
-					(int)(buttonImg.getWidth() - partyTextBounds.getWidth() - 10), 
-					(int)(partyTextBounds.getHeight() + 8));
-			}*/
-
-			return buttonImg;
+			return textPlusX;
 		}
     };
 
@@ -1110,7 +1100,13 @@ public class PsychLayoutManager extends ALayoutManager {
             layout.getPages().addAll(
                     makeCardLayoutPage(card, true, reviewPageNum + currentReviewPage, 0, 0));
         }
-        layout.getPages().addAll(reviewPageNum, makeReviewPage(ballot, pageTargets));
+        
+        List<Page> reviewPages = makeReviewPage(ballot, pageTargets);
+        
+        layout.getPages().addAll(reviewPageNum, reviewPages);
+        
+        for(Page reviewPage : reviewPages)
+        	reviewPage.markAsReviewPage();
         
         layout.getPages().add(reviewPageNum + (ballot.getCards().size() / CARDS_PER_REVIEW_PAGE) + 1, makeCastPage());
         
@@ -1130,7 +1126,7 @@ public class PsychLayoutManager extends ALayoutManager {
         	layout.getPages().add(makeResponsePage());
         	layout.setReponsePage(layout.getPages().size()-1);
         }
-
+        
         return layout;
     }
 

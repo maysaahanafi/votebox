@@ -431,4 +431,12 @@ public class Properties {
     public int size() {
         return _properties.size();
     }
+    
+    /**
+     * For debuging purposes, a meaningful toString().
+     * @return String representation of this Properties object.
+     */
+    public String toString(){
+    	return _properties.toString();
+    }
 }
