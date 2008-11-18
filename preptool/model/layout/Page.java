@@ -49,6 +49,11 @@ public class Page {
 	private ArrayList<ALayoutComponent> components;
 
 	/**
+	 * The title component on this Page
+	 */
+	private ALayoutComponent title;
+	
+	/**
 	 * Unique ID of the background label (if any)
 	 */
 	private String backgroundLabel = "";
@@ -67,6 +72,8 @@ public class Page {
 		return backgroundLabel;
 	}
 
+	
+	
 	/**
 	 * @return the list of components
 	 */
@@ -112,5 +119,13 @@ public class Page {
 
 	public void markAsReviewPage() {
 		isReviewPage = true;
+	}
+	
+	public void setTitle(ALayoutComponent title){
+		this.title = title;
+	}
+	
+	public ALayoutComponent getTitle(){
+		return title;
 	}
 }

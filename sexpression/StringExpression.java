@@ -239,4 +239,15 @@ public class StringExpression extends ASExpression {
     public void finalize() {
         _interned.remove(new BytesBox(_bytes));
     }
+    
+    /**
+     * 
+     */
+    @Override
+    public boolean equals(Object o){
+    	if(!(o instanceof StringExpression))
+    		return false;
+    	
+    	return toString().equals(o.toString());
+    }
 }

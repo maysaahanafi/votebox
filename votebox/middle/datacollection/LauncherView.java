@@ -154,7 +154,11 @@ public class LauncherView extends JFrame {
 									getDirectoryField().getText(),
 									getFilenameField().getText(),
 									getDebugCheckBox().isSelected(),
-									getVVPATField().getText());
+									getVVPATField().getText(),
+									200,
+									310,
+									190,
+									300);
 				}
 			});
 		}

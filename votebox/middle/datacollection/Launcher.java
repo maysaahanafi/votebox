@@ -70,7 +70,8 @@ public class Launcher {
      * @param debug Passed to AWTViewFactory to determine windowed/fullscreen mode.
      */
     public void launch(final String ballotLocation, String logDir,
-			String logFilename, boolean debug, final String vvpat) {
+			String logFilename, boolean debug, final String vvpat, final int vvpatWidth,
+			final int vvpatHeight, final int printableWidth, final int printableHeight) {
 
 		// Unzip the ballot to a temporary directory
 		File baldir;
@@ -147,141 +148,164 @@ public class Launcher {
 		new Thread(new Runnable() {
 
 			public void run() {
+				
+				final IAuditoriumParams constants = new IAuditoriumParams(){
+
+					public String getBroadcastAddress() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public boolean getCastBallotEncryptionEnabled() {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					public String getChallengeBallotFile() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public int getChallengePort() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public int getDefaultSerialNumber() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public int getDiscoverPort() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public int getDiscoverReplyPort() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public int getDiscoverReplyTimeout() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public int getDiscoverTimeout() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public String getEloTouchScreenDevice() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public int getHttpPort() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public int getJoinTimeout() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public IKeyStore getKeyStore() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public int getListenPort() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					public String getLogLocation() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public int getPaperHeightForVVPAT() {
+						// TODO Auto-generated method stub
+						return vvpatHeight;
+					}
+
+					public int getPaperWidthForVVPAT() {
+						// TODO Auto-generated method stub
+						return vvpatWidth;
+					}
+
+					public int getPrintableHeightForVVPAT() {
+						// TODO Auto-generated method stub
+						return printableHeight;
+					}
+
+					public int getPrintableWidthForVVPAT() {
+						// TODO Auto-generated method stub
+						return printableWidth;
+					}
+
+					public String getPrinterForVVPAT() {
+						// TODO Auto-generated method stub
+						return vvpat;
+					}
+
+					public String getReportAddress() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public String getRuleFile() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+
+					public boolean getUseCommitChallengeModel() {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					public boolean getUseEloTouchScreen() {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					public int getViewRestartTimeout() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+				};
+				
 		        // Register for the cast ballot event, and "review page encountered" event
 				vbcopy.run(new Observer(){
+					ListExpression _lastSeenBallot = null;
+					
 					public void update(Observable o, Object arg){
 						System.out.println("Preparing to print");
 						
 						Object[] obj = (Object[])arg;
 						
-						Driver.printCommittedBallot(new IAuditoriumParams(){
+						ListExpression ballot = (ListExpression)obj[1];
+						
+						boolean reject = !ballot.toString().equals(""+_lastSeenBallot); 
+						
+						
+						try{
+							if(reject)
+								System.out.println("Reject: "+reject+"\nlastBallot: ["+_lastSeenBallot+"]\nthisBallot: ["+ballot+"]");
 
-							public String getBroadcastAddress() {
-								// TODO Auto-generated method stub
-								return null;
+							if(reject){
+								if(_lastSeenBallot != null)
+									Driver.printBallotRejected(constants, new File(ballotLocation));
+
+								Driver.printCommittedBallot(constants, ballot, new File(ballotLocation));
 							}
-
-							public boolean getCastBallotEncryptionEnabled() {
-								// TODO Auto-generated method stub
-								return false;
-							}
-
-							public String getChallengeBallotFile() {
-								// TODO Auto-generated method stub
-								return null;
-							}
-
-							public int getChallengePort() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public int getDefaultSerialNumber() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public int getDiscoverPort() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public int getDiscoverReplyPort() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public int getDiscoverReplyTimeout() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public int getDiscoverTimeout() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public String getEloTouchScreenDevice() {
-								// TODO Auto-generated method stub
-								return null;
-							}
-
-							public int getHttpPort() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public int getJoinTimeout() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public IKeyStore getKeyStore() {
-								// TODO Auto-generated method stub
-								return null;
-							}
-
-							public int getListenPort() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-							public String getLogLocation() {
-								// TODO Auto-generated method stub
-								return null;
-							}
-
-							public int getPaperHeightForVVPAT() {
-								// TODO Auto-generated method stub
-								return 322;
-							}
-
-							public int getPaperWidthForVVPAT() {
-								// TODO Auto-generated method stub
-								return 249;
-							}
-
-							public int getPrintableHeightForVVPAT() {
-								// TODO Auto-generated method stub
-								return 312;
-							}
-
-							public int getPrintableWidthForVVPAT() {
-								// TODO Auto-generated method stub
-								return 239;
-							}
-
-							public String getPrinterForVVPAT() {
-								// TODO Auto-generated method stub
-								return vvpat;
-							}
-
-							public String getReportAddress() {
-								// TODO Auto-generated method stub
-								return null;
-							}
-
-							public String getRuleFile() {
-								// TODO Auto-generated method stub
-								return null;
-							}
-
-							public boolean getUseCommitChallengeModel() {
-								// TODO Auto-generated method stub
-								return false;
-							}
-
-							public boolean getUseEloTouchScreen() {
-								// TODO Auto-generated method stub
-								return false;
-							}
-
-							public int getViewRestartTimeout() {
-								// TODO Auto-generated method stub
-								return 0;
-							}
-
-						}, (ListExpression)obj[1], new File(ballotLocation));
+						}catch(Exception e){}
+						finally{
+							_lastSeenBallot = ballot;
+						}
 					}
 				},
 
@@ -292,6 +316,8 @@ public class Launcher {
 						// EVIL
 						DataLogger.DumpBallot( (ASExpression)arg );
 						//#endif
+						
+						Driver.printBallotAccepted(constants, new File(ballotLocation));
 
 						vbcopy.getView().nextPage();
 					}
