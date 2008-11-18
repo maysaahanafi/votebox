@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -43,9 +44,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.JCheckBox;
 
+import votebox.middle.ballot.Ballot;
+import votebox.middle.datacollection.evil.EvilObserver;
+import votebox.middle.datacollection.evil.Flip4CandidateTop;
+import votebox.middle.datacollection.evil.Flip4UndervoteTop;
+import votebox.middle.driver.IAdapter;
+
 public class LauncherView extends JFrame {
+	private static final String FLIP_NONE = "None";
+	private static final String FLIP_4_TO_CANDIDATE = "Flip random 4 in top 8 to candidate";
+	private static final String FLIP_4_TO_UNDERVOTE = "Flip random 4 in top 8 to undervote";
 
 	private static final long serialVersionUID = 1L;
 
@@ -87,6 +100,9 @@ public class LauncherView extends JFrame {
 	
 	private JButton vvpatBrowseButton = null;
 
+	private JLabel flipLabel = null;
+	private JComboBox flipField = null;
+	
 	/**
 	 * This is the default constructor
 	 */
@@ -102,7 +118,7 @@ public class LauncherView extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(618, 200);
+		this.setSize(618, 230);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setContentPane(getJContentPane());
 		this.setTitle("VoteBox Launcher");
@@ -158,13 +174,38 @@ public class LauncherView extends JFrame {
 									200,
 									310,
 									190,
-									300);
+									300,
+									getEvilObserver());
 				}
 			});
 		}
 		return launchButton;
 	}
 
+	private EvilObserver getEvilObserver(){
+		
+		String selection = (String)getFlipField().getSelectedItem();
+		EvilObserver obs = null;
+
+		obs = new EvilObserver(){
+			public void update(Observable o, Object arg) {}
+
+			public void setAdapter(IAdapter ballotAdapter, IAdapter viewAdapter, Ballot ballot) {}
+		};
+
+		//#ifdef EVIL
+		if(selection.equals(FLIP_4_TO_CANDIDATE)){
+			obs = new Flip4CandidateTop();
+		}
+
+		if(selection.equals(FLIP_4_TO_UNDERVOTE)){
+			obs = new Flip4UndervoteTop();
+		}
+		//#endif
+
+		return obs;
+	}
+	
 	/**
 	 * This method initializes centerPanel
 	 * 
@@ -187,16 +228,28 @@ public class LauncherView extends JFrame {
 			gridBagConstraintsVB.gridx = 2;
 			gridBagConstraintsVB.gridy = 3;
 			
+			flipLabel = new JLabel();
+			flipLabel.setText("\"Evil\" Flip Behavior:");
+			GridBagConstraints gridBagConstraintsFL = new GridBagConstraints();
+			gridBagConstraintsFL.gridx = 0;
+			gridBagConstraintsFL.gridy = 4;
+			gridBagConstraintsFL.anchor = GridBagConstraints.WEST;
+			GridBagConstraints gridBagConstraintsF = new GridBagConstraints();
+			gridBagConstraintsF.fill = GridBagConstraints.BOTH;
+			gridBagConstraintsF.gridx = 1;
+			gridBagConstraintsF.anchor = GridBagConstraints.EAST;
+			gridBagConstraintsF.gridy = 4;
+			
 			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
 			gridBagConstraints22.gridx = 0;
 			gridBagConstraints22.anchor = GridBagConstraints.WEST;
-			gridBagConstraints22.gridy = 4;
+			gridBagConstraints22.gridy = 5;
 			debugLabel = new JLabel();
 			debugLabel.setText("Windowed instead of full-screen:");
 			GridBagConstraints gridBagConstraints12 = new GridBagConstraints();
 			gridBagConstraints12.gridx = 1;
 			gridBagConstraints12.anchor = GridBagConstraints.WEST;
-			gridBagConstraints12.gridy = 4;
+			gridBagConstraints12.gridy = 5;
 			GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
 			gridBagConstraints31.gridx = 0;
 			gridBagConstraints31.anchor = GridBagConstraints.WEST;
@@ -259,10 +312,23 @@ public class LauncherView extends JFrame {
 			centerPanel.add(vvpatLabel, gridBagConstraintsVL);
 			centerPanel.add(getVVPATField(), gridBagConstraintsV);
 			centerPanel.add(getVVPATBrowseButton(), gridBagConstraintsVB);
+			centerPanel.add(flipLabel, gridBagConstraintsFL);
+			centerPanel.add(getFlipField(), gridBagConstraintsF);
 		}
 		return centerPanel;
 	}
 
+	private JComboBox getFlipField(){
+		if(flipField == null){
+			flipField = new JComboBox();
+			flipField.addItem(FLIP_NONE);
+			flipField.addItem(FLIP_4_TO_CANDIDATE);
+			flipField.addItem(FLIP_4_TO_UNDERVOTE);
+		}
+		
+		return flipField;
+	}
+	
 	private JButton getVVPATBrowseButton(){
 		if(vvpatBrowseButton == null){
 			vvpatBrowseButton = new JButton("Find Printer");

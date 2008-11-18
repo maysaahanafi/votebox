@@ -60,6 +60,7 @@ import votebox.middle.ballot.BallotParserException;
 import votebox.middle.ballot.CardException;
 import votebox.middle.ballot.IBallotLookupAdapter;
 import votebox.middle.ballot.NonCardException;
+import votebox.middle.datacollection.evil.EvilObserver;
 import votebox.middle.view.IViewFactory;
 import votebox.middle.view.ViewManager;
 
@@ -75,6 +76,9 @@ public class Driver {
 	
 	private boolean _encryptionEnabled;
 
+	private List<EvilObserver> _pendingRegisterForCastBallot = new ArrayList<EvilObserver>();
+	private List<EvilObserver> _pendingRegisterForReview = new ArrayList<EvilObserver>();
+	
 	private IAdapter _viewAdapter = new IAdapter() {
 
 		public boolean deselect(String uid) throws UnknownUIDException,
@@ -174,8 +178,30 @@ public class Driver {
 		
 		if(reviewScreenObserver != null)
 			_view.registerForReview(reviewScreenObserver);
+	
+		for(EvilObserver o : _pendingRegisterForCastBallot){
+			o.setAdapter(_ballotAdapter, _viewAdapter, _ballot);
+			_view.registerForCastBallot(o);
+		}//for
+		
+		_pendingRegisterForCastBallot.clear();
+		
+		for(EvilObserver o : _pendingRegisterForReview){
+			o.setAdapter(_ballotAdapter, _viewAdapter, _ballot);
+			_view.registerForReview(o);
+		}//for
+		
+		_pendingRegisterForReview.clear();
 		
 		_view.run();
+	}
+	
+	public void registerForReview(EvilObserver o){
+		_pendingRegisterForReview.add(o);
+	}
+	
+	public void registerForCastBallot(EvilObserver o){
+		_pendingRegisterForCastBallot.add(o);
 	}
 	
 	public void run(){
@@ -206,10 +232,7 @@ public class Driver {
     	
     	final Image accept = choices.get("accept");
     	
-    	System.out.println("Printing ballot accepted: "+accept);
-    	
-    	if(accept == null)
-    		System.out.println("Keys: "+choices.keySet());
+    	//System.out.println("Printing ballot accepted: "+accept);
     	
     	Printable toPrint = new Printable(){
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
@@ -235,10 +258,7 @@ public class Driver {
     	
     	final Image spoil = choices.get("spoil");
     	
-    	System.out.println("Printing ballot rejected: "+spoil);
-    	
-    	if(spoil == null)
-    		System.out.println("Keys: "+choices.keySet());
+    	//System.out.println("Printing ballot rejected: "+spoil);
     	
     	Printable toPrint = new Printable(){
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
@@ -261,19 +281,19 @@ public class Driver {
      * @param currentBallotFile - ballot file to extract images from
      */
     public static void printCommittedBallot(IAuditoriumParams constants, ListExpression ballot, File currentBallotFile) {
-    	System.out.println("Printing Committed Ballot");
+    	//System.out.println("Printing Committed Ballot");
     	
 		final Map<String, Image> choiceToImage = BallotImageHelper.loadImagesForVVPAT(currentBallotFile);
 		
 		if(choiceToImage == null){
-			System.out.println("\tPrinting aborted, no VVPAT images");
+			//System.out.println("\tPrinting aborted, no VVPAT images");
 			return;
 		}
 		
 		final List<String> choices = new ArrayList<String>();
 		for(int i = 0; i < ballot.size(); i++){
 			ListExpression choice = (ListExpression)ballot.get(i);
-		    System.out.println("\tchoice "+i+": "+choice);
+		    //System.out.println("\tchoice "+i+": "+choice);
 			
 			if(choice.size() != 2){
 				choices.add(choice.get(0).toString());
@@ -294,13 +314,13 @@ public class Driver {
 				choices.add(((ListExpression)choice.get(1)).get(0).toString());
 		}
 		
-		System.out.println("\tChoices extracted: "+choices);
+		//System.out.println("\tChoices extracted: "+choices);
 		
 		int totalSize = 0;
 		for(int i = 0; i < choices.size(); i++)
 			totalSize += choiceToImage.get(choices.get(i)).getHeight(null);
 		
-		System.out.println("\tPage size determined: "+totalSize);
+		//System.out.println("\tPage size determined: "+totalSize);
 		
 		final int fTotalSize = totalSize;
 		final List<String> printedChoices = new ArrayList<String>();
@@ -308,13 +328,10 @@ public class Driver {
 		Printable printedBallot = new Printable(){
 
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-				System.out.println("\t\tPrinting page: "+pageIndex);
+				//System.out.println("\t\tPrinting page: "+pageIndex);
 				int numPages = fTotalSize / (int)pageFormat.getImageableHeight();
 				if(fTotalSize % (int)pageFormat.getImageableHeight() != 0)
 					numPages++;
-				
-				/*if(pageIndex >= numPages)
-					return Printable.NO_SUCH_PAGE;*/
 				
 				if(printedChoices.size() == choices.size())
 					return Printable.NO_SUCH_PAGE;
@@ -336,7 +353,7 @@ public class Driver {
 				
 				totalSize = 0;
 				while(totalSize < pageFormat.getImageableHeight() && choiceIndex < choices.size()){
-					System.out.println("\t\tRendering choice: "+choiceIndex+" - "+choices.get(choiceIndex));
+					//System.out.println("\t\tRendering choice: "+choiceIndex+" - "+choices.get(choiceIndex));
 					Image img = choiceToImage.get(choices.get(choiceIndex));
 					
 					if(img.getHeight(null) + totalSize > pageFormat.getImageableHeight())
@@ -354,7 +371,7 @@ public class Driver {
 							y,
 							null);
 					
-					System.out.println("\t\tRendered at <"+x+", "+y+">");
+					//System.out.println("\t\tRendered at <"+x+", "+y+">");
 					
 					totalSize += img.getHeight(null);
 					choiceIndex++;
@@ -365,7 +382,7 @@ public class Driver {
 			
 		};
 		
-		System.out.println("Ready to print");
+		//System.out.println("Ready to print");
 		Driver.printOnVVPAT(constants, printedBallot);
 	}
     
@@ -373,62 +390,68 @@ public class Driver {
 	 * Prints onto the attached VVPAT printer, if possible.
 	 * @param print - the Printable to print.
 	 */
-	public static void printOnVVPAT(IAuditoriumParams constants, Printable toPrint){
-		System.out.println("printOnVVPAT");
-		
-		//VVPAT not ready
-		if(constants.getPrinterForVVPAT().equals("")) return;
-		
-		System.out.println("\tLooking up printer...");
-		PrintService[] printers = PrinterJob.lookupPrintServices();
-		
-		PrintService vvpat = null;
-		
-		for(PrintService printer : printers){
-			PrinterName name = printer.getAttribute(PrinterName.class);
-			if(name.getValue().equals(constants.getPrinterForVVPAT())){
-				vvpat = printer;
-				break;
-			}//if
-		}//for
-		
-		if(vvpat == null){
-			System.err.println("VVPAT is configured, but not detected as ready.");
-			return;
-		}
-		
-		System.out.println("\tCreating job");
-		PrinterJob job = PrinterJob.getPrinterJob();
-		
-		try {
-			job.setPrintService(vvpat);
-		} catch (PrinterException e) {
-			System.err.println("VVPAT printing failed: "+e.getMessage());
-			return;
-		}
-		
-		Paper paper = new Paper();
-		paper.setSize(constants.getPaperWidthForVVPAT(), constants.getPaperHeightForVVPAT());
-		
-		int imageableWidth = constants.getPrintableWidthForVVPAT();
-		int imageableHeight = constants.getPrintableHeightForVVPAT();
-		
-		int leftInset = (constants.getPaperWidthForVVPAT() - constants.getPrintableWidthForVVPAT()) / 2;
-		int topInset = (constants.getPaperHeightForVVPAT() - constants.getPrintableHeightForVVPAT()) / 2;
-		
-		paper.setImageableArea(leftInset, topInset, imageableWidth, imageableHeight);
-		
-		PageFormat pageFormat = new PageFormat();
-		pageFormat.setPaper(paper);
-		
-		job.setPrintable(toPrint, pageFormat);
-		
-		try {
-			job.print();
-		} catch (PrinterException e) {
-			System.err.println("VVPAT printing failed: "+e.getMessage());
-			return;
-		}
+	public static void printOnVVPAT(final IAuditoriumParams constants, final Printable toPrint){
+		//Marshal printing to a new thread to keep from blocking on an Observer
+		Thread t = new Thread(){
+			public void run(){
+				//System.out.println("printOnVVPAT");
+
+				//VVPAT not ready
+				if(constants.getPrinterForVVPAT().equals("")) return;
+
+				//System.out.println("\tLooking up printer...");
+				PrintService[] printers = PrinterJob.lookupPrintServices();
+
+				PrintService vvpat = null;
+
+				for(PrintService printer : printers){
+					PrinterName name = printer.getAttribute(PrinterName.class);
+					if(name.getValue().equals(constants.getPrinterForVVPAT())){
+						vvpat = printer;
+						break;
+					}//if
+				}//for
+
+				if(vvpat == null){
+					//System.err.println("VVPAT is configured, but not detected as ready.");
+					return;
+				}
+
+				//System.out.println("\tCreating job");
+				PrinterJob job = PrinterJob.getPrinterJob();
+
+				try {
+					job.setPrintService(vvpat);
+				} catch (PrinterException e) {
+					//System.err.println("VVPAT printing failed: "+e.getMessage());
+					return;
+				}
+
+				Paper paper = new Paper();
+				paper.setSize(constants.getPaperWidthForVVPAT(), constants.getPaperHeightForVVPAT());
+
+				int imageableWidth = constants.getPrintableWidthForVVPAT();
+				int imageableHeight = constants.getPrintableHeightForVVPAT();
+
+				int leftInset = (constants.getPaperWidthForVVPAT() - constants.getPrintableWidthForVVPAT()) / 2;
+				int topInset = (constants.getPaperHeightForVVPAT() - constants.getPrintableHeightForVVPAT()) / 2;
+
+				paper.setImageableArea(leftInset, topInset, imageableWidth, imageableHeight);
+
+				PageFormat pageFormat = new PageFormat();
+				pageFormat.setPaper(paper);
+
+				job.setPrintable(toPrint, pageFormat);
+
+				try {
+					job.print();
+				} catch (PrinterException e) {
+					//System.err.println("VVPAT printing failed: "+e.getMessage());
+					return;
+				}
+			}//run
+		};
+		t.start();
 	}
     
 	public static void unzip(String src, String dest) throws IOException {

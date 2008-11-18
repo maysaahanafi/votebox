@@ -37,6 +37,7 @@ import auditorium.IKeyStore;
 
 import sexpression.ASExpression;
 import sexpression.ListExpression;
+import votebox.middle.datacollection.evil.EvilObserver;
 import votebox.middle.driver.Driver;
 import votebox.middle.view.AWTViewFactory;
 
@@ -71,7 +72,8 @@ public class Launcher {
      */
     public void launch(final String ballotLocation, String logDir,
 			String logFilename, boolean debug, final String vvpat, final int vvpatWidth,
-			final int vvpatHeight, final int printableWidth, final int printableHeight) {
+			final int vvpatHeight, final int printableWidth, final int printableHeight,
+			final EvilObserver evilObserver) {
 
 		// Unzip the ballot to a temporary directory
 		File baldir;
@@ -151,139 +153,76 @@ public class Launcher {
 				
 				final IAuditoriumParams constants = new IAuditoriumParams(){
 
-					public String getBroadcastAddress() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public String getBroadcastAddress() {return null;}
 
-					public boolean getCastBallotEncryptionEnabled() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+					public boolean getCastBallotEncryptionEnabled() {return false;}
 
-					public String getChallengeBallotFile() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public String getChallengeBallotFile() {return null;}
 
-					public int getChallengePort() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getChallengePort() {return 0;}
 
-					public int getDefaultSerialNumber() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getDefaultSerialNumber() {return 0;}
 
-					public int getDiscoverPort() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getDiscoverPort() {return 0;}
 
-					public int getDiscoverReplyPort() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getDiscoverReplyPort() {return 0;}
 
-					public int getDiscoverReplyTimeout() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getDiscoverReplyTimeout() {return 0;}
 
-					public int getDiscoverTimeout() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getDiscoverTimeout() {return 0;}
 
-					public String getEloTouchScreenDevice() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public String getEloTouchScreenDevice() {return null;}
 
-					public int getHttpPort() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getHttpPort() {return 0;}
 
-					public int getJoinTimeout() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getJoinTimeout() {return 0;}
 
-					public IKeyStore getKeyStore() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public IKeyStore getKeyStore() {return null;}
 
-					public int getListenPort() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getListenPort() {return 0;}
 
-					public String getLogLocation() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public String getLogLocation() {return null;}
 
 					public int getPaperHeightForVVPAT() {
-						// TODO Auto-generated method stub
 						return vvpatHeight;
 					}
 
 					public int getPaperWidthForVVPAT() {
-						// TODO Auto-generated method stub
 						return vvpatWidth;
 					}
 
 					public int getPrintableHeightForVVPAT() {
-						// TODO Auto-generated method stub
 						return printableHeight;
 					}
 
 					public int getPrintableWidthForVVPAT() {
-						// TODO Auto-generated method stub
 						return printableWidth;
 					}
 
 					public String getPrinterForVVPAT() {
-						// TODO Auto-generated method stub
 						return vvpat;
 					}
 
-					public String getReportAddress() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public String getReportAddress() {return null;}
 
-					public String getRuleFile() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					public String getRuleFile() {return null;}
 
-					public boolean getUseCommitChallengeModel() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+					public boolean getUseCommitChallengeModel() {return false;}
 
-					public boolean getUseEloTouchScreen() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+					public boolean getUseEloTouchScreen() {return false;}
 
-					public int getViewRestartTimeout() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+					public int getViewRestartTimeout() {return 1;}
 
 				};
+				
+				vbcopy.registerForReview(evilObserver);
 				
 		        // Register for the cast ballot event, and "review page encountered" event
 				vbcopy.run(new Observer(){
 					ListExpression _lastSeenBallot = null;
 					
 					public void update(Observable o, Object arg){
-						System.out.println("Preparing to print");
+						//System.out.println("Preparing to print");
 						
 						Object[] obj = (Object[])arg;
 						
@@ -291,11 +230,7 @@ public class Launcher {
 						
 						boolean reject = !ballot.toString().equals(""+_lastSeenBallot); 
 						
-						
 						try{
-							if(reject)
-								System.out.println("Reject: "+reject+"\nlastBallot: ["+_lastSeenBallot+"]\nthisBallot: ["+ballot+"]");
-
 							if(reject){
 								if(_lastSeenBallot != null)
 									Driver.printBallotRejected(constants, new File(ballotLocation));
