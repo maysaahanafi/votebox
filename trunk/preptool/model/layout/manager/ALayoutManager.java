@@ -22,7 +22,9 @@
 
 package preptool.model.layout.manager;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -195,7 +197,7 @@ public abstract class ALayoutManager implements ILayoutManager {
      * @param location path to output the images to
      * @param progressInfo used to indicate the status of the rendering
      */
-    public void renderAllImagesToDisk(Layout layout, final String location,
+    public void renderAllImagesToDisk(final Layout layout, final String location,
             ProgressInfo progressInfo) {
         final HashSet<String> uids = new HashSet<String>();
         final String langShortName = getLanguage().getShortName();
@@ -374,6 +376,52 @@ public abstract class ALayoutManager implements ILayoutManager {
 				});
             }
         }
+        
+        exc.execute(new Runnable(){
+        	public void run(){
+        		File file = new File(location);
+                file = new File(file, "vvpat");
+                if(!file.exists())
+                	file.mkdirs();
+                
+                file = new File(file, "spoil.png");
+                
+                BufferedImage spoil = RenderingUtils.renderLabel("***Voter Rejected Ballot***", "", "", 12, 1024, Color.black, false, false, false);
+                
+                try {
+					ImageIO.write(spoil, "png", file);
+				} catch (IOException e) {
+					System.out.println("Spoiled image creation failed!");
+					e.printStackTrace();
+				}
+        	}
+        });
+        
+        exc.execute(new Runnable(){
+        	public void run(){
+        		File file = new File(location);
+                file = new File(file, "vvpat");
+                if(!file.exists())
+                	file.mkdirs();
+                
+                file = new File(file, "accept.png");
+                
+                BufferedImage subSpoil = RenderingUtils.renderLabel("***Voter Accepted Ballot***", "", "", 12, 1024, Color.black, false, false, false);
+                
+                BufferedImage spoil = new BufferedImage(subSpoil.getWidth(), subSpoil.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+                Graphics g = spoil.getGraphics();
+                g.setColor(Color.white);
+                g.fillRect(0, 0, spoil.getWidth(), spoil.getHeight());
+                g.drawImage(subSpoil, 0, 0, null);
+                
+                try {
+					ImageIO.write(spoil, "png", file);
+				} catch (IOException e) {
+					System.out.println("Accepted ballot creation failed!");
+					e.printStackTrace();
+				}
+        	}
+        });
 
 		exc.shutdown();
 		while (true) {

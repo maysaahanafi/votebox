@@ -2,13 +2,20 @@ package votebox.crypto.interop;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import auditorium.Key;
+
 import sexpression.ASExpression;
+import sexpression.ListExpression;
+import votebox.crypto.BallotEncrypter;
+import votebox.crypto.ElGamalCrypto;
+import votebox.crypto.Pair;
 
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;
@@ -22,6 +29,30 @@ import edu.uconn.cse.adder.VoteProof;
 
 
 public class ConverterTest {
+	
+	@Test
+	public void testBallotEncrypter() throws Exception{
+		ListExpression choice1 = new ListExpression("B21", "1");
+		ListExpression choice2 = new ListExpression("B22", "0");
+		ListExpression choice3 = new ListExpression("B23", "0");
+		
+		ListExpression ballot = new ListExpression(choice1, choice2, choice3);
+		
+		PublicKey pubKey = PublicKey.makePartialKey(128);
+		@SuppressWarnings("unused")
+		PrivateKey priv = pubKey.genKeyPair();
+		
+		ListExpression encrypted = BallotEncrypter.SINGLETON.encryptWithProof(ballot, pubKey);
+		ASExpression vote = ((ListExpression)encrypted.get(0)).get(1);
+		ASExpression proof = ((ListExpression)encrypted.get(1)).get(1);
+		
+		PublicKey finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(2)).get(1).toString());
+		
+		VoteProof vProof = VoteProof.fromString(proof.toString());
+		Vote vVote = Vote.fromString(vote.toString());
+		
+		Assert.assertTrue("Vote should verify", vProof.verify(vVote, finalPubKey, 0, 1));
+	}
 	
 	@Test
 	public void testMembership() throws Exception{
@@ -166,10 +197,17 @@ public class ConverterTest {
 			
 			Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
 			
-			//Generate the final public key
-			PublicKey finalPubKey = new PublicKey(pubKey.getP(), pubKey.getG(),
-					(new AdderInteger(AdderInteger.ONE, pubKey.getP())).multiply(
-							pubKey.getG().pow(poly.evaluate(new AdderInteger(AdderInteger.ZERO, pubKey.getQ())))), pubKey.getF());
+			AdderInteger p = pubKey.getP();
+			AdderInteger q = pubKey.getQ();
+			AdderInteger g = pubKey.getG();
+			AdderInteger f = pubKey.getF();
+			AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
+			
+			AdderInteger gvalue = g.pow((poly).
+                    evaluate(new AdderInteger(AdderInteger.ZERO, q)));
+			finalH = finalH.multiply(gvalue);
+			
+			PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
 			
 			//Generate the final private key
 			List<ElgamalCiphertext> ciphertexts = new ArrayList<ElgamalCiphertext>();
@@ -181,10 +219,17 @@ public class ConverterTest {
 			
 			List<AdderInteger> value = new ArrayList<AdderInteger>();
 			
-			for(int j = 0; j < 5; j++)
-				value.add(AdderInteger.random(AdderInteger.TWO));
+			for(int j = 0; j < 5 + (int)(Math.random() * 6.0); j++){
+				value.add(new AdderInteger(0));
+			}//for
+			
+			int one = (int)(Math.random()*(double)value.size());
+			
+			value.remove(one);
+			value.add(one, new AdderInteger(1));
 			
 			Vote vote = finalPubKey.encrypt(value);
+			
 			VoteProof proof = new VoteProof();
 			//This may need to be (.., .., .., 1, 1)... way to go Adder docs!
 			proof.compute(vote, finalPubKey, value, 0, 1);
@@ -192,18 +237,9 @@ public class ConverterTest {
 			election.castVote(vote);
 			
 			Assert.assertEquals("Votes equivalent", vote.toString(), Converter.toVote(Converter.toSExpression(vote)).toString());
-			
-			/*String proofStr = proof.toString();
-			ASExpression copyExp = Converter.toSExpression(proof);
-			
-			System.out.println("\t"+copyExp);
-			
-			String copyStr = Converter.toVoteProof(copyExp).toString();
-			
-			System.out.println("\t" + copyStr);
-			
-			Assert.assertEquals("Proofs equivalent", proofStr, copyStr);*/
 			proofs.add(proof);
+			
+			Assert.assertTrue("Proof Confirmation", proof.verify(vote, finalPubKey, 0, 1));
 			
 			Vote cipherSum = election.sumVotes();
 			List<AdderInteger> partialSum = finalPrivKey.partialDecrypt(cipherSum);

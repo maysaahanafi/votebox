@@ -93,7 +93,7 @@ public abstract class ALayoutComponent implements Cloneable {
 	 * The component (if any) that is previous in sequence of this component
 	 */
 	protected ALayoutComponent previous;
-
+	
 	/**
 	 * Creates a new ALayoutComponent with the given unique ID
 	 * @param uniqueID the unique ID
@@ -289,7 +289,7 @@ public abstract class ALayoutComponent implements Cloneable {
 		return super.toString() + "[x=" + xPos + ",y=" + yPos + ",width="
 		+ width + ",height=" + height + "]";
 	}
-
+	
 	/**
 	 * Converts this ALayoutComponent object to XML
 	 * @param doc the document

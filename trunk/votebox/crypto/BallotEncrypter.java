@@ -31,7 +31,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.uconn.cse.adder.AdderInteger;
+import edu.uconn.cse.adder.Election;
+import edu.uconn.cse.adder.ElgamalCiphertext;
 import edu.uconn.cse.adder.Polynomial;
+import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
 import edu.uconn.cse.adder.VoteProof;
@@ -60,27 +63,87 @@ public class BallotEncrypter {
      *          This is the pre-encrypt ballot in the form ((race-id counter) ...)
      * @param publicKey
      *          this is an Adder-style public key
-     * @return An ListExpression of the form ([vote] [proof])
+     * @return An ListExpression of the form ((vote [vote]) (proof [proof]) (public-key [key])
      */
     public ListExpression encryptWithProof(ListExpression ballot, PublicKey pubKey){
-    	List<AdderInteger> choices = new ArrayList<AdderInteger>();
+    	List<AdderInteger> value = new ArrayList<AdderInteger>();
     	
     	for(int i = 0; i < ballot.size(); i++){
     		ListExpression choice = (ListExpression)ballot.get(i);
-    		choices.add(new AdderInteger(new Integer(choice.get(1).toString())));
+    		value.add(new AdderInteger(choice.get(1).toString()));
     	}//for
     	
     	Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
-    	PublicKey finalPubKey = new PublicKey(pubKey.getP(), pubKey.getG(),
-    			(new AdderInteger(AdderInteger.ONE, pubKey.getP())).multiply(
-    					pubKey.getG().pow(poly.evaluate(new AdderInteger(AdderInteger.ZERO, pubKey.getQ())))), pubKey.getF());
+		
+		AdderInteger p = pubKey.getP();
+		AdderInteger q = pubKey.getQ();
+		AdderInteger g = pubKey.getG();
+		AdderInteger f = pubKey.getF();
+		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
+		
+		AdderInteger gvalue = g.pow((poly).
+                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
+		finalH = finalH.multiply(gvalue);
+		
+		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
+		
+		//Generate the final private key
+		List<ElgamalCiphertext> ciphertexts = new ArrayList<ElgamalCiphertext>();
+		ElgamalCiphertext ciphertext = pubKey.encryptPoly(poly.evaluate(new AdderInteger(0, pubKey.getQ())));
+		ciphertexts.add(ciphertext);
+		
+		Vote vote = finalPubKey.encrypt(value);
+		
+		VoteProof proof = new VoteProof();
+		//This may need to be (.., .., .., 1, 1)... way to go Adder docs!
+		proof.compute(vote, finalPubKey, value, 0, 1);
+		
+		
+    	
+		ListExpression vList = new ListExpression(StringExpression.makeString("vote"),
+				StringExpression.makeString(vote.toString()));
+		ListExpression pList = new ListExpression(StringExpression.makeString("proof"),
+				StringExpression.makeString(proof.toString()));
+		ListExpression kList = new ListExpression(StringExpression.makeString("public-key"),
+				StringExpression.makeString(finalPubKey.toString()));
+		
+		ListExpression ret = new ListExpression(vList, pList, kList);
+		
+		System.out.println(proof.verify(vote, finalPubKey, 0, 1));
+		System.out.println(VoteProof.fromString(proof.toString()).verify(vote, finalPubKey, 0, 1));
+		System.out.println(proof.verify(Vote.fromString(vote.toString()), finalPubKey, 0, 1));
+		
+		System.out.println(ret);
+		System.out.println(vote);
+		System.out.println(proof);
+		
+		return ret;
+		
+    	/*Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
+    	AdderInteger p = pubKey.getP();
+		AdderInteger q = pubKey.getQ();
+		AdderInteger g = pubKey.getG();
+		AdderInteger f = pubKey.getF();
+		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
+		
+		AdderInteger gvalue = g.pow((poly).
+                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
+		finalH = finalH.multiply(gvalue);
+		
+		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
     	
     	Vote vote = finalPubKey.encrypt(choices);
     	VoteProof proof = new VoteProof();
     	//This may need to be (....., 1, 1); docs are ambiguous
-    	proof.compute(vote, pubKey, choices, 0, 1);
+    	proof.compute(vote, finalPubKey, choices, 0, 1);
     	
-    	return new ListExpression(Converter.toSExpression(vote), Converter.toSExpression(proof));
+    	ASExpression voteE = Converter.toSExpression(vote);
+    	ASExpression proofE = Converter.toSExpression(proof);
+    	
+    	assert Converter.toVote(voteE).toString().equals(vote.toString());
+    	assert Converter.toVoteProof(proofE).toString().equals(proof.toString());
+    	
+    	return new ListExpression(voteE, proofE);*/
     }
     
     /**
@@ -118,7 +181,7 @@ public class BallotEncrypter {
         ElGamalCrypto.SINGLETON.clearRecentRandomness();
         return _recentBallot;
     }
-
+    
     /**
      * Decrypt a ballot using the r-values (not the decryption key).
      * 

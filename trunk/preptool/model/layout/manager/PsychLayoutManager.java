@@ -46,6 +46,7 @@ import preptool.model.ballot.ACard;
 import preptool.model.ballot.Ballot;
 import preptool.model.language.Language;
 import preptool.model.language.LiteralStrings;
+import preptool.model.layout.ALayoutComponent;
 import preptool.model.layout.Background;
 import preptool.model.layout.Button;
 import preptool.model.layout.ILayoutComponentVisitor;
@@ -509,8 +510,10 @@ public class PsychLayoutManager extends ALayoutManager {
         /**
          * Adds a title Label to this frame
          * @param title the Label title
+         * 
+         * @return the added title
          */
-        protected void addTitle(Label title) {
+        protected Spacer addTitle(Label title) {
             // Setup constraints and add title to north pane
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridwidth = 1;
@@ -522,15 +525,19 @@ public class PsychLayoutManager extends ALayoutManager {
             title.setSize(title.execute(sizeVisitor));
             Spacer label = new Spacer(title, north);
             north.add(label, constraints);
+            
+            return label;
         }
 
         /**
          * Adds a title String to this frame
          * @param titleText the String title
          */
-        protected void addTitle(String titleText) {
+        protected Label addTitle(String titleText) {
             Label title = new Label(getNextLayoutUID(), titleText, sizeVisitor);
             addTitle(title);
+            
+            return title;
         }
 
     }
@@ -555,11 +562,13 @@ public class PsychLayoutManager extends ALayoutManager {
      */
     private static final int WINDOW_HEIGHT = 768;
 
+    private static Layout LAST_LAYOUT = null;
+    
     /**
      * Visitor that renders a component and returns an image
      */
     private static ILayoutComponentVisitor<Boolean, BufferedImage> imageVisitor = new ILayoutComponentVisitor<Boolean, BufferedImage>() {
-
+    	
         /**
          * Gets the image from the Background
          */
@@ -684,18 +693,37 @@ public class PsychLayoutManager extends ALayoutManager {
 				VVPAT_CAND_WIDTH,
 				rb.getBackgroundColor());
             
-            BufferedImage xImg = RenderingUtils.renderButton("[X]", fontsize, false, false, 25, rb.getBackgroundColor());
+            BufferedImage xImg = null;
+            
+            //TODO: Make this less of a hack... for instance, working in non-English would be nice
+            if(!rb.getText().contains("None"))
+            	xImg = RenderingUtils.renderButton("[X]", fontsize, false, false, 25, rb.getBackgroundColor());
+            else
+            	xImg = RenderingUtils.renderButton("[ ]", fontsize, false, false, 25, rb.getBackgroundColor());
             
             BufferedImage textPlusX = new BufferedImage(buttonImg.getWidth() + xImg.getWidth() + 10, 
-            		(int)Math.max(buttonImg.getHeight(), xImg.getHeight()), BufferedImage.TYPE_INT_ARGB);
+            		(int)Math.max(buttonImg.getHeight(), xImg.getHeight()), BufferedImage.TYPE_BYTE_BINARY);
             
             Graphics g = textPlusX.getGraphics();
-            g.setColor(rb.getBackgroundColor());
+            g.setColor(Color.white);
             g.fillRect(0, 0, textPlusX.getWidth(), textPlusX.getHeight());
             g.drawImage(xImg, 0, textPlusX.getHeight()/2 - xImg.getHeight()/2, null);
             g.drawImage(buttonImg, xImg.getWidth() + 10, textPlusX.getHeight()/2 - buttonImg.getHeight()/2, null);
-
-			return textPlusX;
+            
+            String titleStr = "" + rb.getPageNum();
+            
+            BufferedImage titleImg = RenderingUtils.renderButton(titleStr, fontsize, true, false, VVPAT_CAND_WIDTH, rb.getBackgroundColor());
+            
+            BufferedImage fullImg = new BufferedImage((int)Math.max(textPlusX.getWidth(), titleImg.getWidth()),
+            		titleImg.getHeight() + 5 + textPlusX.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+            
+            g = fullImg.getGraphics();
+            g.setColor(Color.white);
+            g.fillRect(0, 0, fullImg.getWidth(), fullImg.getHeight());
+            g.drawImage(titleImg, 0, 0, null);
+            g.drawImage(textPlusX, 0, 5 + titleImg.getHeight(), null);
+            
+			return fullImg;
 		}
     };
 
@@ -1127,6 +1155,8 @@ public class PsychLayoutManager extends ALayoutManager {
         	layout.setReponsePage(layout.getPages().size()-1);
         }
         
+        LAST_LAYOUT = layout;
+        
         return layout;
     }
 
@@ -1186,10 +1216,13 @@ public class PsychLayoutManager extends ALayoutManager {
             int target, int idx, int total) {
         ArrayList<JPanel> cardPanels = makeCardPage(card);
         ArrayList<Page> pages = new ArrayList<Page>();
+        
+        Label title = null;
+        
         for (int i = 0; i < cardPanels.size(); i++) {
             // Setup card frame
             PsychLayoutPanel cardFrame = new PsychLayoutPanel();
-            cardFrame.addTitle(card.getTitle(language));
+            title = cardFrame.addTitle(card.getTitle(language));
             cardFrame.addSideBar(2);
             if (!jump) {
                 if (i > 0)
@@ -1241,8 +1274,9 @@ public class PsychLayoutManager extends ALayoutManager {
             for (Component c : cardFrame.getAllComponents()) {
                 Spacer s = (Spacer) c;
                 s.updatePosition();
-                if (!(s.getComponent() instanceof ToggleButton))
+                if (!(s.getComponent() instanceof ToggleButton)){
                     cardPage.getComponents().add(s.getComponent());
+                }//if
             }
             pages.add(cardPage);
         }

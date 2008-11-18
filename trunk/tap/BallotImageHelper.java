@@ -83,10 +83,21 @@ public class BallotImageHelper {
 			while(entries.hasMoreElements()){
 				ZipEntry entry = entries.nextElement();
 				
+				if(entry.getName().endsWith("/vvpat/accept.png"))
+					vvpatMap.put("accept", ImageIO.read(file.getInputStream(entry)));
+				
+				if(entry.getName().endsWith("/vvpat/spoil.png"))
+					vvpatMap.put("spoil", ImageIO.read(file.getInputStream(entry)));
+				
 				if(entry.getName().endsWith(".png") && entry.getName().contains("/vvpat/")){
 					String id = entry.getName();
 					id = id.substring(id.lastIndexOf("/vvpat/")+ 7);
-					id = id.substring(0, id.indexOf("_"));
+					
+					int sub = id.indexOf("_");
+					
+					if(sub == -1) continue;
+					
+					id = id.substring(0, sub);
 					
 					vvpatMap.put(id, ImageIO.read(file.getInputStream(entry)));
 				}

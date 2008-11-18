@@ -53,7 +53,6 @@ import sexpression.ASExpression;
 import sexpression.ListExpression;
 import tap.BallotImageHelper;
 import votebox.middle.IBallotVars;
-import votebox.middle.IncorrectTypeException;
 import votebox.middle.Properties;
 import votebox.middle.ballot.Ballot;
 import votebox.middle.ballot.BallotParser;
@@ -197,9 +196,69 @@ public class Driver {
     }
 
     /**
+     * Prints a statement that the ballot has been accepted by the voter on a VVPAT.
+     * 
+     * @param constants - parameters to use for printing
+     * @param currentBallotFile - ballot file to extract images from
+     */
+    public static void printBallotAccepted(IAuditoriumParams constants, File currentBallotFile){
+    	Map<String, Image> choices = BallotImageHelper.loadImagesForVVPAT(currentBallotFile);
+    	
+    	final Image accept = choices.get("accept");
+    	
+    	System.out.println("Printing ballot accepted: "+accept);
+    	
+    	if(accept == null)
+    		System.out.println("Keys: "+choices.keySet());
+    	
+    	Printable toPrint = new Printable(){
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+				if(pageIndex != 0)
+					return Printable.NO_SUCH_PAGE;
+				
+				graphics.drawImage(accept, (int)pageFormat.getImageableX(), (int)pageFormat.getImageableY(), null);
+				return Printable.PAGE_EXISTS;
+			}
+    	};
+    	
+    	printOnVVPAT(constants, toPrint);
+    }
+    
+    /**
+     * Prints a statement that the ballot has been rejected by the voter on a VVPAT.
+     * 
+     * @param constants - parameters to use for printing
+     * @param currentBallotFile - ballot file to extract images from
+     */
+    public static void printBallotRejected(IAuditoriumParams constants, File currentBallotFile){
+    	Map<String, Image> choices = BallotImageHelper.loadImagesForVVPAT(currentBallotFile);
+    	
+    	final Image spoil = choices.get("spoil");
+    	
+    	System.out.println("Printing ballot rejected: "+spoil);
+    	
+    	if(spoil == null)
+    		System.out.println("Keys: "+choices.keySet());
+    	
+    	Printable toPrint = new Printable(){
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+				if(pageIndex != 0)
+					return Printable.NO_SUCH_PAGE;
+				
+				graphics.drawImage(spoil, (int)pageFormat.getImageableX(), (int)pageFormat.getImageableY(), null);
+				return Printable.PAGE_EXISTS;
+			}
+    	};
+    	
+    	printOnVVPAT(constants, toPrint);
+    }
+    
+    /**
      * Prints a ballot out on a VVPAT.
      * 
+     * @param constants - parameters to use for printing
      * @param ballot - ballot in the form ((race-id (race-id (... ))))
+     * @param currentBallotFile - ballot file to extract images from
      */
     public static void printCommittedBallot(IAuditoriumParams constants, ListExpression ballot, File currentBallotFile) {
     	System.out.println("Printing Committed Ballot");
@@ -244,6 +303,7 @@ public class Driver {
 		System.out.println("\tPage size determined: "+totalSize);
 		
 		final int fTotalSize = totalSize;
+		final List<String> printedChoices = new ArrayList<String>();
 		
 		Printable printedBallot = new Printable(){
 
@@ -253,11 +313,15 @@ public class Driver {
 				if(fTotalSize % (int)pageFormat.getImageableHeight() != 0)
 					numPages++;
 				
-				if(pageIndex >= numPages)
+				/*if(pageIndex >= numPages)
+					return Printable.NO_SUCH_PAGE;*/
+				
+				if(printedChoices.size() == choices.size())
 					return Printable.NO_SUCH_PAGE;
 				
 				int choiceIndex = 0;
 				int totalSize = 0;
+				
 				while(pageIndex != 0){
 					totalSize += choiceToImage.get(choices.get(choiceIndex)).getHeight(null);
 					
@@ -272,12 +336,25 @@ public class Driver {
 				
 				totalSize = 0;
 				while(totalSize < pageFormat.getImageableHeight() && choiceIndex < choices.size()){
+					System.out.println("\t\tRendering choice: "+choiceIndex+" - "+choices.get(choiceIndex));
 					Image img = choiceToImage.get(choices.get(choiceIndex));
 					
+					if(img.getHeight(null) + totalSize > pageFormat.getImageableHeight())
+						break;
+					
+					printedChoices.add(choices.get(choiceIndex));
+					
+					//System.out.println("\t\t"+img);
+					
+					int x = (int)pageFormat.getImageableX();
+					int y = (int)pageFormat.getImageableY() + totalSize;
+					
 					graphics.drawImage(img,
-							(int)pageFormat.getImageableX(),
-							totalSize,
+							x,
+							y,
 							null);
+					
+					System.out.println("\t\tRendered at <"+x+", "+y+">");
 					
 					totalSize += img.getHeight(null);
 					choiceIndex++;
@@ -340,6 +417,7 @@ public class Driver {
 		int topInset = (constants.getPaperHeightForVVPAT() - constants.getPrintableHeightForVVPAT()) / 2;
 		
 		paper.setImageableArea(leftInset, topInset, imageableWidth, imageableHeight);
+		
 		PageFormat pageFormat = new PageFormat();
 		pageFormat.setPaper(paper);
 		
@@ -362,15 +440,26 @@ public class Driver {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		byte[] buf = new byte[1024];
 		int len;
-		
-		while (entries.hasMoreElements()) {
-			ZipEntry entry = (ZipEntry) entries.nextElement();
 
+		//Make all the directories first
+		while(entries.hasMoreElements()){
+			ZipEntry entry = (ZipEntry)entries.nextElement();
+			
 			if (entry.isDirectory()) {
 				//Create the directory using the proper seperator for this platform
 				File newDir = new File(dest, entry.getName().replace('/', File.separatorChar));
 				newDir.mkdirs();
-				
+			}
+		}
+		
+		entries = zipFile.entries();
+		
+		//Now copy all the data files
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = (ZipEntry) entries.nextElement();
+
+			if (entry.isDirectory()) {
+				continue;
 			} else {
 				InputStream in = zipFile.getInputStream(entry);
 				
