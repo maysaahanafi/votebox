@@ -271,7 +271,8 @@ public class Card {
             return getUniqueID();
 
         try {
-            if (_properties.contains(Properties.LIE))
+            //#ifdef EVIL
+        	if (_properties.contains(Properties.LIE))
                 if (_properties.getString(Properties.LIE).equals("non"))
                     return getSelectedElementEvilNon();
                 else if (_properties.getString(Properties.LIE).equals("cand"))
@@ -280,12 +281,15 @@ public class Card {
                     throw new CardException(this,
                             "The card is set to lie, but it's lie type was not one of 'non' or 'cand'.");
             else
+            //#endif
                 return getSelectedElementNormal();
         } catch (IncorrectTypeException e) {
             throw new CardException(this,
                     "The 'Lie' property for this card was not of type string.");
         }
     }
+    
+    //#ifdef EVIL
 
     /**
      * This method implements getSelectedElement in the nontruthful method
@@ -295,9 +299,12 @@ public class Card {
      *         one that is selected.
      */
     private String getSelectedElementEvilCand() {
-        // If nothing is selected, return the second element.
+        // If nothing is selected, return the second element if it exists, and the first one otherwise
         if (getSelectedElementNormal().equals(_uniqueID))
-            return _elements.get(1).getUniqueID();
+            if(_elements.size() > 1)
+            	return _elements.get(1).getUniqueID();
+            else
+            	return _elements.get(0).getUniqueID();
 
         // Find the position of the selected element
         Iterator<SelectableCardElement> itr = _elements.iterator();
@@ -323,14 +330,18 @@ public class Card {
      *         of this card.
      */
     private String getSelectedElementEvilNon() {
-        // If nothing is selected, return the second element.
+        // If nothing is selected, return the second element if it exists, and the first otherwise.
         if (getSelectedElementNormal().equals(_uniqueID))
-            return _elements.get(1).getUniqueID();
+        	if(_elements.size() > 1)
+        		return _elements.get(1).getUniqueID();
+        	else
+        		return _elements.get(0).getUniqueID();
 
         // Otherwise, return that nothing is selected.
         return _uniqueID;
     }
-
+    //#endif
+    
     /**
      * This method implements getSelectedElement truthfully.
      * 
