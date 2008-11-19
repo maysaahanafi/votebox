@@ -226,6 +226,10 @@ public class Launcher {
 						
 						Object[] obj = (Object[])arg;
 						
+						//Do nothing if this is before rendering the screen...
+						if(!((Boolean)obj[0]))
+							return;
+						
 						ListExpression ballot = (ListExpression)obj[1];
 						
 						boolean reject = !ballot.toString().equals(""+_lastSeenBallot); 

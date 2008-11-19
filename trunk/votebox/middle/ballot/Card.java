@@ -374,9 +374,14 @@ public class Card {
      */
     public ASExpression toASExpression() {
         ArrayList<ASExpression> elementList = new ArrayList<ASExpression>();
-        for (SelectableCardElement sce : _elements)
+        /*for (SelectableCardElement sce : _elements)
             if (sce.isSelected())
-                elementList.add(sce.toASExpression());
+                elementList.add(sce.toASExpression());*/
+        try{
+        	elementList.add(StringExpression.makeString(this.getSelectedElement()));
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
         return new ListExpression(StringExpression.makeString(_uniqueID),
                 new ListExpression(elementList));
     }
