@@ -147,6 +147,8 @@ public class ViewManager implements IViewManager {
         _layout.initFromViewManager( _page, this, _ballotLookupAdapter,
         		_ballotAdapter, _factory, _variables );
         
+        boolean postNotice = false;
+        
         try{
         	String isReviewPage = _layout.getPages().get(pagenum).getProperties().getString("IsReviewPage"); 
 
@@ -155,13 +157,17 @@ public class ViewManager implements IViewManager {
         	
         	if(isReviewPage != null && isReviewPage.equals("yes")){
         		//System.out.println("Notifying observers...");
-        		_reviewScreenEncountered.notifyObservers(new Object[]{pagenum, _ballotLookupAdapter.getCastBallot()});
+        		_reviewScreenEncountered.notifyObservers(new Object[]{false, _ballotLookupAdapter.getCastBallot()});
+        		postNotice = true;
         	}//if
         }catch(IncorrectTypeException e){
         	e.printStackTrace();
         }
         
         _layout.draw( pagenum, _view );
+        
+        if(postNotice)
+        	_reviewScreenEncountered.notifyObservers(new Object[]{true, _ballotLookupAdapter.getCastBallot()});
     }
 
     /**
@@ -804,7 +810,7 @@ public class ViewManager implements IViewManager {
      * @param reviewScreenObserver - observer to register
      */
 	public void registerForReview(Observer reviewScreenObserver) {
-		System.out.println("Registering for Review...");
+		//System.out.println("Registering for Review...");
 		_reviewScreenEncountered.addObserver(reviewScreenObserver);
 	}
 }
