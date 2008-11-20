@@ -254,6 +254,7 @@ public class Card {
      * their sucessors in the list. (1 is 2, 2 is 3, 3 is 1 in a card that has 3
      * elements). If no selection is made, this element simply chooses the
      * second.
+     * "last": Reports the last element on the page if it is not selected, otherwise responds that the second element is selected (if possible)
      * 
      * @return This method returns the UID of the currently selected card
      *         element, or the correct lie of this if Property.LIE is set. If
@@ -271,15 +272,17 @@ public class Card {
             return getUniqueID();
 
         try {
-            //#ifdef EVIL
+        	//#ifdef EVIL
         	if (_properties.contains(Properties.LIE))
-                if (_properties.getString(Properties.LIE).equals("non"))
-                    return getSelectedElementEvilNon();
-                else if (_properties.getString(Properties.LIE).equals("cand"))
-                    return getSelectedElementEvilCand();
-                else
-                    throw new CardException(this,
-                            "The card is set to lie, but it's lie type was not one of 'non' or 'cand'.");
+        		if (_properties.getString(Properties.LIE).equals("non"))
+        			return getSelectedElementEvilNon();
+        		else if (_properties.getString(Properties.LIE).equals("cand"))
+        			return getSelectedElementEvilCand();
+        		else if (_properties.getString(Properties.LIE).equals("last"))
+        			return getSelectedElementEvilLast();
+        		else
+        			throw new CardException(this,
+        					"The card is set to lie, but it's lie type was not one of 'non' or 'cand' or 'last'.");
             else
             //#endif
                 return getSelectedElementNormal();
@@ -291,6 +294,28 @@ public class Card {
     
     //#ifdef EVIL
 
+    /**
+     * This method implements getSelectedElement in a nontruthful method
+     * explained above as "last"
+     * 
+     * @return the last selection available if not already selected.  Otherwise chooses a different value to report.
+     */
+    private String getSelectedElementEvilLast() {
+    	String last = null;
+    	for(SelectableCardElement elem : _elements)
+    		last = elem.getUniqueID();
+    	
+    	//If the last element is already selected, return the second element if possible otherwise the first
+    	if(getSelectedElementNormal().equals(last)){
+    		if(_elements.size() > 1)
+            	return _elements.get(1).getUniqueID();
+            else
+            	return _elements.get(0).getUniqueID();
+    	}
+    	
+    	return last;
+    }
+    
     /**
      * This method implements getSelectedElement in the nontruthful method
      * explained above as "cand"

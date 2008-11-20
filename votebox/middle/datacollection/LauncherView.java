@@ -52,6 +52,7 @@ import javax.swing.JCheckBox;
 import votebox.middle.ballot.Ballot;
 import votebox.middle.datacollection.evil.EvilObserver;
 import votebox.middle.datacollection.evil.Flip4CandidateTop;
+import votebox.middle.datacollection.evil.Flip4NoneOfTheAboveTop;
 import votebox.middle.datacollection.evil.Flip4UndervoteTop;
 import votebox.middle.driver.IAdapter;
 
@@ -59,6 +60,7 @@ public class LauncherView extends JFrame {
 	private static final String FLIP_NONE = "None";
 	private static final String FLIP_4_TO_CANDIDATE = "Flip random 4 in top 8 to candidate";
 	private static final String FLIP_4_TO_UNDERVOTE = "Flip random 4 in top 8 to undervote";
+	private static final String FLIP_4_TO_NONE_OF_THE_ABOVE = "Flip random 4 in top 8 to none-of-the-above/last";
 
 	private static final long serialVersionUID = 1L;
 
@@ -201,6 +203,9 @@ public class LauncherView extends JFrame {
 		if(selection.equals(FLIP_4_TO_UNDERVOTE)){
 			obs = new Flip4UndervoteTop();
 		}
+		
+		if(selection.equals(FLIP_4_TO_NONE_OF_THE_ABOVE ))
+			obs = new Flip4NoneOfTheAboveTop();
 		//#endif
 
 		return obs;
@@ -324,6 +329,7 @@ public class LauncherView extends JFrame {
 			flipField.addItem(FLIP_NONE);
 			flipField.addItem(FLIP_4_TO_CANDIDATE);
 			flipField.addItem(FLIP_4_TO_UNDERVOTE);
+			flipField.addItem(FLIP_4_TO_NONE_OF_THE_ABOVE);
 		}
 		
 		return flipField;
