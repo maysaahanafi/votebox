@@ -254,7 +254,7 @@ public class Card {
      * their sucessors in the list. (1 is 2, 2 is 3, 3 is 1 in a card that has 3
      * elements). If no selection is made, this element simply chooses the
      * second.
-     * "last": Reports the last element on the page if it is not selected, otherwise responds that the second element is selected (if possible)
+     * "last_non": Reports the last element on the page if it is not selected, otherwise responds that the second element is selected (if possible)
      * 
      * @return This method returns the UID of the currently selected card
      *         element, or the correct lie of this if Property.LIE is set. If
@@ -278,8 +278,8 @@ public class Card {
         			return getSelectedElementEvilNon();
         		else if (_properties.getString(Properties.LIE).equals("cand"))
         			return getSelectedElementEvilCand();
-        		else if (_properties.getString(Properties.LIE).equals("last"))
-        			return getSelectedElementEvilLast();
+        		else if (_properties.getString(Properties.LIE).equals("last_non"))
+        			return getSelectedElementEvilLastNon();
         		else
         			throw new CardException(this,
         					"The card is set to lie, but it's lie type was not one of 'non' or 'cand' or 'last'.");
@@ -293,14 +293,14 @@ public class Card {
     }
     
     //#ifdef EVIL
-
+    
     /**
      * This method implements getSelectedElement in a nontruthful method
-     * explained above as "last"
+     * explained above as "last_non"
      * 
      * @return the last selection available if not already selected.  Otherwise chooses a different value to report.
      */
-    private String getSelectedElementEvilLast() {
+    private String getSelectedElementEvilLastNon() {
     	String last = null;
     	for(SelectableCardElement elem : _elements)
     		last = elem.getUniqueID();
