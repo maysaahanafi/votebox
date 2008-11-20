@@ -1,4 +1,3 @@
-//#ifdef EVIL
 package votebox.middle.datacollection.evil;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import votebox.middle.ballot.Ballot;
 import votebox.middle.ballot.Card;
 import votebox.middle.driver.IAdapter;
 
-public class Flip4CandidateTop implements EvilObserver{
+public class Flip4NoneOfTheAboveTop implements EvilObserver {
 	private IAdapter _ballotAdapter = null;
 	private Ballot _ballot = null;
 	
@@ -36,8 +35,7 @@ public class Flip4CandidateTop implements EvilObserver{
 			//System.out.println("Adding LIE property...");
 			for(Card card : toFlip){
 				try {
-					System.out.println("\t"+card.getUniqueID());
-					card.getProperties().add(Properties.LIE, "cand", "String");
+					card.getProperties().add(Properties.LIE, "last", "String");
 				} catch (Exception e){
 					System.out.println("Marking card dishonest failed!");
 					e.printStackTrace();
@@ -52,6 +50,5 @@ public class Flip4CandidateTop implements EvilObserver{
 		_ballotAdapter = ballotAdapter;
 		_ballot = ballot;
 	}
-	
+
 }
-//#endif

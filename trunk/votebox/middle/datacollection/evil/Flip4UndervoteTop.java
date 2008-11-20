@@ -18,22 +18,22 @@ public class Flip4UndervoteTop implements EvilObserver {
 	
 	public void update(Observable o, Object arg) {
 		if(_notRun){
-			System.out.println("Flipping");
+			//System.out.println("Flipping");
 			List<Card> cards = _ballot.getCards();
 			List<Card> first8 = new ArrayList<Card>();
 
-			System.out.println("Getting first 8 cards...");
+			//System.out.println("Getting first 8 cards...");
 			for(int i = 0; i < 8; i++)
 				first8.add(cards.get(i));
 
-			System.out.println("Selecting 4 to flip...");
+			//System.out.println("Selecting 4 to flip...");
 			List<Card> toFlip = new ArrayList<Card>();
 			for(int i = 0; i < 4; i++){
 				int p = (int)(Math.random() * first8.size());
 				toFlip.add(first8.remove(p));
 			}
 
-			System.out.println("Adding LIE property...");
+			//System.out.println("Adding LIE property...");
 			for(Card card : toFlip){
 				try {
 					card.getProperties().add(Properties.LIE, "non", "String");
