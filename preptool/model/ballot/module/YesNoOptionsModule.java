@@ -69,6 +69,9 @@ public class YesNoOptionsModule extends AModule {
 
         data.add(new CardElement(LiteralStrings.Singleton.get("YES")));
         data.add(new CardElement(LiteralStrings.Singleton.get("NO")));
+		//#ifdef NONE_OF_ABOVE
+        data.add(new CardElement(LiteralStrings.Singleton.get("NONE_OF_ABOVE")));
+		//#endif
     }
 
     /**

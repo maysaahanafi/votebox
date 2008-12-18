@@ -43,6 +43,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import preptool.model.ballot.ACard;
+import preptool.model.ballot.PropositionCard;
 import preptool.model.ballot.Ballot;
 import preptool.model.language.Language;
 import preptool.model.language.LiteralStrings;
@@ -411,6 +412,36 @@ public class PsychLayoutManager extends ALayoutManager {
             south.add(PNextButton, constraints);
         }
 
+        //#ifdef NONE_OF_ABOVE
+        protected void addNextRequireSelectionButton(Label l, String parentCardUID) {
+            Button nextRequireSelectionButton = new Button(
+            		getNextLayoutUID(), 
+            		LiteralStrings.Singleton.get("NEXT_PAGE_BUTTON", language), 
+            		"NextPageRequireSelection");
+            nextRequireSelectionButton.setIncreasedFontSize(true);
+            nextRequireSelectionButton.setSize(nextButton.execute(sizeVisitor));
+            nextRequireSelectionButton.setPageNum(-1);
+            nextRequireSelectionButton.setParentCardUID(parentCardUID);
+        	
+        	Spacer PNextInfo = new Spacer(l, south);
+            Spacer PNextButton = new Spacer(nextRequireSelectionButton, south);
+
+            // Setup constraints and add label and button
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.weightx = .5;
+            constraints.weighty = .5;
+            constraints.insets = new Insets(0, 0, 0, 0);
+            constraints.gridx = 1;
+            constraints.gridy = 0;
+            constraints.anchor = GridBagConstraints.LINE_END;
+            south.add(PNextInfo, constraints);
+            constraints.gridx = 1;
+            constraints.gridy = 1;
+            constraints.insets = new Insets(0, 0, 32, 50);
+            south.add(PNextButton, constraints);
+        }
+        //#endif
+
         /**
          * Adds a Previous button to the frame, with the given label as
          * instructions
@@ -459,6 +490,31 @@ public class PsychLayoutManager extends ALayoutManager {
             constraints.insets = new Insets(0, 0, 32, 0);
             south.add(PReturnButton, constraints);
         }
+
+        //#ifdef NONE_OF_ABOVE
+        protected void addReturnRequireSelectionButton(Label l, int target, String parentCardUID) {
+        	Button rButton = new Button(
+        			getNextLayoutUID(), 
+        			LiteralStrings.Singleton.get("RETURN_BUTTON", language), 
+        			"GoToPageRequireSelection");
+            rButton.setIncreasedFontSize(true);
+            rButton.setSize(rButton.execute(sizeVisitor));
+            rButton.setPageNum(target);
+            rButton.setParentCardUID(parentCardUID);
+            Spacer PReturnInfo = new Spacer(l, south);
+            Spacer PReturnButton = new Spacer(rButton, south);
+
+            // Setup constraints and add label and button
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            south.add(PReturnInfo, constraints);
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.insets = new Insets(0, 0, 32, 0);
+            south.add(PReturnButton, constraints);
+        }
+        //#endif
 
         /**
          * Adds the sidebar to the west pane, with the given step highlighted
@@ -1157,6 +1213,19 @@ public class PsychLayoutManager extends ALayoutManager {
         
         LAST_LAYOUT = layout;
         
+        //#ifdef NONE_OF_ABOVE
+        // Get the number of cards
+        int numCards = ballot.getCards().size();
+        // Add a "no-selection alert page" for each race
+        for (int raceN = 0; raceN < numCards; raceN++) {
+        	layout.getPages().add(makeNoSelectionPage(raceN+1));
+        }
+        // Add another no-selection alert page for each race-review screen
+        for (int raceN = 0; raceN < numCards; raceN++) {
+        	layout.getPages().add(makeNoSelectionPage(raceN+numCards+4));
+        }
+        //#endif
+        
         return layout;
     }
 
@@ -1225,28 +1294,50 @@ public class PsychLayoutManager extends ALayoutManager {
             title = cardFrame.addTitle(card.getTitle(language));
             cardFrame.addSideBar(2);
             if (!jump) {
-                if (i > 0)
-                    cardFrame.addPreviousButton((Label) moreCandidatesInfo
-                            .clone());
-                else if (idx == 1)
+                if (i > 0) {
+                    cardFrame.addPreviousButton((Label) moreCandidatesInfo.clone());
+                }
+                else if (idx == 1) {
                     cardFrame.addPreviousButton(new Label(getNextLayoutUID(),
                             LiteralStrings.Singleton.get("BACK_INSTRUCTIONS",
                                     language), sizeVisitor));
-                else
+                }
+                else {
                     cardFrame.addPreviousButton(previousInfo);
-                if (i < cardPanels.size() - 1)
+                }
+                if (i < cardPanels.size() - 1) {
+                	//#ifdef NONE_OF_ABOVE
+            		cardFrame.addNextRequireSelectionButton((Label) moreCandidatesInfo.clone(), card.getUID());
+            		//#else
                     cardFrame.addNextButton((Label) moreCandidatesInfo.clone());
-                else if (idx == total)
-                    cardFrame.addNextButton(new Label(getNextLayoutUID(),
-                            LiteralStrings.Singleton.get("FORWARD_REVIEW",
-                                    language), sizeVisitor));
-                else
+            		//#endif
+                }
+                else if (idx == total) {
+                	Label forward = new Label(
+                			getNextLayoutUID(),
+                            LiteralStrings.Singleton.get("FORWARD_REVIEW", language), 
+                            sizeVisitor);
+                	//#ifdef NONE_OF_ABOVE
+                    cardFrame.addNextRequireSelectionButton(forward, card.getUID());
+                    //#else
+                    cardFrame.addNextButton(forward);
+                    //#endif
+                }
+                else {
+                	//#ifdef NONE_OF_ABOVE
+                	cardFrame.addNextRequireSelectionButton(nextInfo, card.getUID());
+                	//#else
                     cardFrame.addNextButton(nextInfo);
+                    //#endif
+                }
             } else {
+            	//#ifdef NONE_OF_ABOVE
+                cardFrame.addReturnRequireSelectionButton(returnInfo, target, card.getUID());
+            	//#else
                 cardFrame.addReturnButton(returnInfo, target);
+                //#endif
                 if (i > 0)
-                    cardFrame.addPreviousButton((Label) moreCandidatesInfo
-                            .clone());
+                    cardFrame.addPreviousButton((Label) moreCandidatesInfo.clone());
                 if (i < cardPanels.size() - 1)
                     cardFrame.addNextButton((Label) moreCandidatesInfo.clone());
             }
@@ -1727,6 +1818,45 @@ public class PsychLayoutManager extends ALayoutManager {
         graphs.fillRect(0, 0, WINDOW_WIDTH, frame.north.getHeight());
         return new Background(getNextLayoutUID(), image);
     }
+
+    //#ifdef NONE_OF_ABOVE
+    protected Page makeNoSelectionPage(int target) {
+        PsychLayoutPanel frame = new PsychLayoutPanel();
+        Label successTitle = new Label(getNextLayoutUID(),
+                LiteralStrings.Singleton.get("NO_SELECTION_TITLE", language));
+        successTitle.setBold(true);
+        successTitle.setCentered(true);
+        successTitle.setSize(successTitle.execute(sizeVisitor));
+        frame.addTitle(successTitle);
+        frame.remove(frame.west);
+
+        JPanel east = new JPanel();
+        east.setLayout(new GridBagLayout());
+        Label instrLabel = new Label(getNextLayoutUID(),
+                LiteralStrings.Singleton.get("NO_SELECTION", language), sizeVisitor);
+        Spacer sp = new Spacer(instrLabel, east);
+        east.add(sp);
+        frame.addAsEastPanel(east);
+
+        Label returnLbl = new Label(getNextLayoutUID(), LiteralStrings.Singleton
+                .get("RETURN_RACE", language), sizeVisitor);
+        frame.addReturnButton(returnLbl, target);
+        
+        frame.validate();
+        frame.pack();
+
+        Page page = new Page();
+        page.getComponents().add(simpleBackground);
+        page.setBackgroundLabel(simpleBackground.getUID());
+
+        for (Component c : frame.getAllComponents()) {
+            Spacer s = (Spacer) c;
+            s.updatePosition();
+            page.getComponents().add(s.getComponent());
+        }
+        return page;
+    }
+    //#endif
 
     @Override
     protected Page makeSuccessPage() {

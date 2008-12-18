@@ -71,6 +71,11 @@ public class Button extends ALayoutComponent {
 	 * The background color of this button
 	 */
 	private Color backgroundColor = new Color(225, 227, 235);
+	
+	/**
+	 * The UID of the card containing this button (the 'parent' card).
+	 */
+	private String parentCardUID;
 
 	/**
 	 * Constructs a new Button with given unique ID, text, and strategy
@@ -199,6 +204,13 @@ public class Button extends ALayoutComponent {
 	public void setStrategy(String strategy) {
 		this.strategy = strategy;
 	}
+	
+	/**
+	 * @param parentUID the UID to set
+	 */
+	public void setParentCardUID(String parentUID) {
+		this.parentCardUID = parentUID;
+	}
 
 	/**
 	 * Converts this Button object to XML
@@ -212,9 +224,20 @@ public class Button extends ALayoutComponent {
 		XMLTools.addProperty(doc, buttonElt, "ButtonStrategy", "String",
 				strategy);
 
-		if (strategy.equals("GoToPage"))
-			XMLTools.addProperty(doc, buttonElt, "PageNumber", "Integer", Integer
-					.toString(pageNum));
+		if (strategy.indexOf("GoToPage") == 0) {
+			XMLTools.addProperty(doc, buttonElt, "PageNumber", "Integer", Integer.toString(pageNum));
+		}
+		
+		if (strategy.equals("NextPageRequireSelection") || strategy.equals("GoToPageRequireSelection")) {
+			// This should point to the 'no selection' page corresponding 
+			// to the current race. For now, the output has to be manually
+			// changed from "-1" to the correct page number
+			XMLTools.addProperty(
+					doc, buttonElt, "NoSelectionPageNumber", "Integer", -1);
+			// Provides the UID of the parent card 
+			XMLTools.addProperty(
+					doc, buttonElt, "ParentCard", "String", parentCardUID);
+		}
 		return buttonElt;
 	}
 

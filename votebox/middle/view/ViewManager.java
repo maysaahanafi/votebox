@@ -813,4 +813,12 @@ public class ViewManager implements IViewManager {
 		//System.out.println("Registering for Review...");
 		_reviewScreenEncountered.addObserver(reviewScreenObserver);
 	}
+
+	/**
+	 * Gets the IBallotLookupAdapter for this ViewManager.
+	 * @return the IBallotLookupAdapter
+	 */
+    public IBallotLookupAdapter getBallotLookupAdapter() {
+    	return _ballotLookupAdapter;
+    }
 }
