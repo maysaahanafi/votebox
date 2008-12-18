@@ -369,6 +369,97 @@ public class Button extends Label implements IFocusable {
                 }
             };
         }
+        else if (strategy.equals( "NextPageRequireSelection" )) {
+            _buttonStrategy = new IButtonStrategy() {
+                public void execute(Button context)
+                        throws BallotBoxViewException {
+                	String parent = "";
+                	String selected = null;
+                	try {
+                		parent = context.getProperties().getString(Properties.PARENT_CARD);
+                    	selected = viewManager.getBallotLookupAdapter().selectedElement(parent);
+                	}
+                	catch (Exception e) {
+                		throw new BallotBoxViewException(
+                				"The parent card property for button with UID"
+                				+ context.getUniqueID()
+                                + " is not defined as a string", e);
+                	}
+                	if (parent.equals(selected)) {
+                        int pagenum;
+                        if (context.getProperties().contains(Properties.NO_SELECTION_PAGE_NUMBER))
+                            try {
+                                pagenum = context.getProperties().getInteger(
+                                    Properties.NO_SELECTION_PAGE_NUMBER );
+                            }
+                            catch (IncorrectTypeException e) {
+                                throw new BallotBoxViewException(
+                                        "The no selection page number property for button with UID"
+                                                + context.getUniqueID()
+                                                + " is not defined as an integer",
+                                        null );
+                            }
+                        else
+                            throw new BallotBoxViewException(
+                                    "Button with UID: "
+                                            + context.getUniqueID()
+                                            + " attempted to jump to the no selection alert page, but the button does not define a page.",
+                                    null );
+                        viewManager.drawPage(pagenum);
+                	}
+                	else {
+                        viewManager.nextPage();
+                	}
+                }
+            };
+        }
+        else if (strategy.equals( "GoToPageRequireSelection" )) {
+            _buttonStrategy = new IButtonStrategy() {
+
+                public void execute(Button context)
+                        throws BallotBoxViewException {
+                	String parent = "";
+                	String selected = null;
+                	try {
+                		parent = context.getProperties().getString(Properties.PARENT_CARD);
+                    	selected = viewManager.getBallotLookupAdapter().selectedElement(parent);
+                	}
+                	catch (Exception e) {
+                		throw new BallotBoxViewException(
+                				"The parent card property for button with UID"
+                				+ context.getUniqueID()
+                                + " is not defined as a string", e);
+                	}
+                    String property;
+                	if (parent.equals(selected)) {
+                		property = Properties.NO_SELECTION_PAGE_NUMBER;
+                	}
+                	else {
+                		property = Properties.PAGE_NUMBER;
+                	}
+                    int pagenum;
+                    if (context.getProperties().contains(property))
+                        try {
+                            pagenum = context.getProperties().getInteger(property);
+                        }
+                        catch (IncorrectTypeException e) {
+                            throw new BallotBoxViewException(
+                                    "The page number property for button with UID"
+                                            + context.getUniqueID()
+                                            + " is not defined as an integer",
+                                    null );
+                        }
+                    else
+                        throw new BallotBoxViewException(
+                                "Button with UID: "
+                                        + context.getUniqueID()
+                                        + " attempted to jump to new page, but the button does not define a page.",
+                                null );
+
+                    viewManager.drawPage( pagenum );
+                }
+            };
+        }
         else
             throw new UnknownStrategyException( strategy );
     }

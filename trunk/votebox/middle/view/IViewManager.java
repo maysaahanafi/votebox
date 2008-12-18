@@ -23,6 +23,7 @@
 package votebox.middle.view;
 
 import votebox.middle.IncorrectTypeException;
+import votebox.middle.ballot.IBallotLookupAdapter;
 
 /**
  * Other classes that make use of the ViewManager should program to this
@@ -118,4 +119,10 @@ public interface IViewManager {
      *         manager is asking to have displayed.
      */
     String getLanguage();
+    
+    /**
+     * Gets the IBallotLookupAdapter for this IViewManager.
+     * @return The IBallotLookupAdapter.
+     */
+    IBallotLookupAdapter getBallotLookupAdapter();
 }

@@ -101,6 +101,17 @@ public class Properties {
      * page number to which it should "go."
      */
     public static final String PAGE_NUMBER = "PageNumber";
+    
+    /**
+     * Defines the page number of the 'no selection' page corresponding to
+     * the current page. For now, this has to be set manually in the output.
+     */
+    public static final String NO_SELECTION_PAGE_NUMBER = "NoSelectionPageNumber";
+    
+    /**
+     * Specifies the UID of the containing ('parent') card.
+     */
+    public static final String PARENT_CARD = "ParentCard";
 
     /**
      * Set this property to name an element in the layout or in the ballot.

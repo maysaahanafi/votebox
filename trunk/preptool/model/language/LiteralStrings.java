@@ -66,6 +66,23 @@ public class LiteralStrings {
 		ls = new LocalizedString();
 		ls.set(ENGLISH, "Thank you for voting!");
 		map.put("SUCCESS_TITLE", ls);
+
+		ls = new LocalizedString();
+		ls.set(ENGLISH, "You must make a selection!");
+		map.put("NO_SELECTION_TITLE", ls);
+
+		ls = new LocalizedString();
+		ls.set(ENGLISH, "You must make a selection on every page. If you do not want to vote, select 'None of the above'.");
+		map.put("NO_SELECTION", ls);
+
+		ls = new LocalizedString();
+		ls.set(ENGLISH, "Click to go back to the selection screen");
+		map.put("RETURN_RACE", ls);
+		
+		ls = new LocalizedString();
+		ls.set(ENGLISH, "None of the Above");
+		ls.set(SPANISH, "Ninguna de las Anteriores");
+		map.put("NONE_OF_ABOVE", ls);
 		
 		ls = new LocalizedString();
 		ls.set(ENGLISH, "Thank you for challenging!");
