@@ -48,6 +48,8 @@ import javax.print.PrintService;
 import javax.print.attribute.standard.PrinterName;
 import javax.swing.Timer;
 
+import edu.uconn.cse.adder.PublicKey;
+
 import sexpression.*;
 import tap.BallotImageHelper;
 import votebox.crypto.*;
@@ -243,7 +245,7 @@ public class VoteBox {
         	//Listen for commit ui events.  When received, send out an encrypted vote.
         	currentDriver.getView().registerForCommit(new Observer() {
 
-        		public void update(Observable o, Object arg) {
+        		public void update(Observable o, Object argTemp) {
         			if (!connected)
         				throw new RuntimeException(
         						"Attempted to cast ballot when not connected to any machines");
@@ -256,11 +258,13 @@ public class VoteBox {
 
                     committedBallot = true;
                     
+                    Object[] arg = (Object[])argTemp;
+                    
         			// arg1 should be the cast ballot structure, check
-        			if (Ballot.BALLOT_PATTERN.match((ASExpression) arg) == NoMatch.SINGLETON)
+        			if (Ballot.BALLOT_PATTERN.match((ASExpression) arg[0]) == NoMatch.SINGLETON)
         				throw new RuntimeException(
         						"Incorrectly expected a cast-ballot");
-        			ListExpression ballot = (ListExpression) arg;
+        			ListExpression ballot = (ListExpression) arg[0];
 
         			try {
 						auditorium.announce(new CommitBallotEvent(mySerial,
@@ -281,7 +285,7 @@ public class VoteBox {
         	//Clean up the encryptor afterwards so as to destroy the random number needed for challenging.
         	currentDriver.getView().registerForCastBallot(new Observer(){
 
-				public void update(Observable o, Object arg) {
+				public void update(Observable o, Object argTemp) {
 					if (!connected)
         				throw new RuntimeException(
         						"Attempted to cast ballot when not connected to any machines");
@@ -295,6 +299,8 @@ public class VoteBox {
         			finishedVoting = true;
         			++publicCount;
         			++protectedCount;
+        			
+        			Object[] arg = (Object[])argTemp;
         			
         			auditorium.announce(new CastCommittedBallotEvent(mySerial,
         					StringExpression.makeString(nonce)));
@@ -313,7 +319,8 @@ public class VoteBox {
         		 * Makes sure that the booth is in a correct state to cast a ballot,
         		 * then announce the cast-ballot message (also increment counters)
         		 */
-        		public void update(Observable o, Object arg) {
+        		@SuppressWarnings("unchecked")
+				public void update(Observable o, Object argTemp) {
         			if (!connected)
         				throw new RuntimeException(
         						"Attempted to cast ballot when not connected to any machines");
@@ -328,19 +335,29 @@ public class VoteBox {
         			++publicCount;
         			++protectedCount;
 
+        			Object[] arg = (Object[])argTemp;
+        			
         			//If we are not using encryption use the plain old CastBallotEvent
         			if(!_constants.getCastBallotEncryptionEnabled()){
         				auditorium.announce(new CastBallotEvent(mySerial,
         						StringExpression.makeString(nonce),
-        						(ASExpression)arg));
+        						(ASExpression)arg[0]));
         			}else{
         				//Else, use the EncryptedCastBallotEvent with a properly encrypted ballot
         				try{
-        					BallotEncrypter.SINGLETON.encrypt((ListExpression)arg, _constants.getKeyStore().loadKey("public"));
+        					if(!VoteBox.this._constants.getEnableNIZKs()){
+        						BallotEncrypter.SINGLETON.encrypt((ListExpression)arg[0], _constants.getKeyStore().loadKey("public"));
 
-        					auditorium.announce(new EncryptedCastBallotEvent(mySerial,
-        							StringExpression.makeString(nonce),
-        							BallotEncrypter.SINGLETON.getRecentEncryptedBallot()));
+        						auditorium.announce(new EncryptedCastBallotEvent(mySerial,
+        								StringExpression.makeString(nonce),
+        								BallotEncrypter.SINGLETON.getRecentEncryptedBallot()));
+        					}else{
+        						BallotEncrypter.SINGLETON.encryptWithProof((ListExpression)arg[0], (List<List<String>>)arg[1], (PublicKey)_constants.getKeyStore().loadAdderKey("public"));
+        						
+        						auditorium.announce(new EncryptedCastBallotWithNIZKsEvent(mySerial,
+        								StringExpression.makeString(nonce),
+        								BallotEncrypter.SINGLETON.getRecentEncryptedBallot()));
+        					}//if
         				} catch (AuditoriumCryptoException e) {
 							System.err.println("Encryption Error: "+e.getMessage());
 						}

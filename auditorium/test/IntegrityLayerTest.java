@@ -77,6 +77,10 @@ public class IntegrityLayerTest {
         public Key loadKey(String nodeid) throws AuditoriumCryptoException {
             return _mykey;
         }
+        
+        public Object loadAdderKey(String nodeid) throws RuntimeException{
+        	return null;
+        }
     };
     private AuditoriumIntegrityLayer _layer;
 

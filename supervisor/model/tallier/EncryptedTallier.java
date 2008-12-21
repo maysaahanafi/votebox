@@ -43,20 +43,26 @@ import votebox.crypto.Pair;
 public class EncryptedTallier implements ITallier {
 	private static ASExpression PATTERN = new ListWildcard(new ListExpression(StringWildcard.SINGLETON, Wildcard.SINGLETON));
 	
+	private Key _privateKey = null;
+	
 	private Map<String, Pair<BigInteger>> _votes = new HashMap<String, Pair<BigInteger>>();
+	
+	public EncryptedTallier(Key privateKey){
+		_privateKey = privateKey;
+	}
 	
 	/**
 	 * @param privateKey - the appropriate ElGamal private key
 	 * @return a text description of the outcome of the election.
 	 */
-	public Map<String, BigInteger> getReport(Key privateKey) {
+	public Map<String, BigInteger> getReport() {
 		
 		Map<String, BigInteger> results = new HashMap<String, BigInteger>();
 		
 		for(String candidate : _votes.keySet()){
 			Pair<BigInteger> value = _votes.get(candidate);
 			
-			results.put(candidate, ElGamalCrypto.SINGLETON.decrypt(privateKey, value));
+			results.put(candidate, ElGamalCrypto.SINGLETON.decrypt(_privateKey, value));
 		}//for
 		
 		return results;

@@ -50,4 +50,9 @@ public interface IKeyStore {
      *         given file.
      */
     Cert loadCert(String nodeid) throws AuditoriumCryptoException;
+    
+    /**
+     * Load the adder key associated with the given ID.
+     */
+    Object loadAdderKey(String nodeid) throws RuntimeException;
 }

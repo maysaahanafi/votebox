@@ -42,7 +42,7 @@ public class ConverterTest {
 		@SuppressWarnings("unused")
 		PrivateKey priv = pubKey.genKeyPair();
 		
-		ListExpression encrypted = BallotEncrypter.SINGLETON.encryptWithProof(ballot, pubKey);
+		ListExpression encrypted = BallotEncrypter.SINGLETON.encryptSublistWithProof(ballot, pubKey);
 		ASExpression vote = ((ListExpression)encrypted.get(0)).get(1);
 		ASExpression proof = ((ListExpression)encrypted.get(1)).get(1);
 		
@@ -52,6 +52,23 @@ public class ConverterTest {
 		Vote vVote = Vote.fromString(vote.toString());
 		
 		Assert.assertTrue("Vote should verify", vProof.verify(vVote, finalPubKey, 0, 1));
+		
+		choice1 = new ListExpression("B21", "1");
+		choice2 = new ListExpression("B22", "0");
+		choice3 = new ListExpression("B23", "1");
+		
+		ballot = new ListExpression(choice1, choice2, choice3);
+		
+		encrypted = BallotEncrypter.SINGLETON.encryptSublistWithProof(ballot, pubKey);
+		vote = ((ListExpression)encrypted.get(0)).get(1);
+		proof = ((ListExpression)encrypted.get(1)).get(1);
+		
+		finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(2)).get(1).toString());
+		
+		vProof = VoteProof.fromString(proof.toString());
+		vVote = Vote.fromString(vote.toString());
+		
+		Assert.assertFalse("Vote shouldn't verify", vProof.verify(vVote, finalPubKey, 0, 1));
 	}
 	
 	@Test

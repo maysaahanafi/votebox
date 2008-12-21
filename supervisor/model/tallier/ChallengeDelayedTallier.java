@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import auditorium.Bugout;
+import auditorium.Key;
 
 import sexpression.ASExpression;
 
@@ -40,7 +41,11 @@ public class ChallengeDelayedTallier extends EncryptedTallier {
 	//Mapping of nonce values to pending ballots
 	private Map<ASExpression, byte[]> _nonceToBallot = new HashMap<ASExpression, byte[]>();
 	
-	public ChallengeDelayedTallier(){}
+	private Key _privateKey = null;
+	
+	public ChallengeDelayedTallier(Key privateKey){
+		super(privateKey);
+	}
 	
 	@Override
 	public void recordVotes(byte[] message, ASExpression nonce){

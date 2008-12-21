@@ -98,6 +98,9 @@ public class AuditoriumParams implements IAuditoriumParams,
     public static final int PRINTABLE_WIDTH_FOR_VVPAT = 239;
     public static final int PRINTABLE_HEIGHT_FOR_VVPAT = 311;
     
+    //By default, we don't enable NIZKs.
+    public static final boolean ENABLE_NIZKS = false;
+    
     private final HashMap<String, String> _config;
 
     /**
@@ -294,6 +297,13 @@ public class AuditoriumParams implements IAuditoriumParams,
 		}catch(NumberFormatException e){}
 		
 		return PRINTABLE_WIDTH_FOR_VVPAT;
+	}
+	
+	public boolean getEnableNIZKs() {
+		if(_config.containsKey("ENABLE_NIZKS"))
+			return Boolean.parseBoolean(_config.get("ENABLE_NIZKS"));
+		
+		return ENABLE_NIZKS;
 	}
 	
     /**

@@ -175,4 +175,9 @@ public interface IAuditoriumParams {
      * @return the height of the printable area (in 1/72nds of an inch) of the page on the VVPAT printer.
      */
     public int getPrintableHeightForVVPAT();
+    
+    /**
+     * @return true if VoteBox should use NIZKs to confirm the wellformed-ness of ballots.
+     */
+    public boolean getEnableNIZKs();
 }

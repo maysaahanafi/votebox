@@ -213,6 +213,7 @@ public class Launcher {
 
 					public int getViewRestartTimeout() {return 1;}
 
+					public boolean getEnableNIZKs() { return false; }
 				};
 				
 				vbcopy.registerForReview(evilObserver);

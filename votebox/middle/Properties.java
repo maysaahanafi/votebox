@@ -184,6 +184,13 @@ public class Properties {
     public static final String LIE = "Lie";
 
     /**
+     * Set this property to a list of race-ids to indicate the group of race-ids that compose the race on this card.
+     * In the event that a race spans multiple cards, the FIRST card should contain this property
+     * and it should be omitted on all subsequent cards in the race.
+     */
+    public static final String RACE_GROUP = "RaceGroup";
+    
+    /**
      * Here, we hold the actual property mappings.
      */
     private HashMap<String, Object> _properties = new HashMap<String, Object>();

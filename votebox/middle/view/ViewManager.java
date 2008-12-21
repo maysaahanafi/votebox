@@ -251,8 +251,12 @@ public class ViewManager implements IViewManager {
      * releasing, remove the event and put all code in this function, so that an
      * outside party cannot register malicious code.
      */
-    public void castBallot() {    	
-        _castBallotEvent.notifyObservers(_ballotLookupAdapter.getCastBallot());
+    public void castBallot() {
+    	Object[] toPass = new Object[]{
+    		_ballotLookupAdapter.getCastBallot(),
+    		_ballotLookupAdapter.getRaceGroups()
+    	};
+        _castBallotEvent.notifyObservers(toPass);
     }
 
     /**
@@ -271,7 +275,11 @@ public class ViewManager implements IViewManager {
      * Call this method if the voter has proceeded past the review screen.
      */
     public void commitBallot() {
-        _commitEvent.notifyObservers(_ballotLookupAdapter.getCastBallot());
+    	Object[] toPass = new Object[]{
+        	_ballotLookupAdapter.getCastBallot(),
+        	_ballotLookupAdapter.getRaceGroups()
+    	};
+        _commitEvent.notifyObservers(toPass);
     }
 
     /**
