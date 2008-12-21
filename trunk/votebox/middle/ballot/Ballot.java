@@ -67,6 +67,11 @@ public final class Ballot {
      * This field holds how many selections have been made in the ballot.
      */
     private int _numSelections = 0;
+    
+    /**
+     * List of the lists of race-ids that make up each race in the ballot.
+     */
+    private List<List<String>> _raceGroups = null;
 
     /**
      * This is Ballot's public constructor.
@@ -80,12 +85,18 @@ public final class Ballot {
      *            These are the elements that make up this ballot. This is a
      *            dictionary mapping a unique id to its corresponding card
      *            element for every card element contained in this ballot
+     * @param raceGroups
+     * 	          For every race, the race-ids that make it up.  This is equivalent
+     *            to a list of lists such that each sub list may only have one
+     *            child element selected in a valid ballot at any time.
      */
     public Ballot(List<Card> cards, Properties properties,
-            HashMap<String, SelectableCardElement> elements) {
+            HashMap<String, SelectableCardElement> elements,
+            List<List<String>> raceGroups) {
         _cards = cards;
         _properties = properties;
         _elements = elements;
+        _raceGroups = raceGroups;
 
         // 1) Set the parent pointer for each card back to this ballot
         // 2) Set the strategy of each card that this ballot contains
@@ -293,5 +304,16 @@ public final class Ballot {
         for (Card card : _cards)
             pairs.addAll(card.getCastBallot());
         return new ListExpression(pairs);
+    }
+    
+    /**
+     * Accessor for the race group parameter passed at construction.
+     * Refer there for more discussion.
+     * 
+     * @return the race groups of this ballots
+     * @see {@link #Ballot(List, Properties, HashMap, List)}
+     */
+    public List<List<String>> getRaceGroups(){
+    	return _raceGroups;
     }
 }

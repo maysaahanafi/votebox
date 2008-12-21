@@ -30,6 +30,9 @@ import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import edu.uconn.cse.adder.PrivateKey;
+import edu.uconn.cse.adder.PublicKey;
+
 import sexpression.*;
 import sexpression.stream.*;
 
@@ -105,6 +108,35 @@ public class SimpleKeyStore implements IKeyStore {
 		return _certCache.get(nodeid);
 	}
 
+    public Object loadAdderKey(String nodeid) throws RuntimeException{
+    	try{
+    	ASExpression key = load(nodeid+".adder.key");
+
+    	String str = ((StringExpression)key).toString();
+    	
+    	PublicKey pubKey = null;
+    	PrivateKey privKey = null;
+    	
+    	try{
+    		pubKey = PublicKey.fromString(str);
+    	}catch(Exception e){
+    		try{
+    			privKey = PrivateKey.fromString(str);
+    		}catch(Exception f){}
+    	}
+    	
+    	if(pubKey != null)
+    		return pubKey;
+    	
+    	if(privKey != null)
+    		return privKey;
+    	}catch(Exception e){
+    		throw new RuntimeException(e);
+    	}
+    	
+    	throw new RuntimeException("No adder key exists for nodeid: "+nodeid);
+    }
+    
     /**
      * Loads a file for use in the KeyStore.<BR>
      * First searches the ROOT_JAR, if it exists.<BR>

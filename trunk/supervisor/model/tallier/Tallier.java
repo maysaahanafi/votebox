@@ -57,7 +57,7 @@ public class Tallier implements ITallier{
 	/**
 	 * @see supervisor.model.tallier.ITallier#getReport()
 	 */
-	public Map<String, BigInteger> getReport(Key ignored) {
+	public Map<String, BigInteger> getReport() {
 		Map<String, BigInteger> results = new HashMap<String, BigInteger>();
 		
 		for(Map<String, Integer> race : votes.values()){

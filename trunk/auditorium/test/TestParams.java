@@ -62,7 +62,7 @@ public class TestParams implements IAuditoriumParams {
     public static final int DEFAULT_HTTP_PORT = 80;
     public static final String DEFAULT_BALLOT_FILE = "";
     public static final String DEFAULT_PRINTER_FOR_VVPAT = "";
-    
+    public static final boolean DEFAULT_ENABLE_NIZKS = false;
 
     public String getBroadcastAddress() {
         return BROADCAST_ADDRESS;
@@ -162,5 +162,9 @@ public class TestParams implements IAuditoriumParams {
 
 	public int getPrintableWidthForVVPAT() {
 		return 0;
+	}
+
+	public boolean getEnableNIZKs() {
+		return DEFAULT_ENABLE_NIZKS;
 	}
 }

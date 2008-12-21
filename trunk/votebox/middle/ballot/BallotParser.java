@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -177,7 +179,19 @@ public class BallotParser {
                                 + " as being a Property or Page.", null );
         }
 
-        return new Ballot( cards, properties, _elements );
+        List<List<String>> raceGroups = new ArrayList<List<String>>();
+        for(Card card : cards){
+        	Properties cardProps = card.getProperties();
+        	if(cardProps.contains(Properties.RACE_GROUP)){
+        		try{
+        			raceGroups.add(cardProps.getStringList(Properties.RACE_GROUP));
+        		}catch(Exception e){
+        			throw new BallotParserException(e.getMessage(), null);
+        		}
+        	}//if
+        }
+        
+        return new Ballot(cards, properties, _elements, raceGroups);
     }
 
     /**

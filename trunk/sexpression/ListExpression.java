@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An ListExpression is an SExpression. In particular, it is a list of simpler
@@ -67,7 +68,7 @@ public class ListExpression extends ASExpression implements
      *            This list of type ASExpression is the list that will represent
      *            this SExpressionList.
      */
-    public ListExpression(ArrayList<ASExpression> list) {
+    public ListExpression(List<ASExpression> list) {
         _list = list.toArray( new ASExpression[0] );
     }
 

@@ -27,8 +27,10 @@ import java.lang.management.ThreadMXBean;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;
@@ -57,20 +59,52 @@ public class BallotEncrypter {
     }
 
     /**
-     * Take an unenctyped ballot and make it encrypted, while also generating a NIZK.
+     * Takes an unencrypted ballot and encrypts it, while also generating a set of NIZKs to prove it is well formed.
+     * 
+     * @param ballot - Unencrypted ballot of the form ((race-id counter) ...) counter = {0, 1}
+     * @param raceGroups - a list of of groups of race-ids that are considered "together" in a well formed ballot.
+     * @param pubKey - the Adder PublicKey to use to encrypt the ballot and generate the NIZKs
+     * @return a ListExpression in the form (((vote [vote]) (vote-ids ([id1], [id2], ...)) (proof [proof]) (public-key [key])) ...)
+     */
+    public ListExpression encryptWithProof(ListExpression ballot, List<List<String>> raceGroups, PublicKey pubKey){
+    	List<ASExpression> subBallots = new ArrayList<ASExpression>();
+    	
+    	Map<String, ListExpression> ballotMap = new HashMap<String, ListExpression>();
+    	for(int i = 0; i < ballot.size(); i++){
+    		ListExpression vote = (ListExpression)ballot.get(i);
+    		String id = vote.get(0).toString();
+    		ballotMap.put(id, vote);
+    	}
+    	
+    	for(List<String> group : raceGroups){
+    		List<ASExpression> races = new ArrayList<ASExpression>();
+    		for(String raceId : group)
+    			races.add(ballotMap.get(raceId));
+    		
+    		ListExpression subBallot = new ListExpression(races);
+    		subBallots.add(encryptSublistWithProof(subBallot, pubKey));
+    	}
+    	
+    	return new ListExpression(subBallots);
+    }
+    
+    /**
+     * Take an unencryped ballot and make it encrypted, while also generating a NIZK.
      * 
      * @param ballot 
      *          This is the pre-encrypt ballot in the form ((race-id counter) ...)
      * @param publicKey
      *          this is an Adder-style public key
-     * @return An ListExpression of the form ((vote [vote]) (proof [proof]) (public-key [key])
+     * @return An ListExpression of the form ((vote [vote]) (vote-ids ([id1], [id2], ...)) (proof [proof]) (public-key [key]))
      */
-    public ListExpression encryptWithProof(ListExpression ballot, PublicKey pubKey){
+    public ListExpression encryptSublistWithProof(ListExpression ballot, PublicKey pubKey){
     	List<AdderInteger> value = new ArrayList<AdderInteger>();
+    	List<ASExpression> valueIds = new ArrayList<ASExpression>();
     	
     	for(int i = 0; i < ballot.size(); i++){
     		ListExpression choice = (ListExpression)ballot.get(i);
     		value.add(new AdderInteger(choice.get(1).toString()));
+    		valueIds.add(choice.get(0));
     	}//for
     	
     	Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
@@ -95,55 +129,24 @@ public class BallotEncrypter {
 		Vote vote = finalPubKey.encrypt(value);
 		
 		VoteProof proof = new VoteProof();
-		//This may need to be (.., .., .., 1, 1)... way to go Adder docs!
 		proof.compute(vote, finalPubKey, value, 0, 1);
-		
-		
     	
 		ListExpression vList = new ListExpression(StringExpression.makeString("vote"),
 				StringExpression.makeString(vote.toString()));
+		ListExpression idList = new ListExpression(StringExpression.makeString("vote-ids"),
+				new ListExpression(valueIds));
 		ListExpression pList = new ListExpression(StringExpression.makeString("proof"),
 				StringExpression.makeString(proof.toString()));
 		ListExpression kList = new ListExpression(StringExpression.makeString("public-key"),
 				StringExpression.makeString(finalPubKey.toString()));
 		
-		ListExpression ret = new ListExpression(vList, pList, kList);
+		ListExpression ret = new ListExpression(vList, idList, pList, kList);
 		
-		System.out.println(proof.verify(vote, finalPubKey, 0, 1));
-		System.out.println(VoteProof.fromString(proof.toString()).verify(vote, finalPubKey, 0, 1));
-		System.out.println(proof.verify(Vote.fromString(vote.toString()), finalPubKey, 0, 1));
-		
-		System.out.println(ret);
-		System.out.println(vote);
-		System.out.println(proof);
+		_recentBallot = ret;
+		_randomList = ElGamalCrypto.SINGLETON.getRecentRandomness();
+        ElGamalCrypto.SINGLETON.clearRecentRandomness();
 		
 		return ret;
-		
-    	/*Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
-    	AdderInteger p = pubKey.getP();
-		AdderInteger q = pubKey.getQ();
-		AdderInteger g = pubKey.getG();
-		AdderInteger f = pubKey.getF();
-		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
-		
-		AdderInteger gvalue = g.pow((poly).
-                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
-		finalH = finalH.multiply(gvalue);
-		
-		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
-    	
-    	Vote vote = finalPubKey.encrypt(choices);
-    	VoteProof proof = new VoteProof();
-    	//This may need to be (....., 1, 1); docs are ambiguous
-    	proof.compute(vote, finalPubKey, choices, 0, 1);
-    	
-    	ASExpression voteE = Converter.toSExpression(vote);
-    	ASExpression proofE = Converter.toSExpression(proof);
-    	
-    	assert Converter.toVote(voteE).toString().equals(vote.toString());
-    	assert Converter.toVoteProof(proofE).toString().equals(proof.toString());
-    	
-    	return new ListExpression(voteE, proofE);*/
     }
     
     /**

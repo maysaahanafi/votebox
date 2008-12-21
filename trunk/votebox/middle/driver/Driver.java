@@ -143,6 +143,10 @@ public class Driver {
 		public int numSelections() {
 			return _ballot.getNumSelections();
 		}
+
+		public List<List<String>> getRaceGroups() {
+			return _ballot.getRaceGroups();
+		}
 	};
 
 	public Driver(String path, IViewFactory factory, boolean encryptionEnabled) {

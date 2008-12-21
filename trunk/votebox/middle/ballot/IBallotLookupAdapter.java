@@ -22,6 +22,8 @@
 
 package votebox.middle.ballot;
 
+import java.util.List;
+
 import sexpression.ASExpression;
 import votebox.middle.driver.UnknownUIDException;
 
@@ -106,4 +108,11 @@ public interface IBallotLookupAdapter {
 	 *         on the ballot associated with this adapter.
 	 */
 	public int numSelections();
+	
+	/**
+	 * Call this method to determine the structure and contents of the various races in this ballot.
+	 * 
+	 * @return a List of the groups of race-ids that make up each race.  Used to construct NIZKs.
+	 */
+	public List<List<String>> getRaceGroups();
 }

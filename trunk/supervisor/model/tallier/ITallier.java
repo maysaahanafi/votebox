@@ -41,11 +41,10 @@ public interface ITallier {
 	/**
 	 * Gets the report of the total tally
 	 * 
-	 * @param key - Any necessary key for this operation.
 	 * 
 	 * @return the report as a map of Candidiate to votes received.
 	 */
-	public Map<String, BigInteger> getReport(Key key);
+	public Map<String, BigInteger> getReport();
 	
 	/**
 	 * Records the votes from the given ballot, as an S-Expression in byte array

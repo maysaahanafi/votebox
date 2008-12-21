@@ -36,11 +36,16 @@ import java.util.TreeSet;
 
 import javax.swing.Timer;
 
+import edu.uconn.cse.adder.PrivateKey;
+import edu.uconn.cse.adder.PublicKey;
+
 import sexpression.ASExpression;
 import sexpression.NoMatch;
 import sexpression.StringExpression;
 import supervisor.model.tallier.ChallengeDelayedTallier;
+import supervisor.model.tallier.ChallengeDelayedWithNIZKsTallier;
 import supervisor.model.tallier.EncryptedTallier;
+import supervisor.model.tallier.EncryptedTallierWithNIZKs;
 import supervisor.model.tallier.ITallier;
 import supervisor.model.tallier.Tallier;
 import votebox.events.ActivatedEvent;
@@ -119,7 +124,7 @@ public class Model {
 
     private IAuditoriumParams auditoriumParams;
     
-    private Key privateKey = null;
+    //private Key privateKey = null;
 
     /**
      * Equivalent to Model(-1, params);
@@ -240,7 +245,8 @@ public class Model {
     public Map<String, BigInteger> closePolls() {
         auditorium
                 .announce(new PollsClosedEvent(mySerial, new Date().getTime()));
-        return tallier.getReport(privateKey);
+        //return tallier.getReport(privateKey);
+        return tallier.getReport();
     }
 
     /**
@@ -679,10 +685,17 @@ public class Model {
             public void pollsOpen(PollsOpenEvent e){
                 
             	if(auditoriumParams.getUseCommitChallengeModel()){
-            		//Loading privateKey well in advance so the whole affair is "fail-fast"
     				try {
-						privateKey = auditoriumParams.getKeyStore().loadKey("private");
-						tallier = new ChallengeDelayedTallier();
+						if(!auditoriumParams.getEnableNIZKs()){
+							//Loading privateKey well in advance so the whole affair is "fail-fast"
+							Key privateKey = auditoriumParams.getKeyStore().loadKey("private");
+							tallier = new ChallengeDelayedTallier(privateKey);
+						}else{
+							//Loading privateKey well in advance so the whole affair is "fail-fast"
+							PrivateKey privateKey = (PrivateKey)auditoriumParams.getKeyStore().loadAdderKey("private");
+							PublicKey publicKey = (PublicKey)auditoriumParams.getKeyStore().loadAdderKey("public");
+							tallier = new ChallengeDelayedWithNIZKsTallier(publicKey, privateKey);
+						}//if
 					} catch (AuditoriumCryptoException e1) {
 						System.err.println("Crypto error encountered: "+e1.getMessage());
 						e1.printStackTrace();
@@ -690,14 +703,24 @@ public class Model {
             	}else{
             		//If Encryption is not enabled, use a vanilla tallier
             		if(!auditoriumParams.getCastBallotEncryptionEnabled()){
-            			privateKey = null;
+            			if(auditoriumParams.getEnableNIZKs())
+            				throw new RuntimeException("Encryption must be enabled to use NIZKs");
+            			
+            			//privateKey = null;
             			tallier = new Tallier();
             		}else{
             			//Otherwise, grab the private key and allocate an encrypted tallier
             			try{
-            				//Loading privateKey well in advance so the whole affair is "fail-fast"
-            				privateKey = auditoriumParams.getKeyStore().loadKey("private");
-            				tallier = new EncryptedTallier();
+            				if(!auditoriumParams.getEnableNIZKs()){
+	            				//Loading privateKey well in advance so the whole affair is "fail-fast"
+	            				Key privateKey = auditoriumParams.getKeyStore().loadKey("private");
+	            				tallier = new EncryptedTallier(privateKey);
+            				}else{
+            					//Loading privateKey well in advance so the whole affair is "fail-fast"
+            					PrivateKey privateKey = (PrivateKey)auditoriumParams.getKeyStore().loadAdderKey("private");
+            					PublicKey publicKey = (PublicKey)auditoriumParams.getKeyStore().loadAdderKey("public");
+            					tallier = new EncryptedTallierWithNIZKs(publicKey, privateKey);
+            				}//if
             			}catch(AuditoriumCryptoException e1){
             				System.err.println("Crypto error encountered: "+e1.getMessage());
     						e1.printStackTrace();
