@@ -2,20 +2,15 @@ package votebox.crypto.interop;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import auditorium.Key;
-
 import sexpression.ASExpression;
 import sexpression.ListExpression;
 import votebox.crypto.BallotEncrypter;
-import votebox.crypto.ElGamalCrypto;
-import votebox.crypto.Pair;
 
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;

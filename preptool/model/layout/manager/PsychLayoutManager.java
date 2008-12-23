@@ -43,11 +43,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import preptool.model.ballot.ACard;
-import preptool.model.ballot.PropositionCard;
 import preptool.model.ballot.Ballot;
 import preptool.model.language.Language;
 import preptool.model.language.LiteralStrings;
-import preptool.model.layout.ALayoutComponent;
 import preptool.model.layout.Background;
 import preptool.model.layout.Button;
 import preptool.model.layout.ILayoutComponentVisitor;
@@ -618,7 +616,7 @@ public class PsychLayoutManager extends ALayoutManager {
      */
     private static final int WINDOW_HEIGHT = 768;
 
-    private static Layout LAST_LAYOUT = null;
+    //private static Layout LAST_LAYOUT = null;
     
     /**
      * Visitor that renders a component and returns an image
@@ -1211,7 +1209,7 @@ public class PsychLayoutManager extends ALayoutManager {
         	layout.setReponsePage(layout.getPages().size()-1);
         }
         
-        LAST_LAYOUT = layout;
+        //LAST_LAYOUT = layout;
         
         //#ifdef NONE_OF_ABOVE
         // Get the number of cards
@@ -1286,7 +1284,8 @@ public class PsychLayoutManager extends ALayoutManager {
         ArrayList<JPanel> cardPanels = makeCardPage(card);
         ArrayList<Page> pages = new ArrayList<Page>();
         
-        Label title = null;
+        @SuppressWarnings("unused")
+		Label title = null;
         
         for (int i = 0; i < cardPanels.size(); i++) {
             // Setup card frame

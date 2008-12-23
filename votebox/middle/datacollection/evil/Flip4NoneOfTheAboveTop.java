@@ -10,7 +10,7 @@ import votebox.middle.ballot.Card;
 import votebox.middle.driver.IAdapter;
 
 public class Flip4NoneOfTheAboveTop implements EvilObserver {
-	private IAdapter _ballotAdapter = null;
+	//private IAdapter _ballotAdapter = null;
 	private Ballot _ballot = null;
 	
 	private boolean _notRun = true;
@@ -47,7 +47,7 @@ public class Flip4NoneOfTheAboveTop implements EvilObserver {
 	}
 
 	public void setAdapter(IAdapter ballotAdapter, IAdapter viewAdapter, Ballot ballot) {
-		_ballotAdapter = ballotAdapter;
+		//_ballotAdapter = ballotAdapter;
 		_ballot = ballot;
 	}
 

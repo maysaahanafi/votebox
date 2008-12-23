@@ -22,36 +22,21 @@
 
 package votebox;
 
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.print.PageFormat;
-import java.awt.print.Paper;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.print.PrintService;
-import javax.print.attribute.standard.PrinterName;
 import javax.swing.Timer;
 
 import edu.uconn.cse.adder.PublicKey;
 
 import sexpression.*;
-import tap.BallotImageHelper;
 import votebox.crypto.*;
 import votebox.events.*;
 import votebox.middle.*;
@@ -300,7 +285,7 @@ public class VoteBox {
         			++publicCount;
         			++protectedCount;
         			
-        			Object[] arg = (Object[])argTemp;
+        			//Object[] arg = (Object[])argTemp;
         			
         			auditorium.announce(new CastCommittedBallotEvent(mySerial,
         					StringExpression.makeString(nonce)));
