@@ -41,8 +41,6 @@ public class ChallengeDelayedTallier extends EncryptedTallier {
 	//Mapping of nonce values to pending ballots
 	private Map<ASExpression, byte[]> _nonceToBallot = new HashMap<ASExpression, byte[]>();
 	
-	private Key _privateKey = null;
-	
 	public ChallengeDelayedTallier(Key privateKey){
 		super(privateKey);
 	}

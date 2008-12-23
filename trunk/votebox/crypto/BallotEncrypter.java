@@ -33,10 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.uconn.cse.adder.AdderInteger;
-import edu.uconn.cse.adder.Election;
 import edu.uconn.cse.adder.ElgamalCiphertext;
 import edu.uconn.cse.adder.Polynomial;
-import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
 import edu.uconn.cse.adder.VoteProof;
@@ -44,7 +42,6 @@ import edu.uconn.cse.adder.VoteProof;
 import auditorium.Key;
 
 import sexpression.*;
-import votebox.crypto.interop.Converter;
 import votebox.middle.IBallotVars;
 import votebox.middle.ballot.*;
 

@@ -1,7 +1,6 @@
 package supervisor.model.tallier;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,11 +20,7 @@ import edu.uconn.cse.adder.VoteProof;
 
 import sexpression.ASExpression;
 import sexpression.ListExpression;
-import sexpression.NoMatch;
 import sexpression.stream.ASEInputStreamReader;
-import sexpression.stream.InvalidVerbatimStreamException;
-import votebox.crypto.ElGamalCrypto;
-import votebox.crypto.Pair;
 
 public class EncryptedTallierWithNIZKs implements ITallier {
 	private PrivateKey _privateKey = null;

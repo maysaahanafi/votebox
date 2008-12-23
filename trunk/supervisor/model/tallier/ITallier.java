@@ -23,7 +23,6 @@
 package supervisor.model.tallier;
 
 import sexpression.ASExpression;
-import auditorium.Key;
 
 import java.math.BigInteger;
 import java.util.Map;
