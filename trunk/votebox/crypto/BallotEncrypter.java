@@ -205,8 +205,9 @@ public class BallotEncrypter {
      * @param publicKey
      * @return Decrypted ballot, of the form ((race-id plaintext-counter) ...)
      */
-    public ListExpression adderDecrypt(ListExpression ballot, List<List<AdderInteger>> rVals, PublicKey pubKey){
+    public ListExpression adderDecrypt(ListExpression ballot, List<List<AdderInteger>> rVals){
     	Map<String, Vote> idsToVote = new HashMap<String, Vote>();
+    	Map<String, PublicKey> idsToPubKey = new HashMap<String, PublicKey>();
     	Map<String, List<AdderInteger>> idsToRs = new HashMap<String, List<AdderInteger>>();
     	Map<String, List<AdderInteger>> idsToDecrypted = new HashMap<String, List<AdderInteger>>();
     	
@@ -214,28 +215,17 @@ public class BallotEncrypter {
     		ListExpression race = (ListExpression)ballot.get(i);
     		Vote vote = Vote.fromString(((ListExpression)race.get(0)).get(1).toString());
     		ListExpression voteIds = (ListExpression)((ListExpression)race.get(1)).get(1);
+    		PublicKey finalPubKey = PublicKey.fromString(((ListExpression)race.get(3)).get(1).toString());
     		
     		idsToVote.put(voteIds.toString(), vote);
     		idsToRs.put(voteIds.toString(), rVals.get(i));
+    		idsToPubKey.put(voteIds.toString(), finalPubKey);
     	}
-    	
-    	Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
-		
-		AdderInteger p = pubKey.getP();
-		AdderInteger q = pubKey.getQ();
-		AdderInteger g = pubKey.getG();
-		AdderInteger f = pubKey.getF();
-		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
-		
-		AdderInteger gvalue = g.pow((poly).
-                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
-		finalH = finalH.multiply(gvalue);
-		
-		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
-    	
+
     	for(String ids : idsToVote.keySet()){
     		Vote vote = idsToVote.get(ids);
     		List<AdderInteger> rs = idsToRs.get(ids);
+    		PublicKey finalPubKey = idsToPubKey.get(ids);
     		
     		List<AdderInteger> d = adderDecryptSublist(vote, rs, finalPubKey);
     		
@@ -249,23 +239,31 @@ public class BallotEncrypter {
     	List<ASExpression> subLists = new ArrayList<ASExpression>();
     	
     	for(String ids : idsToPlaintext.keySet()){
-    		try{
-    		  ListExpression idList = (ListExpression)(new ASEInputStreamReader(new ByteArrayInputStream(ids.getBytes()))).read();
-    		  List<AdderInteger> plaintexts = idsToPlaintext.get(ids);
-    		  
-    		  for(int i = 0; i < idList.size(); i++){
-    			  StringExpression id = (StringExpression)idList.get(i);
-    			  AdderInteger plaintext = plaintexts.get(i);
-    			  List<ASExpression> subList = new ArrayList<ASExpression>();
-    			  subList.add(id);
-    			  subList.add(StringExpression.make(plaintext.toString()));
-    			  
-    			  subLists.add(new ListExpression(subList));
-    		  }
-    		}catch(Exception e){}
+    		List<StringExpression> idList = parseIds(ids.toString());
+    		List<AdderInteger> plaintexts = idsToPlaintext.get(ids);
+
+    		for(int i = 0; i < idList.size(); i++){
+    			StringExpression id = (StringExpression)idList.get(i);
+    			AdderInteger plaintext = plaintexts.get(i);
+    			List<ASExpression> subList = new ArrayList<ASExpression>();
+    			subList.add(id);
+    			subList.add(StringExpression.make(plaintext.toString()));
+    			subLists.add(new ListExpression(subList));
+    		}
     	}
     	
     	return new ListExpression(subLists);
+    }
+    
+    private List<StringExpression> parseIds(String ids){
+    	String[] strs = ids.split(" ");
+    	List<StringExpression> toRet = new ArrayList<StringExpression>();
+    	
+    	for(String str : strs){
+    		toRet.add(StringExpression.makeString(str.replaceAll("\\(", "").replaceAll("\\)", "")));
+    	}
+    	
+    	return toRet;
     }
     
     /**
@@ -281,11 +279,13 @@ public class BallotEncrypter {
     	//Adder encrypt is of m (public initial g, p, h) [infered from code]
     	//                    m = {0, 1}
     	//                    g' = g^r
-    	//                    h' = (h^r) * (m + 1)^2
+    	//                    h' = (h^r) * f^m
     	
     	//Quick decrypt (given r) [puzzled out by Kevin Montrose]
     	//                    confirm g^r = g'
-    	//                    m = (h' / (h^r))^(1/2) - 1
+    	//                    m' = (h' / (h^r))
+    	//                    if(m' == f) m = 1
+    	//                    if(m' == 1) m = 0
     	
     	List<ElgamalCiphertext> ciphers = (List<ElgamalCiphertext>)vote.getCipherList();
     	List<AdderInteger> ret = new ArrayList<AdderInteger>();
@@ -294,6 +294,7 @@ public class BallotEncrypter {
     	
     	for(ElgamalCiphertext cipher : ciphers){
     		AdderInteger r = rVals.get(i);
+    		
     		AdderInteger gPrime = cipher.getG();
     		AdderInteger hPrime = cipher.getH();
     		
@@ -302,20 +303,20 @@ public class BallotEncrypter {
     			return null;
     		}
     		
-    		AdderInteger step = hPrime.divide(key.getH().pow(r));
+    		AdderInteger mPrime = hPrime.divide(key.getH().pow(r));
     		AdderInteger m = null;
     		
-    		//Observe that m was 0 or 1, thus step must be either 1^2 or 2^2 (1 or 4) respectively
-    		if(step.equals(AdderInteger.ONE)){
+    		//Observe that m was 0 or 1, thus step must be either f or 1 respectively
+    		if(mPrime.equals(AdderInteger.ONE)){
     			m = AdderInteger.ZERO;
     		}//if
     		
-    		if(step.equals(AdderInteger.TWO.add(AdderInteger.TWO))){
+    		if(mPrime.equals(key.getF())){
     			m = AdderInteger.ONE;
     		}//if
     		
     		if(m == null){
-    			Bugout.err("Expected intermediate step to be 1 or 4, found "+step+"\n ["+step.bigintValue()+"]");
+    			Bugout.err("Expected intermediate step to be f or 1, found "+mPrime+"\n [f = "+key.getF()+"]");
     			return null;
     		}
     		
@@ -428,6 +429,7 @@ public class BallotEncrypter {
     public void clear() {
         _recentBallot = null;
         _randomList = null;
+        _adderRandom = new ArrayList<List<AdderInteger>>();
     }
 
     /**

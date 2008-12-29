@@ -100,8 +100,6 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 				
 				PublicKey suppliedPublicKey = PublicKey.fromString(publicKeyE.get(1).toString());
 				
-				
-				
 				if(!(suppliedPublicKey.toString().equals(_finalPublicKey.toString()))){
 					Bugout.err("Expected supplied final PublicKey to match generated\nSupplied: "+suppliedPublicKey+"\nGenerated: "+_finalPublicKey);
 					Bugout.err("Rejected ballot:\n"+new String(ballotBytes));

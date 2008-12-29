@@ -8,6 +8,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import auditorium.Bugout;
+
 import sexpression.ASExpression;
 import sexpression.ListExpression;
 import votebox.crypto.BallotEncrypter;
@@ -25,6 +27,106 @@ import edu.uconn.cse.adder.VoteProof;
 
 public class ConverterTest {
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testChallengeCore() throws Exception{
+		//Generate keys
+		PublicKey pubKey = PublicKey.makePartialKey(128);
+		@SuppressWarnings("unused")
+		PrivateKey priv = pubKey.genKeyPair();
+		
+		//Build and encrypt a sub-ballot
+		ListExpression choice11 = new ListExpression("B11", "1");
+		ListExpression choice12 = new ListExpression("B12", "0");
+		ListExpression ballot = new ListExpression(choice11, choice12);
+		
+		List<List<String>> groups = new ArrayList<List<String>>();
+		List<String> group = new ArrayList<String>();
+		group.add("B11");
+		group.add("B12");
+		groups.add(group);
+		
+		ListExpression encryptedTop = BallotEncrypter.SINGLETON.encryptWithProof(ballot, groups, pubKey);
+		ListExpression encrypted = (ListExpression)encryptedTop.get(0);
+		
+		PublicKey finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(3)).get(1).toString());
+		
+		Vote vote = Vote.fromString(((ListExpression)encrypted.get(0)).get(1).toString());
+		List<ElgamalCiphertext> ciphers = vote.getCipherList();
+		List<AdderInteger> randoms = BallotEncrypter.SINGLETON.getRecentAdderRandom().get(0);
+		
+		for(int i = 0; i < ciphers.size(); i++){
+			ElgamalCiphertext cipher = ciphers.get(i);
+			AdderInteger random = randoms.get(i);
+			
+			AdderInteger r = random;
+	        AdderInteger bigG = finalPubKey.getG().pow(r);
+	        AdderInteger step1 = finalPubKey.getH().pow(r);
+	        AdderInteger step20 = finalPubKey.getF().pow(AdderInteger.ZERO);
+	        AdderInteger step21 = finalPubKey.getF().pow(AdderInteger.ONE);
+	        AdderInteger bigH0 = step1.multiply(step20);
+	        AdderInteger bigH1 = step1.multiply(step21);
+	        
+	        System.out.println("0: "+bigH0);
+	        System.out.println("1: "+bigH1);
+	        System.out.println("?: "+cipher.getH());
+		}
+	}
+	
+	@Test
+	public void testBallotChallenge() throws Exception{
+		ListExpression choice11 = new ListExpression("B11", "1");
+		ListExpression choice12 = new ListExpression("B12", "0");
+		ListExpression choice13 = new ListExpression("B13", "0");
+		
+		ListExpression choice21 = new ListExpression("B21", "0");
+		ListExpression choice22 = new ListExpression("B22", "0");
+		ListExpression choice23 = new ListExpression("B23", "1");
+		
+		ListExpression choice31 = new ListExpression("B31", "0");
+		ListExpression choice32 = new ListExpression("B32", "1");
+		ListExpression choice33 = new ListExpression("B33", "0");
+		
+		ListExpression choice41 = new ListExpression("B41", "0");
+		ListExpression choice42 = new ListExpression("B42", "0");
+		ListExpression choice43 = new ListExpression("B43", "0");
+		
+		ListExpression ballot = new ListExpression(choice11, choice12, choice13,
+				                                   choice21, choice22, choice23,
+				                                   choice31, choice32, choice33,
+				                                   choice41, choice42, choice43);
+		
+		PublicKey pubKey = PublicKey.makePartialKey(128);
+		@SuppressWarnings("unused")
+		PrivateKey priv = pubKey.genKeyPair();
+		
+		List<List<String>> raceGroups = new ArrayList<List<String>>();
+		for(int i = 1; i <=4; i++){
+			List<String> sub = new ArrayList<String>();
+			sub.add("B"+i+"1");
+			sub.add("B"+i+"2");
+			sub.add("B"+i+"3");
+			
+			raceGroups.add(sub);
+		}//for
+		
+		ListExpression encrypted = BallotEncrypter.SINGLETON.encryptWithProof(ballot, raceGroups, pubKey);
+		List<List<AdderInteger>> randoms = BallotEncrypter.SINGLETON.getRecentAdderRandom();
+		
+		ListExpression decrypted = BallotEncrypter.SINGLETON.adderDecrypt(encrypted, randoms);
+		
+		for(int i = 0; i < decrypted.size(); i++){
+			ListExpression sub = (ListExpression)decrypted.get(i);
+			String raceId = sub.get(0).toString();
+			String val = sub.get(1).toString();
+			
+			if(raceId.equals("B11") || raceId.equals("B23") || raceId.equals("B32"))
+				Assert.assertEquals("Affirmative Votes", "1", val);
+			else
+				Assert.assertEquals("Negative Votes", "0", val);
+		}
+	}
+	
 	@Test
 	public void testBallotEncrypter() throws Exception{
 		ListExpression choice1 = new ListExpression("B21", "1");
@@ -38,10 +140,13 @@ public class ConverterTest {
 		PrivateKey priv = pubKey.genKeyPair();
 		
 		ListExpression encrypted = BallotEncrypter.SINGLETON.encryptSublistWithProof(ballot, pubKey);
-		ASExpression vote = ((ListExpression)encrypted.get(0)).get(1);
-		ASExpression proof = ((ListExpression)encrypted.get(1)).get(1);
 		
-		PublicKey finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(2)).get(1).toString());
+		ASExpression vote = ((ListExpression)encrypted.get(0)).get(1);
+		@SuppressWarnings("unused")
+		ASExpression voteId = ((ListExpression)encrypted.get(1)).get(1);
+		ASExpression proof = ((ListExpression)encrypted.get(2)).get(1);
+		
+		PublicKey finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(3)).get(1).toString());
 		
 		VoteProof vProof = VoteProof.fromString(proof.toString());
 		Vote vVote = Vote.fromString(vote.toString());
@@ -56,9 +161,9 @@ public class ConverterTest {
 		
 		encrypted = BallotEncrypter.SINGLETON.encryptSublistWithProof(ballot, pubKey);
 		vote = ((ListExpression)encrypted.get(0)).get(1);
-		proof = ((ListExpression)encrypted.get(1)).get(1);
+		proof = ((ListExpression)encrypted.get(2)).get(1);
 		
-		finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(2)).get(1).toString());
+		finalPubKey = PublicKey.fromString(((ListExpression)encrypted.get(3)).get(1).toString());
 		
 		vProof = VoteProof.fromString(proof.toString());
 		vVote = Vote.fromString(vote.toString());

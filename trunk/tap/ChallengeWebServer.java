@@ -564,7 +564,8 @@ public class ChallengeWebServer {
 			ASExpression ballot = ((CommitBallotEvent)(CommitBallotEvent.getMatcher().match(-1, innerMap.get(MessageType.Commit)))).getBallot();
 			ASExpression random = ((ChallengeEvent)ChallengeEvent.getMatcher().match(-1, innerMap.get(MessageType.Challenge))).getRandom();
 			
-			innerMap.put(MessageType.Result, BallotEncrypter.SINGLETON.adderDecrypt((ListExpression)ballot, toTraditionalList((ListExpression)random), ADDER_PUBLIC_KEY));
+			//innerMap.put(MessageType.Result, BallotEncrypter.SINGLETON.adderDecrypt((ListExpression)ballot, toTraditionalList((ListExpression)random), ADDER_PUBLIC_KEY));
+			innerMap.put(MessageType.Result, BallotEncrypter.SINGLETON.adderDecrypt((ListExpression)ballot, toTraditionalList((ListExpression)random)));
 			map.put(serial, voteList);
 		}
 		
