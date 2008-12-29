@@ -217,9 +217,15 @@ public class VoteBox {
 
                     finishedVoting = true;
 
-                    auditorium.announce(new ChallengeEvent(mySerial,
-                            StringExpression.makeString(nonce),
-                            BallotEncrypter.SINGLETON.getRecentRandom()));
+                    if(!_constants.getEnableNIZKs()){
+	                    auditorium.announce(new ChallengeEvent(mySerial,
+	                            StringExpression.makeString(nonce),
+	                            BallotEncrypter.SINGLETON.getRecentRandom()));
+                    }else{
+                    	auditorium.announce(new AdderChallengeEvent(mySerial,
+                    			StringExpression.makeString(nonce),
+                    			BallotEncrypter.SINGLETON.getRecentAdderRandom()));
+                    }
 
                     BallotEncrypter.SINGLETON.clear();
                     
