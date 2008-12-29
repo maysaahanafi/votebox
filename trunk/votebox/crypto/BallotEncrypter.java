@@ -22,6 +22,7 @@
 
 package votebox.crypto;
 
+import java.io.ByteArrayInputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.math.BigInteger;
@@ -39,9 +40,11 @@ import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
 import edu.uconn.cse.adder.VoteProof;
 
+import auditorium.Bugout;
 import auditorium.Key;
 
 import sexpression.*;
+import sexpression.stream.ASEInputStreamReader;
 import votebox.middle.IBallotVars;
 import votebox.middle.ballot.*;
 
@@ -51,6 +54,8 @@ public class BallotEncrypter {
 
     private List<BigInteger> _randomList;
     private ListExpression _recentBallot;
+    
+    private List<List<AdderInteger>> _adderRandom;
 
     private BallotEncrypter() {
     }
@@ -64,6 +69,7 @@ public class BallotEncrypter {
      * @return a ListExpression in the form (((vote [vote]) (vote-ids ([id1], [id2], ...)) (proof [proof]) (public-key [key])) ...)
      */
     public ListExpression encryptWithProof(ListExpression ballot, List<List<String>> raceGroups, PublicKey pubKey){
+    	_adderRandom = new ArrayList<List<AdderInteger>>();
     	List<ASExpression> subBallots = new ArrayList<ASExpression>();
     	
     	Map<String, ListExpression> ballotMap = new HashMap<String, ListExpression>();
@@ -82,7 +88,9 @@ public class BallotEncrypter {
     		subBallots.add(encryptSublistWithProof(subBallot, pubKey));
     	}
     	
-    	return new ListExpression(subBallots);
+    	_recentBallot = new ListExpression(subBallots);
+    	
+    	return _recentBallot;
     }
     
     /**
@@ -94,7 +102,8 @@ public class BallotEncrypter {
      *          this is an Adder-style public key
      * @return An ListExpression of the form ((vote [vote]) (vote-ids ([id1], [id2], ...)) (proof [proof]) (public-key [key]))
      */
-    public ListExpression encryptSublistWithProof(ListExpression ballot, PublicKey pubKey){
+    @SuppressWarnings("unchecked")
+	public ListExpression encryptSublistWithProof(ListExpression ballot, PublicKey pubKey){
     	List<AdderInteger> value = new ArrayList<AdderInteger>();
     	List<ASExpression> valueIds = new ArrayList<ASExpression>();
     	
@@ -125,6 +134,14 @@ public class BallotEncrypter {
 		
 		Vote vote = finalPubKey.encrypt(value);
 		
+		List<ElgamalCiphertext> ciphers = (List<ElgamalCiphertext>)vote.getCipherList();
+		
+		List<AdderInteger> subRandom = new ArrayList<AdderInteger>();
+		for(ElgamalCiphertext cipher : ciphers)
+			subRandom.add(cipher.getR());
+		
+		_adderRandom.add(subRandom);
+		
 		VoteProof proof = new VoteProof();
 		proof.compute(vote, finalPubKey, value, 0, 1);
     	
@@ -139,9 +156,7 @@ public class BallotEncrypter {
 		
 		ListExpression ret = new ListExpression(vList, idList, pList, kList);
 		
-		_recentBallot = ret;
-		_randomList = ElGamalCrypto.SINGLETON.getRecentRandomness();
-        ElGamalCrypto.SINGLETON.clearRecentRandomness();
+		
 		
 		return ret;
     }
@@ -180,6 +195,136 @@ public class BallotEncrypter {
         _randomList = ElGamalCrypto.SINGLETON.getRecentRandomness();
         ElGamalCrypto.SINGLETON.clearRecentRandomness();
         return _recentBallot;
+    }
+    
+    /**
+     * Decrypt an Adder ballot using the random values.
+     * 
+     * @param ballot
+     * @param rVals
+     * @param publicKey
+     * @return Decrypted ballot, of the form ((race-id plaintext-counter) ...)
+     */
+    public ListExpression adderDecrypt(ListExpression ballot, List<List<AdderInteger>> rVals, PublicKey pubKey){
+    	Map<String, Vote> idsToVote = new HashMap<String, Vote>();
+    	Map<String, List<AdderInteger>> idsToRs = new HashMap<String, List<AdderInteger>>();
+    	Map<String, List<AdderInteger>> idsToDecrypted = new HashMap<String, List<AdderInteger>>();
+    	
+    	for(int i = 0; i < ballot.size(); i++){
+    		ListExpression race = (ListExpression)ballot.get(i);
+    		Vote vote = Vote.fromString(((ListExpression)race.get(0)).get(1).toString());
+    		ListExpression voteIds = (ListExpression)((ListExpression)race.get(1)).get(1);
+    		
+    		idsToVote.put(voteIds.toString(), vote);
+    		idsToRs.put(voteIds.toString(), rVals.get(i));
+    	}
+    	
+    	Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
+		
+		AdderInteger p = pubKey.getP();
+		AdderInteger q = pubKey.getQ();
+		AdderInteger g = pubKey.getG();
+		AdderInteger f = pubKey.getF();
+		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
+		
+		AdderInteger gvalue = g.pow((poly).
+                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
+		finalH = finalH.multiply(gvalue);
+		
+		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
+    	
+    	for(String ids : idsToVote.keySet()){
+    		Vote vote = idsToVote.get(ids);
+    		List<AdderInteger> rs = idsToRs.get(ids);
+    		
+    		List<AdderInteger> d = adderDecryptSublist(vote, rs, finalPubKey);
+    		
+    		idsToDecrypted.put(ids, d);
+    	}
+    	
+    	return toTraditionalFormat(idsToDecrypted);
+    }
+    
+    private ListExpression toTraditionalFormat(Map<String, List<AdderInteger>> idsToPlaintext){
+    	List<ASExpression> subLists = new ArrayList<ASExpression>();
+    	
+    	for(String ids : idsToPlaintext.keySet()){
+    		try{
+    		  ListExpression idList = (ListExpression)(new ASEInputStreamReader(new ByteArrayInputStream(ids.getBytes()))).read();
+    		  List<AdderInteger> plaintexts = idsToPlaintext.get(ids);
+    		  
+    		  for(int i = 0; i < idList.size(); i++){
+    			  StringExpression id = (StringExpression)idList.get(i);
+    			  AdderInteger plaintext = plaintexts.get(i);
+    			  List<ASExpression> subList = new ArrayList<ASExpression>();
+    			  subList.add(id);
+    			  subList.add(StringExpression.make(plaintext.toString()));
+    			  
+    			  subLists.add(new ListExpression(subList));
+    		  }
+    		}catch(Exception e){}
+    	}
+    	
+    	return new ListExpression(subLists);
+    }
+    
+    /**
+     * Decrypt a single Adder vote using the provided random values.
+     * 
+     * @param vote
+     * @param rVals
+     * 
+     * @return Decrypted vote as a list of integers
+     */
+    @SuppressWarnings("unchecked")
+	public List<AdderInteger> adderDecryptSublist(Vote vote, List<AdderInteger> rVals, PublicKey key){
+    	//Adder encrypt is of m (public initial g, p, h) [infered from code]
+    	//                    m = {0, 1}
+    	//                    g' = g^r
+    	//                    h' = (h^r) * (m + 1)^2
+    	
+    	//Quick decrypt (given r) [puzzled out by Kevin Montrose]
+    	//                    confirm g^r = g'
+    	//                    m = (h' / (h^r))^(1/2) - 1
+    	
+    	List<ElgamalCiphertext> ciphers = (List<ElgamalCiphertext>)vote.getCipherList();
+    	List<AdderInteger> ret = new ArrayList<AdderInteger>();
+    	
+    	int i = 0;
+    	
+    	for(ElgamalCiphertext cipher : ciphers){
+    		AdderInteger r = rVals.get(i);
+    		AdderInteger gPrime = cipher.getG();
+    		AdderInteger hPrime = cipher.getH();
+    		
+    		if(!key.getG().pow(r).equals(gPrime)){
+    			Bugout.err("Random value does not correspond to ciphertext.");
+    			return null;
+    		}
+    		
+    		AdderInteger step = hPrime.divide(key.getH().pow(r));
+    		AdderInteger m = null;
+    		
+    		//Observe that m was 0 or 1, thus step must be either 1^2 or 2^2 (1 or 4) respectively
+    		if(step.equals(AdderInteger.ONE)){
+    			m = AdderInteger.ZERO;
+    		}//if
+    		
+    		if(step.equals(AdderInteger.TWO.add(AdderInteger.TWO))){
+    			m = AdderInteger.ONE;
+    		}//if
+    		
+    		if(m == null){
+    			Bugout.err("Expected intermediate step to be 1 or 4, found "+step+"\n ["+step.bigintValue()+"]");
+    			return null;
+    		}
+    		
+    		ret.add(m);
+    		
+    	    i++;
+    	}
+    	
+    	return ret;
     }
     
     /**
@@ -259,6 +404,15 @@ public class BallotEncrypter {
         return new ListExpression(pairs);
     }
 
+    /**
+     * Get the most recent random, for the Adder encryption sub-system.
+     * 
+     * @return This method returns the random list used in the last call to encryptWithProof(...).
+     */
+    public List<List<AdderInteger>> getRecentAdderRandom(){
+    	return _adderRandom;
+    }
+    
     /**
      * Get the result of the most recent encrypt call.
      * 

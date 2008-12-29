@@ -34,6 +34,9 @@ import java.nio.charset.Charset;
 
 import javax.imageio.ImageIO;
 
+import edu.uconn.cse.adder.AdderInteger;
+import edu.uconn.cse.adder.PublicKey;
+
 import auditorium.AuditoriumCryptoException;
 import auditorium.IAuditoriumParams;
 import auditorium.Key;
@@ -44,6 +47,7 @@ import sexpression.stream.ASEInputStreamReader;
 import sexpression.stream.InvalidVerbatimStreamException;
 import votebox.AuditoriumParams;
 import votebox.crypto.BallotEncrypter;
+import votebox.events.AdderChallengeEvent;
 import votebox.events.CastCommittedBallotEvent;
 import votebox.events.ChallengeEvent;
 import votebox.events.CommitBallotEvent;
@@ -56,6 +60,7 @@ import votebox.events.CommitBallotEvent;
  */
 public class ChallengeWebServer {
 	public static Key PUBLIC_KEY = null;
+	public static PublicKey ADDER_PUBLIC_KEY = null;
 	
 	/**
 	 * Loads the public key necissary for operation.
@@ -64,6 +69,7 @@ public class ChallengeWebServer {
 	static{
 		try {
 			PUBLIC_KEY = (new AuditoriumParams("webserver.conf")).getKeyStore().loadKey("public");
+			ADDER_PUBLIC_KEY = (PublicKey)(new AuditoriumParams("webserver.conf")).getKeyStore().loadAdderKey("public");
 		} catch (AuditoriumCryptoException e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -481,6 +487,7 @@ public class ChallengeWebServer {
 		Commit,
 		Cast,
 		Challenge,
+		AdderChallenge,
 		Result,
 		UnknownType
 	};//MessageType
@@ -521,6 +528,12 @@ public class ChallengeWebServer {
 			type = MessageType.Challenge;
 		}//if
 		
+		if(AdderChallengeEvent.getMatcher().match(-1, ase) != null){
+			type = MessageType.AdderChallenge;
+		}//if
+		
+		//TODO: Hook the Adder stuff in here.
+		
 		System.out.println(type+" --> "+ase);
 		
 		List<TimeStampedMap<MessageType, ASExpression>> voteList = map.get(serial);
@@ -547,7 +560,32 @@ public class ChallengeWebServer {
 			map.put(serial, voteList);
 		}//if
 		
+		if(type == MessageType.AdderChallenge){
+			ASExpression ballot = ((CommitBallotEvent)(CommitBallotEvent.getMatcher().match(-1, innerMap.get(MessageType.Commit)))).getBallot();
+			ASExpression random = ((ChallengeEvent)ChallengeEvent.getMatcher().match(-1, innerMap.get(MessageType.Challenge))).getRandom();
+			
+			innerMap.put(MessageType.Result, BallotEncrypter.SINGLETON.adderDecrypt((ListExpression)ballot, toTraditionalList((ListExpression)random), ADDER_PUBLIC_KEY));
+			map.put(serial, voteList);
+		}
+		
 	}//placeInMap
+	
+	private static List<List<AdderInteger>> toTraditionalList(ListExpression exp){
+		List<List<AdderInteger>> toRet = new ArrayList<List<AdderInteger>>();
+		
+		for(int i = 0; i < exp.size(); i++){
+			ListExpression sub = (ListExpression)exp.get(i);
+			List<AdderInteger> subList = new ArrayList<AdderInteger>();
+			for(int j = 0; j < sub.size(); j++){
+				ASExpression subExp = sub.get(j);
+				subList.add(new AdderInteger(subExp.toString()));
+			}
+			
+			toRet.add(subList);
+		}
+		
+		return toRet;
+	}
 	
 	/**
 	 * Taking in a ballot location, tries to load all relavent images into a map of race-ids to Images.
