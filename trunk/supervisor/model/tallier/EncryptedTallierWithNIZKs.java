@@ -140,6 +140,12 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 		}
 	}
 
+	/**
+	 * Using nizks imposes structure on our race format we haven't had before.
+	 * This method is 
+	 * @param voteIds
+	 * @return
+	 */
 	private String makeId(List<String> voteIds){
 		String str = voteIds.get(0);
 		for(int i = 1; i < voteIds.size(); i++)
