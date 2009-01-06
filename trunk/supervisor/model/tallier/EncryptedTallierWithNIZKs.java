@@ -22,6 +22,11 @@ import sexpression.ASExpression;
 import sexpression.ListExpression;
 import sexpression.stream.ASEInputStreamReader;
 
+/**
+ * Tallier for elections run with NIZKs but without the commit-challenge model enabled.
+ * @author Montrose
+ *
+ */
 public class EncryptedTallierWithNIZKs implements ITallier {
 	private PrivateKey _privateKey = null;
 	private PublicKey _publicKey = null;
@@ -30,6 +35,12 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 	
 	private Map<String, Election> _results = new HashMap<String, Election>();
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param pub - The PublicKey used to encrypt votes to be tallied.
+	 * @param priv - The PrivateKey to be used to decrypt the totals.
+	 */
 	public EncryptedTallierWithNIZKs(PublicKey pub, PrivateKey priv){
 		_privateKey = priv;
 		_publicKey = pub;
