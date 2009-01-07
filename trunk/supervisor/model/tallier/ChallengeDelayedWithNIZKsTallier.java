@@ -22,6 +22,11 @@ import sexpression.ASExpression;
 import sexpression.ListExpression;
 import sexpression.stream.ASEInputStreamReader;
 
+/**
+ * Tallier for elections with both NIZKs and the challenge-commit model enabled.
+ * @author Montrose
+ *
+ */
 public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 	private PublicKey _publicKey;
 	private PrivateKey _privateKey;
@@ -32,6 +37,12 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 	
 	private Map<ASExpression, byte[]> _pendingVotes = new HashMap<ASExpression, byte[]>();
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param pubKey - the Adder PublicKey used to encrypt votes
+	 * @param privKey - the Adder PrivateKey used to decrypt totals.
+	 */
 	public ChallengeDelayedWithNIZKsTallier(PublicKey pubKey, PrivateKey privKey){
 		_publicKey = pubKey;
 		_privateKey = privKey;
@@ -131,6 +142,28 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 		_pendingVotes.put(nonce, ballot);
 	}
 
+	/**
+	 * Using nizks imposes structure on our race format we haven't had before.
+	 * This method is 
+	 * @param voteIds
+	 * @return
+	 */
+	private String makeId(List<String> voteIds){
+		String str = voteIds.get(0);
+		for(int i = 1; i < voteIds.size(); i++)
+			str+=","+voteIds.get(i);
+		
+		return str;
+	}
+	
+	/**
+	 * Confirms that the vote, voteIds, proof, and publicKey fields pulled out of a ballot are well-formed.
+	 * 
+	 * @param vote
+	 * @param voteIds
+	 * @param proof
+	 * @param publicKey
+	 */
 	private void confirmValid(ListExpression vote, ListExpression voteIds, ListExpression proof, ListExpression publicKey){
 		if(!vote.get(0).equals("vote"))
 			throw new RuntimeException("Missing \"vote\"");
@@ -145,14 +178,12 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 			throw new RuntimeException("Missing \"public-key\"");
 	}
 	
-	private String makeId(List<String> voteIds){
-		String str = voteIds.get(0);
-		for(int i = 1; i < voteIds.size(); i++)
-			str+=","+voteIds.get(i);
-		
-		return str;
-	}
-	
+	/**
+	 * Generates the "final" public key using the pre-generated public key.
+	 * This is needed to actually tally and perform NIZK verification.
+	 * 
+	 * @return the new PublicKey
+	 */
 	private PublicKey generateFinalPublicKey(){
 		Polynomial poly = new Polynomial(_publicKey.getP(), _publicKey.getG(), _publicKey.getF(), 0);
 		
@@ -171,6 +202,12 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 		return finalPublicKey;
 	}
 	
+	/**
+	 * Generates the "final" PrivateKey from the pre-generated one.
+	 * This is needed to decrypt the totals calculated with the corresponding final public key.
+	 * 
+	 * @return the new PrivateKey
+	 */
 	private PrivateKey generateFinalPrivateKey(){
 		//Generate the final private key
 		Polynomial poly = new Polynomial(_publicKey.getP(), _publicKey.getG(), _publicKey.getF(), 0);
@@ -181,6 +218,5 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 		PrivateKey finalPrivKey = _privateKey.getFinalPrivKey(ciphertexts);
 		
 		return finalPrivKey;
-	}
-	
+	}	
 }

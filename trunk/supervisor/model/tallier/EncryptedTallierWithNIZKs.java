@@ -154,6 +154,14 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 		return str;
 	}
 	
+	/**
+	 * Confirms that the vote, voteIds, proof, and publicKey fields pulled out of a ballot are well-formed.
+	 * 
+	 * @param vote
+	 * @param voteIds
+	 * @param proof
+	 * @param publicKey
+	 */
 	private void confirmValid(ListExpression vote, ListExpression voteIds, ListExpression proof, ListExpression publicKey){
 		if(!vote.get(0).equals("vote"))
 			throw new RuntimeException("Missing \"vote\"");
@@ -168,6 +176,12 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 			throw new RuntimeException("Missing \"public-key\"");
 	}
 	
+	/**
+	 * Generates the "final" public key using the pre-generated public key.
+	 * This is needed to actually tally and perform NIZK verification.
+	 * 
+	 * @return the new PublicKey
+	 */
 	private PublicKey generateFinalPublicKey(){
 		Polynomial poly = new Polynomial(_publicKey.getP(), _publicKey.getG(), _publicKey.getF(), 0);
 		
@@ -186,6 +200,12 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 		return finalPublicKey;
 	}
 	
+	/**
+	 * Generates the "final" PrivateKey from the pre-generated one.
+	 * This is needed to decrypt the totals calculated with the corresponding final public key.
+	 * 
+	 * @return the new PrivateKey
+	 */
 	private PrivateKey generateFinalPrivateKey(){
 		//Generate the final private key
 		Polynomial poly = new Polynomial(_publicKey.getP(), _publicKey.getG(), _publicKey.getF(), 0);
