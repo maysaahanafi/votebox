@@ -1307,7 +1307,8 @@ public class PsychLayoutManager extends ALayoutManager {
                 if (i < cardPanels.size() - 1) {
                 	//#ifdef NONE_OF_ABOVE
             		cardFrame.addNextRequireSelectionButton((Label) moreCandidatesInfo.clone(), card.getUID());
-            		//#else
+            		//#endif
+            		//#ifndef NONE_OF_ABOVE
                     cardFrame.addNextButton((Label) moreCandidatesInfo.clone());
             		//#endif
                 }
@@ -1318,21 +1319,24 @@ public class PsychLayoutManager extends ALayoutManager {
                             sizeVisitor);
                 	//#ifdef NONE_OF_ABOVE
                     cardFrame.addNextRequireSelectionButton(forward, card.getUID());
-                    //#else
+                     //#endif
+            		//#ifndef NONE_OF_ABOVE
                     cardFrame.addNextButton(forward);
                     //#endif
                 }
                 else {
                 	//#ifdef NONE_OF_ABOVE
                 	cardFrame.addNextRequireSelectionButton(nextInfo, card.getUID());
-                	//#else
+                	//#endif
+            		//#ifndef NONE_OF_ABOVE
                     cardFrame.addNextButton(nextInfo);
                     //#endif
                 }
             } else {
             	//#ifdef NONE_OF_ABOVE
                 cardFrame.addReturnRequireSelectionButton(returnInfo, target, card.getUID());
-            	//#else
+            	//#endif
+        		//#ifndef NONE_OF_ABOVE
                 cardFrame.addReturnButton(returnInfo, target);
                 //#endif
                 if (i > 0)
