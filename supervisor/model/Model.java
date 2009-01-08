@@ -59,6 +59,7 @@ import votebox.events.ChallengeEvent;
 import votebox.events.ChallengeResponseEvent;
 import votebox.events.CommitBallotEvent;
 import votebox.events.EncryptedCastBallotEvent;
+import votebox.events.EncryptedCastBallotWithNIZKsEvent;
 import votebox.events.IAnnounceEvent;
 import votebox.events.JoinEvent;
 import votebox.events.LastPollsOpenEvent;
@@ -485,7 +486,7 @@ public class Model {
                     SupervisorEvent.getMatcher(), VoteBoxEvent.getMatcher(),
                     EncryptedCastBallotEvent.getMatcher(), CommitBallotEvent.getMatcher(),
                     CastCommittedBallotEvent.getMatcher(), ChallengeResponseEvent.getMatcher(),
-                    ChallengeEvent.getMatcher());
+                    ChallengeEvent.getMatcher(), EncryptedCastBallotWithNIZKsEvent.getMatcher());
         } catch (NetworkException e1) {
             throw new RuntimeException(e1);
         }

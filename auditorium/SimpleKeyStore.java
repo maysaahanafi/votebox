@@ -22,6 +22,7 @@
 
 package auditorium;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -108,11 +109,18 @@ public class SimpleKeyStore implements IKeyStore {
 		return _certCache.get(nodeid);
 	}
 
-	public Object loadAdderKey(String nodeid) throws RuntimeException{
+	public Object loadAdderKey(String nodeid){
 		try{
-			ASExpression key = load(nodeid+".adder.key");
+			InputStream in = getInput(nodeid+".adder.key");
 
-			String str = ((StringExpression)key).toString();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			
+			int i;
+			while((i = in.read()) != -1){
+				baos.write(i);
+			}
+			
+			String str = new String(baos.toByteArray());
 
 			PublicKey pubKey = null;
 			PrivateKey privKey = null;

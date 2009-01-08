@@ -131,6 +131,8 @@ public class TallyDialog extends JDialog {
         add(okButton, c);
         
         setSize((int)Math.max(400, getPreferredSize().getWidth()), 400);
+        
+        System.out.println("Results: "+results);
     }
 
 	/**

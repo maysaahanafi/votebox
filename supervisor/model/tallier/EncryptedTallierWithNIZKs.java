@@ -85,6 +85,8 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 	}
 
 	public void recordVotes(byte[] ballotBytes, ASExpression nonce) {
+		System.out.println("EncryptedTallierWithNIZKs.recordVotes(..., "+nonce+")");
+		
 		ASEInputStreamReader in = new ASEInputStreamReader(
 				new ByteArrayInputStream(ballotBytes));
 		
