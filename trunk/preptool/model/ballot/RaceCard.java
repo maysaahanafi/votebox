@@ -23,15 +23,20 @@
 package preptool.model.ballot;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import preptool.model.XMLTools;
 import preptool.model.ballot.module.CandidatesModule;
 import preptool.model.ballot.module.TextFieldModule;
 import preptool.model.language.Language;
 import preptool.model.language.LiteralStrings;
 import preptool.model.layout.manager.ALayoutManager;
 import preptool.model.layout.manager.ALayoutManager.ICardLayout;
+import votebox.middle.Properties;
 
 /**
  * RaceCard is the implementation of an ACard that constitutes a race with
@@ -103,11 +108,18 @@ public class RaceCard extends ACard {
     public Element toXML(Document doc) {
         Element cardElt = super.toXML(doc);
 
+        List<String> ids = new ArrayList<String>();
+        
         CandidatesModule candidatesModule = (CandidatesModule) getModuleByName("Candidates");
         for (CardElement ce : candidatesModule.getData()) {
             Element cardElementElt = ce.toXML(doc);
             cardElt.appendChild(cardElementElt);
+            
+            ids.add(ce.uniqueID);
         }
+        
+        //Need to carry the grouping of these candidates together for NIZK purposes.
+        XMLTools.addListProperty(doc, cardElt, Properties.RACE_GROUP, "String", ids.toArray(new String[0]));
         return cardElt;
     }
 }

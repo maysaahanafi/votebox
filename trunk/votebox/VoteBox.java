@@ -258,9 +258,15 @@ public class VoteBox {
         			ListExpression ballot = (ListExpression) arg[0];
 
         			try {
+        				if(!_constants.getEnableNIZKs()){
 						auditorium.announce(new CommitBallotEvent(mySerial,
 								StringExpression.makeString(nonce),
 								BallotEncrypter.SINGLETON.encrypt(ballot, _constants.getKeyStore().loadKey("public"))));
+        				}else{
+        					auditorium.announce(new CommitBallotEvent(mySerial,
+        							StringExpression.makeString(nonce),
+        							BallotEncrypter.SINGLETON.encryptWithProof(ballot, (List<List<String>>)arg[1], (PublicKey)_constants.getKeyStore().loadAdderKey("public"))));
+        				}
 						
 						//printCommittedBallot(ballot);
 					} catch (AuditoriumCryptoException e) {
