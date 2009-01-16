@@ -23,12 +23,14 @@
 package votebox.middle.view;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class AView implements IView{
+public abstract class AView implements IView, Runnable{
 
     protected final HashMap<IDrawable, Rectangle> _hitboxMap;
     protected final LinkedList<IDrawable> _currentDrawables;
@@ -36,12 +38,15 @@ public abstract class AView implements IView{
     protected int _yoffset;
     protected IDrawable _background;
     
-    private ExecutorService _executor = Executors.newCachedThreadPool();
-
+    private Thread _eventDispatcher = new Thread(this);
+    private List<Object[]> _pendingEvents = new ArrayList<Object[]>();
+    
     protected AView() {
         _hitboxMap = new HashMap<IDrawable, Rectangle>();
         _currentDrawables = new LinkedList<IDrawable>();
         _handlers = new HashMap<EventType, IEventHandler>();
+        
+        _eventDispatcher.start();
     }
 
     /**
@@ -113,12 +118,33 @@ public abstract class AView implements IView{
      *            This structure wraps information about the event.
      */
     protected void deliver(final EventType type, final InputEvent event) {
-    	_executor.submit(new Runnable(){
-    		public void run(){
-    			if (_handlers.containsKey( type ))
-    				_handlers.get( type ).handle( event );
-    		}//run
-    	});
+    	synchronized(_pendingEvents){
+    	  _pendingEvents.add(new Object[]{type, event});
+    	  _pendingEvents.notify();
+    	}
+    }
+    
+    /**
+     * Dispatches events (in the order of their arrival)
+     */
+    public void run(){
+    	while(true){
+    		synchronized(_pendingEvents){
+    			while(_pendingEvents.size() == 0)
+					try {
+						_pendingEvents.wait();
+					} catch (InterruptedException e) {}
+    			
+    			while(_pendingEvents.size() > 0){
+    				Object[] params = _pendingEvents.remove(0);
+    				EventType type = (EventType)params[0];
+    				InputEvent event = (InputEvent)params[1];
+    				
+    				if(_handlers.containsKey(type))
+    					_handlers.get(type).handle(event);
+    			}
+    		}
+    	}
     }
     
     /**
