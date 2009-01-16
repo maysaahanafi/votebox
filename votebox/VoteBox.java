@@ -657,7 +657,8 @@ public class VoteBox {
                     AuthorizedToCastEvent.getMatcher(), BallotReceivedEvent.getMatcher(),
                     OverrideCancelEvent.getMatcher(), OverrideCastEvent.getMatcher(),
                     PollsOpenQEvent.getMatcher(), BallotCountedEvent.getMatcher(),
-                    ChallengeEvent.getMatcher(), ChallengeResponseEvent.getMatcher());
+                    ChallengeEvent.getMatcher(), ChallengeResponseEvent.getMatcher(),
+                    AuthorizedToCastWithNIZKsEvent.getMatcher());
         } catch (NetworkException e1) {
         	//NetworkException represents a recoverable error
         	//  so just note it and continue

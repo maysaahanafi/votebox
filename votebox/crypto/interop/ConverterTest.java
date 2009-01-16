@@ -12,6 +12,7 @@ import auditorium.Bugout;
 
 import sexpression.ASExpression;
 import sexpression.ListExpression;
+import supervisor.model.tallier.ChallengeDelayedWithNIZKsTallier;
 import votebox.crypto.BallotEncrypter;
 
 import edu.uconn.cse.adder.AdderInteger;
@@ -26,7 +27,6 @@ import edu.uconn.cse.adder.VoteProof;
 
 
 public class ConverterTest {
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testChallengeCore() throws Exception{
@@ -151,7 +151,13 @@ public class ConverterTest {
 		VoteProof vProof = VoteProof.fromString(proof.toString());
 		Vote vVote = Vote.fromString(vote.toString());
 		
+		Election election = new Election(pubKey.getP());
+		election.castVote(vVote);
+		
+		List<AdderInteger> results = BallotEncrypter.SINGLETON.adderDecryptWithKey(election, pubKey, priv);
+		
 		Assert.assertTrue("Vote should verify", vProof.verify(vVote, finalPubKey, 0, 1));
+		Assert.assertEquals("Result as expected", 1, results.get(1).intValue());
 		
 		choice1 = new ListExpression("B21", "1");
 		choice2 = new ListExpression("B22", "0");
@@ -312,7 +318,8 @@ public class ConverterTest {
 			PublicKey pubKey = PublicKey.makePartialKey(128);
 			PrivateKey privKey = pubKey.genKeyPair();
 			
-			Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
+			//Generate final public key
+			/*Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
 			
 			AdderInteger p = pubKey.getP();
 			AdderInteger q = pubKey.getQ();
@@ -324,13 +331,16 @@ public class ConverterTest {
                     evaluate(new AdderInteger(AdderInteger.ZERO, q)));
 			finalH = finalH.multiply(gvalue);
 			
-			PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
+			PublicKey finalPubKey = new PublicKey(p, g, finalH, f);*/
 			
 			//Generate the final private key
-			List<ElgamalCiphertext> ciphertexts = new ArrayList<ElgamalCiphertext>();
+			/*List<ElgamalCiphertext> ciphertexts = new ArrayList<ElgamalCiphertext>();
 			ElgamalCiphertext ciphertext = pubKey.encryptPoly(poly.evaluate(new AdderInteger(0, pubKey.getQ())));
 			ciphertexts.add(ciphertext);
 			PrivateKey finalPrivKey = privKey.getFinalPrivKey(ciphertexts);
+			*/
+			PublicKey finalPubKey = AdderKeyManipulator.generateFinalPublicKey(pubKey);
+			PrivateKey finalPrivKey = AdderKeyManipulator.generateFinalPrivateKey(pubKey, privKey);
 			
 			Election election = new Election(pubKey.getP());
 			

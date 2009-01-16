@@ -48,9 +48,11 @@ import supervisor.model.tallier.EncryptedTallier;
 import supervisor.model.tallier.EncryptedTallierWithNIZKs;
 import supervisor.model.tallier.ITallier;
 import supervisor.model.tallier.Tallier;
+import votebox.crypto.interop.AdderKeyManipulator;
 import votebox.events.ActivatedEvent;
 import votebox.events.AssignLabelEvent;
 import votebox.events.AuthorizedToCastEvent;
+import votebox.events.AuthorizedToCastWithNIZKsEvent;
 import votebox.events.BallotCountedEvent;
 import votebox.events.BallotReceivedEvent;
 import votebox.events.CastBallotEvent;
@@ -234,8 +236,14 @@ public class Model {
         byte[] ballot = new byte[(int) file.length()];
         fin.read(ballot);
 
-        auditorium.announce(new AuthorizedToCastEvent(mySerial, node, nonce,
+        if(!this.auditoriumParams.getEnableNIZKs()){
+        	auditorium.announce(new AuthorizedToCastEvent(mySerial, node, nonce,
                 ballot));
+        }else{
+        	auditorium.announce(new AuthorizedToCastWithNIZKsEvent(mySerial, node,
+        			nonce, ballot,
+        			AdderKeyManipulator.generateFinalPublicKey((PublicKey)auditoriumParams.getKeyStore().loadAdderKey("public"))));
+        }
     }
 
     /**
@@ -486,7 +494,8 @@ public class Model {
                     SupervisorEvent.getMatcher(), VoteBoxEvent.getMatcher(),
                     EncryptedCastBallotEvent.getMatcher(), CommitBallotEvent.getMatcher(),
                     CastCommittedBallotEvent.getMatcher(), ChallengeResponseEvent.getMatcher(),
-                    ChallengeEvent.getMatcher(), EncryptedCastBallotWithNIZKsEvent.getMatcher());
+                    ChallengeEvent.getMatcher(), EncryptedCastBallotWithNIZKsEvent.getMatcher(),
+                    AuthorizedToCastWithNIZKsEvent.getMatcher());
         } catch (NetworkException e1) {
             throw new RuntimeException(e1);
         }
