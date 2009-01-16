@@ -60,7 +60,8 @@ public class RaceResult {
 		
 		Iterator<ASExpression> it=list.iterator();
 		while(it.hasNext()){//for each race
-			ListExpression ex=(ListExpression)(it.next());
+			ASExpression aex = it.next();
+			ListExpression ex=(ListExpression)aex;
 			RaceResult rr=new RaceResult();
 			
 			Iterator raceIt=ex.iterator();

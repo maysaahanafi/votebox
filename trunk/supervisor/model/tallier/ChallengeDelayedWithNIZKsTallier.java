@@ -21,6 +21,7 @@ import edu.uconn.cse.adder.VoteProof;
 import sexpression.ASExpression;
 import sexpression.ListExpression;
 import sexpression.stream.ASEInputStreamReader;
+import votebox.crypto.interop.AdderKeyManipulator;
 
 /**
  * Tallier for elections with both NIZKs and the challenge-commit model enabled.
@@ -46,8 +47,8 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 	public ChallengeDelayedWithNIZKsTallier(PublicKey pubKey, PrivateKey privKey){
 		_publicKey = pubKey;
 		_privateKey = privKey;
-		_finalPublicKey = generateFinalPublicKey();
-		_finalPrivateKey = generateFinalPrivateKey();
+		_finalPublicKey = AdderKeyManipulator.generateFinalPublicKey(_publicKey);
+		_finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(_publicKey, _privateKey);
 	}
 
 	public void challenged(ASExpression nonce) {
@@ -168,58 +169,16 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 	 * @param publicKey
 	 */
 	private void confirmValid(ListExpression vote, ListExpression voteIds, ListExpression proof, ListExpression publicKey){
-		if(!vote.get(0).equals("vote"))
+		if(!vote.get(0).toString().equals("vote"))
 			throw new RuntimeException("Missing \"vote\"");
 		
-		if(!voteIds.get(0).equals("vote-ids"))
+		if(!voteIds.get(0).toString().equals("vote-ids"))
 			throw new RuntimeException("Missing \"vote-ids\"");
 		
-		if(!proof.get(0).equals("proof"))
+		if(!proof.get(0).toString().equals("proof"))
 			throw new RuntimeException("Missing \"proof\"");
 		
-		if(!publicKey.get(0).equals("public-key"))
+		if(!publicKey.get(0).toString().equals("public-key"))
 			throw new RuntimeException("Missing \"public-key\"");
 	}
-	
-	/**
-	 * Generates the "final" public key using the pre-generated public key.
-	 * This is needed to actually tally and perform NIZK verification.
-	 * 
-	 * @return the new PublicKey
-	 */
-	private PublicKey generateFinalPublicKey(){
-		Polynomial poly = new Polynomial(_publicKey.getP(), _publicKey.getG(), _publicKey.getF(), 0);
-		
-		AdderInteger p = _publicKey.getP();
-		AdderInteger q = _publicKey.getQ();
-		AdderInteger g = _publicKey.getG();
-		AdderInteger f = _publicKey.getF();
-		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
-		
-		AdderInteger gvalue = g.pow((poly).
-                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
-		finalH = finalH.multiply(gvalue);
-		
-		PublicKey finalPublicKey = new PublicKey(p, g, finalH, f);
-		
-		return finalPublicKey;
-	}
-	
-	/**
-	 * Generates the "final" PrivateKey from the pre-generated one.
-	 * This is needed to decrypt the totals calculated with the corresponding final public key.
-	 * 
-	 * @return the new PrivateKey
-	 */
-	private PrivateKey generateFinalPrivateKey(){
-		//Generate the final private key
-		Polynomial poly = new Polynomial(_publicKey.getP(), _publicKey.getG(), _publicKey.getF(), 0);
-		
-		List<ElgamalCiphertext> ciphertexts = new ArrayList<ElgamalCiphertext>();
-		ElgamalCiphertext ciphertext = _publicKey.encryptPoly(poly.evaluate(new AdderInteger(0, _publicKey.getQ())));
-		ciphertexts.add(ciphertext);
-		PrivateKey finalPrivKey = _privateKey.getFinalPrivKey(ciphertexts);
-		
-		return finalPrivKey;
-	}	
 }

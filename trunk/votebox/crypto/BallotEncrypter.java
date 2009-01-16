@@ -34,8 +34,10 @@ import java.util.List;
 import java.util.Map;
 
 import edu.uconn.cse.adder.AdderInteger;
+import edu.uconn.cse.adder.Election;
 import edu.uconn.cse.adder.ElgamalCiphertext;
 import edu.uconn.cse.adder.Polynomial;
+import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
 import edu.uconn.cse.adder.VoteProof;
@@ -45,6 +47,7 @@ import auditorium.Key;
 
 import sexpression.*;
 import sexpression.stream.ASEInputStreamReader;
+import votebox.crypto.interop.AdderKeyManipulator;
 import votebox.middle.IBallotVars;
 import votebox.middle.ballot.*;
 
@@ -113,24 +116,7 @@ public class BallotEncrypter {
     		valueIds.add(choice.get(0));
     	}//for
     	
-    	Polynomial poly = new Polynomial(pubKey.getP(), pubKey.getG(), pubKey.getF(), 0);
-		
-		AdderInteger p = pubKey.getP();
-		AdderInteger q = pubKey.getQ();
-		AdderInteger g = pubKey.getG();
-		AdderInteger f = pubKey.getF();
-		AdderInteger finalH = new AdderInteger(AdderInteger.ONE, p);
-		
-		AdderInteger gvalue = g.pow((poly).
-                evaluate(new AdderInteger(AdderInteger.ZERO, q)));
-		finalH = finalH.multiply(gvalue);
-		
-		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
-		
-		//Generate the final private key
-		List<ElgamalCiphertext> ciphertexts = new ArrayList<ElgamalCiphertext>();
-		ElgamalCiphertext ciphertext = pubKey.encryptPoly(poly.evaluate(new AdderInteger(0, pubKey.getQ())));
-		ciphertexts.add(ciphertext);
+    	PublicKey finalPubKey = AdderKeyManipulator.generateFinalPublicKey(pubKey);
 		
 		Vote vote = finalPubKey.encrypt(value);
 		
@@ -155,8 +141,6 @@ public class BallotEncrypter {
 				StringExpression.makeString(finalPubKey.toString()));
 		
 		ListExpression ret = new ListExpression(vList, idList, pList, kList);
-		
-		
 		
 		return ret;
     }
@@ -195,6 +179,32 @@ public class BallotEncrypter {
         _randomList = ElGamalCrypto.SINGLETON.getRecentRandomness();
         ElGamalCrypto.SINGLETON.clearRecentRandomness();
         return _recentBallot;
+    }
+    
+    /**
+     * Decrypt an Adder Election using a PrivateKey.
+     * 
+     * @param election
+     * @param privKey
+     * @return Decrypted results
+     */
+    public List<AdderInteger> adderDecryptWithKey(Election election, PublicKey publicKey, PrivateKey privateKey){
+    	PrivateKey finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(publicKey, privateKey);
+    	PublicKey finalPublicKey = AdderKeyManipulator.generateFinalPublicKey(publicKey);
+    	
+    	Vote cipherSum = election.sumVotes();
+		List<AdderInteger> partialSum = (List<AdderInteger>)finalPrivateKey.partialDecrypt(cipherSum);
+		AdderInteger coeff = new AdderInteger(0);
+
+		List<List<AdderInteger>> partialSums = new ArrayList<List<AdderInteger>>();
+		partialSums.add(partialSum);
+
+		List<AdderInteger> coeffs = new ArrayList<AdderInteger>();
+		coeffs.add(coeff);
+
+		List<AdderInteger> results = election.getFinalSum(partialSums, coeffs, cipherSum, finalPublicKey);
+		
+		return results;
     }
     
     /**
