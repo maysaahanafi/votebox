@@ -107,6 +107,8 @@ public class ViewManager implements IViewManager {
         registerQueues();
         setMediaSizes();
         setLanguages();
+        
+        _language = getSupportedLanguages().get(0);
     }
 
     /**
