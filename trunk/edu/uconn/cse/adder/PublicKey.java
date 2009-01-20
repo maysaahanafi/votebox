@@ -297,4 +297,18 @@ public class PublicKey {
 
         return sb.toString();
     }
+    
+    /**
+     * Addition by Kevin Montrose, member of the VoteBox team.
+     * We need to test for equality between two keys in some places, just for sanities sake.
+     * 
+     * @param o - object to test against
+     */
+    @Override
+    public boolean equals(Object o){
+    	if(!(o instanceof PublicKey))
+    		return false;
+    	
+    	return o.toString().equals(toString());
+    }
 }

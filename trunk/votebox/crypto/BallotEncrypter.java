@@ -22,7 +22,6 @@
 
 package votebox.crypto;
 
-import java.io.ByteArrayInputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.math.BigInteger;
@@ -36,7 +35,6 @@ import java.util.Map;
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;
 import edu.uconn.cse.adder.ElgamalCiphertext;
-import edu.uconn.cse.adder.Polynomial;
 import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
@@ -46,7 +44,6 @@ import auditorium.Bugout;
 import auditorium.Key;
 
 import sexpression.*;
-import sexpression.stream.ASEInputStreamReader;
 import votebox.crypto.interop.AdderKeyManipulator;
 import votebox.middle.IBallotVars;
 import votebox.middle.ballot.*;
