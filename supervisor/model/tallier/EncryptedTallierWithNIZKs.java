@@ -11,8 +11,6 @@ import auditorium.Bugout;
 
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;
-import edu.uconn.cse.adder.ElgamalCiphertext;
-import edu.uconn.cse.adder.Polynomial;
 import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
@@ -46,8 +44,8 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 		_privateKey = priv;
 		_publicKey = pub;
 		
-		_finalPublicKey = AdderKeyManipulator.generateFinalPublicKey(_publicKey);
-		_finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(_publicKey, _privateKey);
+		//_finalPublicKey = AdderKeyManipulator.generateFinalPublicKey(_publicKey);
+		//_finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(_publicKey, _privateKey);
 	}
 	
 	public void challenged(ASExpression nonce) {
@@ -60,9 +58,12 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 
 	@SuppressWarnings("unchecked")
 	public Map<String, BigInteger> getReport() {
+		_finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(_publicKey, _privateKey);
 		Map<String, BigInteger> report = new HashMap<String, BigInteger>();
 		
 		for(String group : _results.keySet()){
+			System.out.println("Decrypting election-id \""+group+"\"");
+			
 			Election election = _results.get(group);
 			
 			Vote cipherSum = election.sumVotes();
@@ -78,6 +79,9 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 			List<AdderInteger> results = election.getFinalSum(partialSums, coeffs, cipherSum, _finalPublicKey);
 			String[] ids = group.split(",");
 			
+			System.out.println("\tresults size: "+results.size());
+			System.out.println("\tids count: "+ids.length);
+			
 			for(int i = 0; i < ids.length; i++)
 				report.put(ids[i], results.get(i).bigintValue());
 		}//for
@@ -86,6 +90,16 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 	}
 
 	public void recordVotes(byte[] ballotBytes, ASExpression nonce) {
+		if(_finalPublicKey == null)
+			_finalPublicKey = AdderKeyManipulator.generateFinalPublicKey(_publicKey);
+		else{
+			PublicKey copy = AdderKeyManipulator.generateFinalPublicKey(_publicKey);
+			
+			if(!_finalPublicKey.equals(copy))
+				//throw new RuntimeException("Final public key changed!\n"+_finalPublicKey+"\n\n"+copy);
+				Bugout.err("Final public key changed!\n"+_finalPublicKey+"\n\n"+copy);
+		}
+		
 		System.out.println("EncryptedTallierWithNIZKs.recordVotes(..., "+nonce+")");
 		
 		ASEInputStreamReader in = new ASEInputStreamReader(
@@ -107,26 +121,26 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 				
 				Vote vote = Vote.fromString(voteE.get(1).toString());
 				List<String> voteIds = new ArrayList<String>();
-				for(int j = 1; j < voteIdsE.size(); j++)
-					voteIds.add(voteIdsE.get(1).toString());
+				for(int j = 0; j < ((ListExpression)voteIdsE.get(1)).size(); j++)
+					voteIds.add(((ListExpression)voteIdsE.get(1)).get(j).toString());
 				
 				VoteProof voteProof = VoteProof.fromString(proofE.get(1).toString());
 				
 				PublicKey suppliedPublicKey = PublicKey.fromString(publicKeyE.get(1).toString());
 				
-				if(!(suppliedPublicKey.toString().equals(_finalPublicKey.toString()))){
-					Bugout.err("Expected supplied final PublicKey to match generated\nSupplied: "+suppliedPublicKey+"\nGenerated: "+_finalPublicKey);
-					Bugout.err("Rejected ballot:\n"+new String(ballotBytes));
-					return;
+				if(!(suppliedPublicKey.toString().trim().equals(_finalPublicKey.toString().trim()))){
+					Bugout.err("!!!Expected supplied final PublicKey to match generated\nSupplied: "+suppliedPublicKey+"\nGenerated: "+_finalPublicKey+"!!!");
 				}
 				
 				if(!voteProof.verify(vote, _finalPublicKey, 0, 1)){
-					Bugout.err("Ballot failed NIZK test");
-					Bugout.err("Rejected ballot:\n"+new String(ballotBytes));
-					return;
+					Bugout.err("!!!Ballot failed NIZK test!!!");
 				}
 				
 				String subElectionId = makeId(voteIds);
+				
+				System.out.println("Updating election-id \""+subElectionId+"\"");
+				System.out.println("\t"+voteIds);
+				System.out.println("\t"+voteIdsE);
 				
 				Election election = _results.get(subElectionId);
 				

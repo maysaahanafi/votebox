@@ -3,8 +3,6 @@ package votebox.crypto.interop;
 import java.util.ArrayList;
 import java.util.List;
 
-import auditorium.AuditoriumCryptoException;
-
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.ElgamalCiphertext;
 import edu.uconn.cse.adder.Polynomial;
@@ -84,9 +82,9 @@ public class AdderKeyManipulator {
                 evaluate(new AdderInteger(AdderInteger.ZERO, q)));
 		finalH = finalH.multiply(gvalue);
 		
-		PublicKey finalPubKey = new PublicKey(p, g, finalH, f);
+		_cachedKey = new PublicKey(p, g, finalH, f);
 		
-		return finalPubKey;
+		return _cachedKey;
 	}
 	
 	/**
