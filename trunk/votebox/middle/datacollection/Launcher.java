@@ -254,7 +254,9 @@ public class Launcher {
 
 						//#ifdef EVIL
 						// EVIL
-						DataLogger.DumpBallot( (ASExpression)arg );
+						ASExpression ballot = (ASExpression)((Object[])arg)[0];
+						System.out.println("Preparing to dump ballot:\n\t"+ballot);
+						DataLogger.DumpBallot( ballot );
 						//#endif
 						
 						Driver.printBallotAccepted(constants, new File(ballotLocation));

@@ -109,6 +109,7 @@ public class ViewManager implements IViewManager {
         setLanguages();
         
         _language = getSupportedLanguages().get(0);
+        System.out.println("(ViewManager) Selected Language: "+_language);
     }
 
     /**
@@ -718,6 +719,8 @@ public class ViewManager implements IViewManager {
      */
     private void makePages() {
         try {
+        	System.out.println("Making Pages with Language: "+getLanguage());
+        	
             _layout = new LayoutParser().getLayout( _variables, getSize(),
                     getLanguage() );
             _layout.initFromViewManager( this, _ballotLookupAdapter,
