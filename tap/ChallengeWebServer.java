@@ -48,6 +48,7 @@ import sexpression.stream.InvalidVerbatimStreamException;
 import votebox.AuditoriumParams;
 import votebox.crypto.BallotEncrypter;
 import votebox.events.AdderChallengeEvent;
+import votebox.events.AuthorizedToCastWithNIZKsEvent;
 import votebox.events.CastCommittedBallotEvent;
 import votebox.events.ChallengeEvent;
 import votebox.events.CommitBallotEvent;
@@ -61,6 +62,7 @@ import votebox.events.CommitBallotEvent;
 public class ChallengeWebServer {
 	public static Key PUBLIC_KEY = null;
 	public static PublicKey ADDER_PUBLIC_KEY = null;
+	public static PublicKey ADDER_FINAL_PUBLIC_KEY = null;
 	
 	/**
 	 * Loads the public key necissary for operation.
@@ -532,7 +534,19 @@ public class ChallengeWebServer {
 			type = MessageType.AdderChallenge;
 		}//if
 		
-		//TODO: Hook the Adder stuff in here.
+		if(AuthorizedToCastWithNIZKsEvent.getMatcher().match(-1, ase) != null){
+			PublicKey finalPubKey = extractFinalKey((ListExpression)ase);
+			
+			if(ADDER_FINAL_PUBLIC_KEY != null){
+				ADDER_FINAL_PUBLIC_KEY = finalPubKey;
+			}else{
+				if(!ADDER_FINAL_PUBLIC_KEY.equals(finalPubKey)){
+					System.err.println("Final public key has CHANGED!\n"+ADDER_FINAL_PUBLIC_KEY+"\n\n"+finalPubKey);
+				}
+			}
+			
+			return;
+		}
 		
 		System.out.println(type+" --> "+ase);
 		
@@ -564,12 +578,15 @@ public class ChallengeWebServer {
 			ASExpression ballot = ((CommitBallotEvent)(CommitBallotEvent.getMatcher().match(-1, innerMap.get(MessageType.Commit)))).getBallot();
 			ASExpression random = ((ChallengeEvent)ChallengeEvent.getMatcher().match(-1, innerMap.get(MessageType.Challenge))).getRandom();
 			
-			//innerMap.put(MessageType.Result, BallotEncrypter.SINGLETON.adderDecrypt((ListExpression)ballot, toTraditionalList((ListExpression)random), ADDER_PUBLIC_KEY));
 			innerMap.put(MessageType.Result, BallotEncrypter.SINGLETON.adderDecrypt((ListExpression)ballot, toTraditionalList((ListExpression)random)));
 			map.put(serial, voteList);
 		}
 		
 	}//placeInMap
+	
+	private static PublicKey extractFinalKey(ListExpression exp){
+		return PublicKey.fromString(exp.get(4).toString());
+	}
 	
 	private static List<List<AdderInteger>> toTraditionalList(ListExpression exp){
 		List<List<AdderInteger>> toRet = new ArrayList<List<AdderInteger>>();

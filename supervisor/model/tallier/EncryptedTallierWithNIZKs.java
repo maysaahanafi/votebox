@@ -130,10 +130,12 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 				
 				if(!(suppliedPublicKey.toString().trim().equals(_finalPublicKey.toString().trim()))){
 					Bugout.err("!!!Expected supplied final PublicKey to match generated\nSupplied: "+suppliedPublicKey+"\nGenerated: "+_finalPublicKey+"!!!");
+					return;
 				}
 				
 				if(!voteProof.verify(vote, _finalPublicKey, 0, 1)){
 					Bugout.err("!!!Ballot failed NIZK test!!!");
+					return;
 				}
 				
 				String subElectionId = makeId(voteIds);

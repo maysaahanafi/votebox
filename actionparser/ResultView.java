@@ -22,9 +22,12 @@
 
 package actionparser;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -42,10 +45,15 @@ import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.filechooser.FileFilter;
 
 import tap.BallotImageHelper;
 
@@ -73,7 +81,7 @@ public class ResultView extends JFrame {
 		
 		raceMap.put("(none)", generateNoneImage());
 		
-		JPanel center = new JPanel();
+		final JPanel center = new JPanel();
 		
 		BoxLayout layout = new BoxLayout(center, BoxLayout.Y_AXIS);
 		center.setLayout(layout);
@@ -95,7 +103,9 @@ public class ResultView extends JFrame {
 				titlePanel.add(Box.createHorizontalGlue());
 				
 				center.add(titlePanel);
-			}//if
+			}else{
+				System.out.println("Omitting title card...");
+			}
 			
 			for(String resStr : res.get_res()){
 				JPanel indented = new JPanel();
@@ -112,15 +122,63 @@ public class ResultView extends JFrame {
 					indented.add(Box.createHorizontalGlue());
 
 					center.add(indented);
-				}//if
+				}else{
+					System.out.println("Omitting race card for: "+resStr);
+				}
 			}
 		}//for
 		
-		center.add(Box.createVerticalGlue());
+		//center.add(Box.createVerticalGlue());
 		
-		add(new JScrollPane(center));
+		setLayout(new BorderLayout());
+		
+		add(new JScrollPane(center), BorderLayout.CENTER);
 		
 		setSize(1024, 768);
+		
+		JButton saveScreen = new JButton("Save Screen Capture");
+		saveScreen.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				scrapScreen(center);
+			}
+		});
+		
+		add(saveScreen, BorderLayout.SOUTH);
+	}
+	
+	protected void scrapScreen(JComponent comp){
+		BufferedImage img = new BufferedImage(comp.getWidth(), comp.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		
+		comp.paintAll(img.getGraphics());
+		
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new FileFilter(){
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".png");
+			}
+
+			@Override
+			public String getDescription() {
+				return ".PNG Image File";
+			}
+			
+		});
+		if(chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION){
+			return;
+		}
+		
+		File file = chooser.getSelectedFile();
+		
+		if(!file.getName().endsWith(".png")){
+			file = new File(file.getAbsolutePath()+".png");
+		}
+		
+		try{
+			ImageIO.write(img, "PNG", file);
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 	
 	protected Image generateNoneImage(){
@@ -177,8 +235,9 @@ public class ResultView extends JFrame {
 		if(!entryName.endsWith(".png"))
 			return false;
 		
-		if(entryName.indexOf("_selected_") == -1)
+		if(entryName.indexOf("_selected_") == -1 && entryName.indexOf("_focusedSelected_") == -1 && entryName.indexOf("_focused_") == -1)
 			return false;
+		
 		if(langs != null)
 			if(entryName.indexOf(langs.get(0)) == -1) //grab the first language for now
 				return false;

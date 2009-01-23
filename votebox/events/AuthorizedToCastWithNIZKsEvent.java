@@ -73,10 +73,11 @@ public class AuthorizedToCastWithNIZKsEvent extends AuthorizedToCastEvent {
                 .makeString( "authorized-to-cast" ), StringExpression
                 .makeString( Integer.toString( node ) ), StringExpression
                 .makeString( nonce ), StringExpression.makeString( ballot ) );*/
-    	return new ListExpression( StringExpression
-                .makeString( "authorized-to-cast-with-nizks" ), StringExpression
-                .makeString( Integer.toString( getNode() ) ), StringExpression
-                .makeString( new BigInteger(getNonce()).toString() ), StringExpression.makeString( getBallot() ),
+    	return new ListExpression( 
+    			StringExpression.makeString( "authorized-to-cast-with-nizks" ), 
+                StringExpression.makeString( Integer.toString( getNode() ) ), 
+                StringExpression.makeString( new BigInteger(getNonce()).toString() ), 
+                StringExpression.makeString( getBallot() ),
                 StringExpression.makeString(_finalPubKey.toString()));
     }
 }

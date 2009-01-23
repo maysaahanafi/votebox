@@ -33,8 +33,10 @@ import auditorium.NetworkException;
 import sexpression.stream.ASEWriter;
 import votebox.AuditoriumParams;
 import votebox.events.ActivatedEvent;
+import votebox.events.AdderChallengeEvent;
 import votebox.events.AssignLabelEvent;
 import votebox.events.AuthorizedToCastEvent;
+import votebox.events.AuthorizedToCastWithNIZKsEvent;
 import votebox.events.BallotCountedEvent;
 import votebox.events.BallotReceivedEvent;
 import votebox.events.CastBallotEvent;
@@ -113,7 +115,10 @@ public class Tap {
 					AuditoriumParams.Singleton,
 					CommitBallotEvent.getMatcher(),
 					CastCommittedBallotEvent.getMatcher(),
-					ChallengeEvent.getMatcher());
+					ChallengeEvent.getMatcher(),
+					AuthorizedToCastWithNIZKsEvent.getMatcher(),
+					AdderChallengeEvent.getMatcher()
+					);
 		}catch(NetworkException e){
 			throw new RuntimeException("Unable to connect to Auditorium: "+e.getMessage(), e);
 		}//catch

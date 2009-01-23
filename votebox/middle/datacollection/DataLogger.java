@@ -114,8 +114,10 @@ public class DataLogger {
     }
 
     public static void DumpBallot(ASExpression ballot) {
-        if (Singleton == null)
+        if (Singleton == null){
+        	System.out.println("Cancelled dumping ballot, [Singleton = null]");
             return;
+        }//if
         Singleton.dumpBallot( ballot );
     }
 
@@ -194,6 +196,7 @@ public class DataLogger {
     private void dumpBallot(ASExpression ballot) {
         try {
             _ballotwriter.writeASE( ballot );
+            System.out.println("Successfully dumped ballot to file.");
         }
         catch (UnsupportedEncodingException e) {
             // Encoding errors should actually stop things because this is a
@@ -203,6 +206,9 @@ public class DataLogger {
                     "DataLogger dump failed becaues of an unsupported encoding error." );
         }
         catch (IOException e) {
+        	System.out.println("\"Recoverable\" error encountered...");
+        	e.printStackTrace();
+        	
             // IO errors shouldn't stop the process of things, but we need
             // to make sure that keep the expressions that don't get logged
             // so that if the disk is failing, the logged entries can be
