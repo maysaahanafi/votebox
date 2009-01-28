@@ -19,7 +19,7 @@ public class Polynomial {
     private AdderInteger g;
     private AdderInteger f;
     private int degree;
-    private List/*<AdderInteger>*/ coeffs;
+    private List<AdderInteger> coeffs;
 
     /**
      * Creates a new Polynomial of degree 0 with the specified parameter
@@ -53,7 +53,7 @@ public class Polynomial {
         this.g = g;
         this.f = f;
         this.degree = degree;
-        coeffs = new ArrayList/*<AdderInteger>*/(degree + 1);
+        coeffs = new ArrayList<AdderInteger>(degree + 1);
 
         for (int i = 0; i <= degree; i++) {
             coeffs.add(AdderInteger.random(q));
@@ -70,7 +70,7 @@ public class Polynomial {
      * @param coeffs the coefficients
      */
     public Polynomial(AdderInteger p, AdderInteger g, AdderInteger f,
-                      List/*<AdderInteger>*/ coeffs) {
+                      List<AdderInteger> coeffs) {
         this.p = p;
         this.q = p.subtract(AdderInteger.ONE).divide(AdderInteger.TWO);
         this.g = g;
@@ -90,7 +90,7 @@ public class Polynomial {
      * @param coeffs the coefficients
      */
     private Polynomial(AdderInteger p, AdderInteger q, AdderInteger g,
-                       AdderInteger f, List/*<AdderInteger>*/ coeffs) {
+                       AdderInteger f, List<AdderInteger> coeffs) {
         this.p = p;
         this.q = q;
         this.g = g;
@@ -123,9 +123,9 @@ public class Polynomial {
      *
      * @return the list of Lagrange coefficients of this polynomial
      */
-    public List/*<AdderInteger>*/ lagrange() {
-        List/*<AdderInteger>*/ lagrangeCoeffs =
-            new ArrayList/*<AdderInteger>*/(coeffs.size());
+    public List<AdderInteger> lagrange() {
+        List<AdderInteger> lagrangeCoeffs =
+            new ArrayList<AdderInteger>(coeffs.size());
 
         /*for (AdderInteger ai : coeffs) {*/
         for (Iterator it = coeffs.iterator(); it.hasNext();) {
@@ -190,7 +190,7 @@ public class Polynomial {
      *
      * @return the list of coefficients
      */
-    public List/*<AdderInteger>*/ getCoeffs() {
+    public List<AdderInteger> getCoeffs() {
         return coeffs;
     }
 
@@ -241,7 +241,7 @@ public class Polynomial {
                 throw new InvalidPolynomialException("too many tokens");
             }
 
-            List/*<AdderInteger>*/ coeffs = new ArrayList/*<AdderInteger>*/();
+            List<AdderInteger> coeffs = new ArrayList<AdderInteger>();
 
             while (st0.hasMoreTokens()) {
                 coeffs.add(new AdderInteger(st0.nextToken(), q));

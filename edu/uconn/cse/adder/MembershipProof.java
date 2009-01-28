@@ -17,20 +17,20 @@ public class MembershipProof {
     private AdderInteger p;
     private AdderInteger q;
     private AdderInteger c;
-    private List/*<AdderInteger>*/ yList;
-    private List/*<AdderInteger>*/ zList;
-    private List/*<AdderInteger>*/ sList;
-    private List/*<AdderInteger>*/ cList;
+    private List<AdderInteger> yList;
+    private List<AdderInteger> zList;
+    private List<AdderInteger> sList;
+    private List<AdderInteger> cList;
 
     /**
      * Constructs a new <code>MembershipProof</code> object with the specified
      * prime.
      */
     public MembershipProof() {
-        yList = new ArrayList/*<AdderInteger>*/();
-        zList = new ArrayList/*<AdderInteger>*/();
-        sList = new ArrayList/*<AdderInteger>*/();
-        cList = new ArrayList/*<AdderInteger>*/();
+        yList = new ArrayList<AdderInteger>();
+        zList = new ArrayList<AdderInteger>();
+        sList = new ArrayList<AdderInteger>();
+        cList = new ArrayList<AdderInteger>();
     }
 
     /**
@@ -45,10 +45,10 @@ public class MembershipProof {
      * @param cList the c list
      */
     private MembershipProof(AdderInteger p, AdderInteger q,
-                        List/*<AdderInteger>*/ yList,
-                        List/*<AdderInteger>*/ zList,
-                        List/*<AdderInteger>*/ sList,
-                        List/*<AdderInteger>*/ cList) {
+                        List<AdderInteger> yList,
+                        List<AdderInteger> zList,
+                        List<AdderInteger> sList,
+                        List<AdderInteger> cList) {
         this.p = p;
         this.q = q;
         this.yList = yList;
@@ -213,8 +213,8 @@ public class MembershipProof {
             AdderInteger q
                 = p.subtract(AdderInteger.ONE).divide(AdderInteger.TWO);
 
-            List/*<AdderInteger>*/ yList
-                = new ArrayList/*<AdderInteger>*/(count);
+            List<AdderInteger> yList
+                = new ArrayList<AdderInteger>(count);
 
             for (int ySize = 0; ySize < count; ySize++) {
                 if (!st.nextToken().equals("y")) {
@@ -225,8 +225,8 @@ public class MembershipProof {
                 yList.add(new AdderInteger(st.nextToken(), p));
             }
 
-            List/*<AdderInteger>*/ zList
-                = new ArrayList/*<AdderInteger>*/(count);
+            List<AdderInteger> zList
+                = new ArrayList<AdderInteger>(count);
 
             for (int zSize = 0; zSize < count; zSize++) {
                 if (!st.nextToken().equals("z")) {
@@ -237,8 +237,8 @@ public class MembershipProof {
                 zList.add(new AdderInteger(st.nextToken(), p));
             }
 
-            List/*<AdderInteger>*/ sList
-                = new ArrayList/*<AdderInteger>*/(count);
+            List<AdderInteger> sList
+                = new ArrayList<AdderInteger>(count);
 
             for (int sSize = 0; sSize < count; sSize++) {
                 if (!st.nextToken().equals("s")) {
@@ -249,8 +249,8 @@ public class MembershipProof {
                 sList.add(new AdderInteger(st.nextToken(), q));
             }
 
-            List/*<AdderInteger>*/ cList
-                = new ArrayList/*<AdderInteger>*/(count);
+            List<AdderInteger> cList
+                = new ArrayList<AdderInteger>(count);
 
             for (int cSize = 0; cSize < count; cSize++) {
                 if (!st.nextToken().equals("c")) {

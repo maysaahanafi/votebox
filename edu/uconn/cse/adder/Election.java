@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Election {
     private AdderInteger p;
-    private List/*<Vote>*/ votes;
+    private List<Vote> votes;
 
     /**
      * Creates a new election.
@@ -22,7 +22,7 @@ public class Election {
      */
     public Election(AdderInteger p) {
         this.p = p;
-        this.votes = new ArrayList/*<Vote>*/();
+        this.votes = new ArrayList<Vote>();
     }
 
     /**
@@ -30,7 +30,7 @@ public class Election {
      *
      * @return the voes
      */
-    public List/*<Vote>*/ getVotes() {
+    public List<Vote> getVotes() {
         return votes;
     }
 
@@ -52,8 +52,8 @@ public class Election {
     public Vote sumVotes() {
         Vote vote = (Vote) votes.get(0);
         int size = vote.getCipherList().size();
-        List/*<ElgamalCiphertext>*/ initList = new 
-            ArrayList/*<ElgamalCiphertext>*/(size);
+        List<ElgamalCiphertext> initList = new 
+            ArrayList<ElgamalCiphertext>(size);
 
         for (int i = 0; i < size; i++) {
             ElgamalCiphertext ciphertext
@@ -83,9 +83,9 @@ public class Election {
      * @param  masterKey   the master public key
      * @return the final vote tally
      */
-    public List/*<AdderInteger>*/
-                    getFinalSum(List/*<List<AdderInteger>>*/ partialSums,
-                    List/*<AdderInteger>*/ coeffs, Vote sum,
+    public List<AdderInteger>
+                    getFinalSum(List<List<AdderInteger>> partialSums,
+                    List<AdderInteger> coeffs, Vote sum,
                     PublicKey masterKey) {
         AdderInteger p = masterKey.getP();
         AdderInteger q = masterKey.getQ();
@@ -93,15 +93,15 @@ public class Election {
         AdderInteger g = masterKey.getG();
 
         Polynomial poly = new Polynomial(p, g, f, coeffs);
-        List/*<AdderInteger>*/ lagrangeCoeffs = poly.lagrange();
+        List<AdderInteger> lagrangeCoeffs = poly.lagrange();
         int lsize = lagrangeCoeffs.size();
 
-        List/*<ElgamalCiphertext>*/ cipherList = sum.getCipherList();
+        List<ElgamalCiphertext> cipherList = sum.getCipherList();
         int csize = cipherList.size();
-        List/*<AdderInteger>*/ productList
-            = new ArrayList/*<AdderInteger>*/(csize);
-        List/*<AdderInteger>*/ results
-            = new ArrayList/*<AdderInteger>*/(csize);
+        List<AdderInteger> productList
+            = new ArrayList<AdderInteger>(csize);
+        List<AdderInteger> results
+            = new ArrayList<AdderInteger>(csize);
 
         for (int i = 0; i < csize; i++) {
             productList.add(new AdderInteger(AdderInteger.ONE, p));
@@ -122,26 +122,26 @@ public class Election {
 
             int numVotes = votes.size();
 
-            System.out.println("Looping " + (numVotes + 1) + " times to look for result");
+            //System.out.println("Looping " + (numVotes + 1) + " times to look for result");
 
             for (int k = 0; k <= numVotes; k++) {
                 j = new AdderInteger(k, q);
 
-                System.out.println("DOES " + new AdderInteger(f, p).pow(j) + " equal " + target + "?");
+                //System.out.println("DOES " + new AdderInteger(f, p).pow(j) + " equal " + target + "?");
 
                 if (f.pow(j).equals(target)) {
-                    System.out.println("GOT RESULT!!!");
+                    //System.out.println("GOT RESULT!!!");
                     gotResult = true;
                     break;
                 }
             }
 
             if (gotResult) {
-                System.out.println("Adding result: " + j);
+                //System.out.println("Adding result: " + j);
                 results.add(j);
                 gotResult = false;
             } else {
-                System.out.println("THROWING EXCEPTION!!!");
+                //System.out.println("THROWING EXCEPTION!!!");
                 throw new SearchSpaceExhaustedException("Error searching for "
                                                         + target);
             }

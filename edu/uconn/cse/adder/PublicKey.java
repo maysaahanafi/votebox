@@ -143,9 +143,9 @@ public class PublicKey {
      *
      * @return the encrypted vote
      */
-    public Vote encrypt(List/*<AdderInteger>*/ choices) {
-        List/*<ElgamalCiphertext>*/ voteList
-            = new ArrayList/*<ElgamalCiphertext>*/(choices.size());
+    public Vote encrypt(List<AdderInteger> choices) {
+        List<ElgamalCiphertext> voteList
+            = new ArrayList<ElgamalCiphertext>(choices.size());
 
         Iterator it;
 
