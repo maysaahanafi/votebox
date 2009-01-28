@@ -11,8 +11,6 @@ import auditorium.Bugout;
 
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;
-import edu.uconn.cse.adder.ElgamalCiphertext;
-import edu.uconn.cse.adder.Polynomial;
 import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
@@ -127,6 +125,7 @@ public class ChallengeDelayedWithNIZKsTallier implements ITallier {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map<String, BigInteger> getReport() {
 		_finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(_publicKey, _privateKey);
 		Map<String, BigInteger> report = new HashMap<String, BigInteger>();

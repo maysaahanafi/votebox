@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 
 public class VoteProof {
     private AdderInteger p;
-    private List/*<MembershipProof>*/ proofList;
+    private List<MembershipProof> proofList;
     private MembershipProof sumProof;
 
     public VoteProof() {
@@ -14,17 +14,17 @@ public class VoteProof {
     }
 
     private VoteProof(MembershipProof sumProof,
-                      List/*<MembershipProof>*/ proofList) {
+                      List<MembershipProof> proofList) {
         this.sumProof = sumProof;
         this.proofList = proofList;
     }
 
     public void compute(Vote vote, PublicKey pubKey,
-                        List/*<AdderInteger>*/ choices, int min, int max) {
+                        List<AdderInteger> choices, int min, int max) {
         this.p = pubKey.getP();
-        List/*<ElgamalCiphertext>*/ cipherList = vote.getCipherList();
-        List/*<AdderInteger>*/ cipherDomain
-            = new ArrayList/*<AdderInteger>*/(2);
+        List<ElgamalCiphertext> cipherList = vote.getCipherList();
+        List<AdderInteger> cipherDomain
+            = new ArrayList<AdderInteger>(2);
 
         cipherDomain.add(AdderInteger.ZERO);
         cipherDomain.add(AdderInteger.ONE);
@@ -34,7 +34,7 @@ public class VoteProof {
 
         int numChoices = 0;
         int size = cipherList.size();
-        this.proofList = new ArrayList(size);
+        this.proofList = new ArrayList<MembershipProof>(size);
 
         for (int i = 0; i < size; i++) {
             MembershipProof proof = new MembershipProof();
@@ -51,8 +51,8 @@ public class VoteProof {
             }
         }
 
-        List/*<AdderInteger>*/ totalDomain
-            = new ArrayList/*<AdderInteger>*/(max + 1);
+        List<AdderInteger> totalDomain
+            = new ArrayList<AdderInteger>(max + 1);
 
         for (int j = min; j <= max; j++) {
             totalDomain.add(new AdderInteger(j));
@@ -65,9 +65,9 @@ public class VoteProof {
 
     public boolean verify(Vote vote, PublicKey pubKey, int min, int max) {
         this.p = pubKey.getP();
-        List/*<ElgamalCiphertext>*/ cipherList = vote.getCipherList();
-        List/*<AdderInteger>*/ cipherDomain
-            = new ArrayList/*<AdderInteger>*/(2);
+        List<ElgamalCiphertext> cipherList = vote.getCipherList();
+        List<AdderInteger> cipherDomain
+            = new ArrayList<AdderInteger>(2);
 
         cipherDomain.add(AdderInteger.ZERO);
         cipherDomain.add(AdderInteger.ONE);
@@ -88,8 +88,8 @@ public class VoteProof {
             sumCipher = sumCipher.multiply(ciphertext);
         }
 
-        List/*<AdderInteger>*/ totalDomain
-            = new ArrayList/*<AdderInteger>*/(max + 1);
+        List<AdderInteger> totalDomain
+            = new ArrayList<AdderInteger>(max + 1);
 
         for (int j = min; j <= max; j++) {
             totalDomain.add(new AdderInteger(j));
@@ -104,8 +104,8 @@ public class VoteProof {
 
     public static VoteProof fromString(String s) {
         StringTokenizer st = new StringTokenizer(s, " ");
-        List/*<ElgamalCiphertext>*/ pList
-            = new ArrayList/*<ElgamalCiphertext>*/(25); // XXX: what size? 
+        List<MembershipProof> pList
+            = new ArrayList<MembershipProof>(25); // XXX: what size? 
         MembershipProof sumProof = MembershipProof.fromString(st.nextToken());
 
         while (st.hasMoreTokens()) {

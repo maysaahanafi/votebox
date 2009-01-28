@@ -185,7 +185,8 @@ public class BallotEncrypter {
      * @param privKey
      * @return Decrypted results
      */
-    public List<AdderInteger> adderDecryptWithKey(Election election, PublicKey publicKey, PrivateKey privateKey){
+    @SuppressWarnings("unchecked")
+	public List<AdderInteger> adderDecryptWithKey(Election election, PublicKey publicKey, PrivateKey privateKey){
     	PrivateKey finalPrivateKey = AdderKeyManipulator.generateFinalPrivateKey(publicKey, privateKey);
     	PublicKey finalPublicKey = AdderKeyManipulator.generateFinalPublicKey(publicKey);
     	

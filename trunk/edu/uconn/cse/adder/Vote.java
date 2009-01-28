@@ -5,23 +5,23 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class Vote {
-    private List/*<ElgamalCiphertext>*/ cipherList;
+    private List<ElgamalCiphertext> cipherList;
 
     public Vote() {
 
     }
 
-    public Vote(List/*<ElgamalCiphertext>*/ cipherList) {
+    public Vote(List<ElgamalCiphertext> cipherList) {
         this.cipherList = cipherList;
     }
 
-    public List getCipherList() {
+    public List<ElgamalCiphertext> getCipherList() {
         return cipherList;
     }
 
     Vote multiply(Vote vote) {
-        List/*<ElgamalCiphertext>*/ vec
-            = new ArrayList/*<ElgamalCiphertext>*/(this.getCipherList().size());
+        List<ElgamalCiphertext> vec
+            = new ArrayList<ElgamalCiphertext>(this.getCipherList().size());
 
         for (int i = 0; i < this.getCipherList().size(); i++) {
             ElgamalCiphertext ciphertext1
@@ -40,8 +40,8 @@ public class Vote {
 
     public static Vote fromString(String s) {
         StringTokenizer st = new StringTokenizer(s, " ");
-        List/*<ElgamalCiphertext>*/ cList
-            = new ArrayList/*<ElgamalCiphertext>*/(25); // XXX: what size?
+        List<ElgamalCiphertext> cList
+            = new ArrayList<ElgamalCiphertext>(25); // XXX: what size?
 
         while (st.hasMoreTokens()) {
             String s2 = st.nextToken();

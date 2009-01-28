@@ -52,7 +52,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.filechooser.FileFilter;
 
 import tap.BallotImageHelper;

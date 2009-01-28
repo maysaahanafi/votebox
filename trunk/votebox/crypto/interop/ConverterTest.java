@@ -8,18 +8,14 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import auditorium.Bugout;
-
 import sexpression.ASExpression;
 import sexpression.ListExpression;
-import supervisor.model.tallier.ChallengeDelayedWithNIZKsTallier;
 import votebox.crypto.BallotEncrypter;
 
 import edu.uconn.cse.adder.AdderInteger;
 import edu.uconn.cse.adder.Election;
 import edu.uconn.cse.adder.ElgamalCiphertext;
 import edu.uconn.cse.adder.MembershipProof;
-import edu.uconn.cse.adder.Polynomial;
 import edu.uconn.cse.adder.PrivateKey;
 import edu.uconn.cse.adder.PublicKey;
 import edu.uconn.cse.adder.Vote;
@@ -60,7 +56,7 @@ public class ConverterTest {
 			AdderInteger random = randoms.get(i);
 			
 			AdderInteger r = random;
-	        AdderInteger bigG = finalPubKey.getG().pow(r);
+	        //AdderInteger bigG = finalPubKey.getG().pow(r);
 	        AdderInteger step1 = finalPubKey.getH().pow(r);
 	        AdderInteger step20 = finalPubKey.getF().pow(AdderInteger.ZERO);
 	        AdderInteger step21 = finalPubKey.getF().pow(AdderInteger.ONE);

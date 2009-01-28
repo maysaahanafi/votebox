@@ -236,7 +236,8 @@ public class VoteBox {
         	//Listen for commit ui events.  When received, send out an encrypted vote.
         	currentDriver.getView().registerForCommit(new Observer() {
 
-        		public void update(Observable o, Object argTemp) {
+        		@SuppressWarnings("unchecked")
+				public void update(Observable o, Object argTemp) {
         			if (!connected)
         				throw new RuntimeException(
         						"Attempted to cast ballot when not connected to any machines");
