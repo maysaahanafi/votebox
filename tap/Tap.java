@@ -197,8 +197,12 @@ public class Tap {
 			reportAddr = params.getReportAddress();
 			
 			if(reportAddr.length() == 0){
-				reportAddr = args[p];
-				p++;
+				try{
+					reportAddr = args[p];
+					p++;
+				}catch(Exception e){
+					throw new RuntimeException("usage: Tap [serial] [report address] [port]");
+				}
 			}
 			
 			port = params.getChallengePort();
@@ -235,7 +239,7 @@ public class Tap {
 					break;
 				}catch(IOException e){
 					System.out.println("Connection failed: "+e.getMessage());
-					System.out.println("Retry in 5...");
+					System.out.println("Retry in 5 seconds...");
 					Thread.sleep(5000);
 				}//catch
 			}//while
