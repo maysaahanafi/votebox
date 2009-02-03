@@ -50,6 +50,7 @@ import supervisor.model.tallier.ITallier;
 import supervisor.model.tallier.Tallier;
 import votebox.crypto.interop.AdderKeyManipulator;
 import votebox.events.ActivatedEvent;
+import votebox.events.AdderChallengeEvent;
 import votebox.events.AssignLabelEvent;
 import votebox.events.AuthorizedToCastEvent;
 import votebox.events.AuthorizedToCastWithNIZKsEvent;
@@ -495,7 +496,7 @@ public class Model {
                     EncryptedCastBallotEvent.getMatcher(), CommitBallotEvent.getMatcher(),
                     CastCommittedBallotEvent.getMatcher(), ChallengeResponseEvent.getMatcher(),
                     ChallengeEvent.getMatcher(), EncryptedCastBallotWithNIZKsEvent.getMatcher(),
-                    AuthorizedToCastWithNIZKsEvent.getMatcher());
+                    AuthorizedToCastWithNIZKsEvent.getMatcher(), AdderChallengeEvent.getMatcher());
         } catch (NetworkException e1) {
             throw new RuntimeException(e1);
         }
@@ -876,6 +877,8 @@ public class Model {
              * and as such should be excluded from the final tally.
              */
             public void challenge(ChallengeEvent e) {
+            	System.out.println("Received challenge: "+e);
+            	
             	tallier.challenged(e.getNonce());
             	auditorium.announce(new ChallengeResponseEvent(mySerial, 
             			e.getSerial(), e.getNonce()));

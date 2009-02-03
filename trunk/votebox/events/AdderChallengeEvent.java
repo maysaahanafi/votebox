@@ -38,6 +38,8 @@ public class AdderChallengeEvent extends ChallengeEvent {
      */
     public AdderChallengeEvent(int serial, ASExpression nonce, ListExpression randomList){
     	super(serial, nonce, randomList);
+    	
+    	System.out.println("Allocated AdderChallengeEvent\n\t"+this);
     }
     
     /**
