@@ -120,16 +120,18 @@ public class SimpleKeyStore implements IKeyStore {
 				baos.write(i);
 			}
 			
-			String str = new String(baos.toByteArray());
+			//String str = new String(baos.toByteArray());
 
 			PublicKey pubKey = null;
 			PrivateKey privKey = null;
 
 			try{
-				pubKey = PublicKey.fromString(str);
+				//pubKey = PublicKey.fromString(str);
+				pubKey = PublicKey.fromASE(ASExpression.makeVerbatim(baos.toByteArray()));
 			}catch(Exception e){
 				try{
-					privKey = PrivateKey.fromString(str);
+					//privKey = PrivateKey.fromString(str);
+					privKey = PrivateKey.fromASE(ASExpression.makeVerbatim(baos.toByteArray()));
 				}catch(Exception f){}
 			}
 

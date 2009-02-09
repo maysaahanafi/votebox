@@ -63,7 +63,8 @@ public class AdderChallengeEvent extends ChallengeEvent {
     	for(List<AdderInteger> list : rList){
     		List<ASExpression> copy = new ArrayList<ASExpression>();
     		for(AdderInteger i : list){
-    			copy.add(StringExpression.makeString(i.toString()));
+    			//copy.add(StringExpression.makeString(i.toString()));
+    			copy.add(i.toASE());
     		}
     		
     		lists.add(new ListExpression(copy));

@@ -119,14 +119,17 @@ public class EncryptedTallierWithNIZKs implements ITallier {
 				
 				confirmValid(voteE, voteIdsE, proofE, publicKeyE);
 				
-				Vote vote = Vote.fromString(voteE.get(1).toString());
+				//Vote vote = Vote.fromString(voteE.get(1).toString());
+				Vote vote = Vote.fromASE(voteE.get(1));
 				List<String> voteIds = new ArrayList<String>();
 				for(int j = 0; j < ((ListExpression)voteIdsE.get(1)).size(); j++)
 					voteIds.add(((ListExpression)voteIdsE.get(1)).get(j).toString());
 				
-				VoteProof voteProof = VoteProof.fromString(proofE.get(1).toString());
+				//VoteProof voteProof = VoteProof.fromString(proofE.get(1).toString());
+				VoteProof voteProof = VoteProof.fromASE(proofE.get(1));
 				
-				PublicKey suppliedPublicKey = PublicKey.fromString(publicKeyE.get(1).toString());
+				//PublicKey suppliedPublicKey = PublicKey.fromString(publicKeyE.get(1).toString());
+				PublicKey suppliedPublicKey = PublicKey.fromASE(publicKeyE.get(1));
 				
 				if(!(suppliedPublicKey.toString().trim().equals(_finalPublicKey.toString().trim()))){
 					Bugout.err("!!!Expected supplied final PublicKey to match generated\nSupplied: "+suppliedPublicKey+"\nGenerated: "+_finalPublicKey+"!!!");

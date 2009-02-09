@@ -595,7 +595,8 @@ public class ChallengeWebServer {
 	}//placeInMap
 	
 	private static PublicKey extractFinalKey(ListExpression exp){
-		return PublicKey.fromString(exp.get(4).toString());
+		//return PublicKey.fromString(exp.get(4).toString());
+		return PublicKey.fromASE(exp.get(4));
 	}
 	
 	private static List<List<AdderInteger>> toTraditionalList(ListExpression exp){
@@ -606,7 +607,8 @@ public class ChallengeWebServer {
 			List<AdderInteger> subList = new ArrayList<AdderInteger>();
 			for(int j = 0; j < sub.size(); j++){
 				ASExpression subExp = sub.get(j);
-				subList.add(new AdderInteger(subExp.toString()));
+				//subList.add(new AdderInteger(subExp.toString()));
+				subList.add(AdderInteger.fromASE(subExp));
 			}
 			
 			toRet.add(subList);

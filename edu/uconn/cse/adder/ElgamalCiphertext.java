@@ -3,6 +3,10 @@ package edu.uconn.cse.adder;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import sexpression.ASExpression;
+import sexpression.ListExpression;
+import sexpression.StringExpression;
+
 
 /**
  * Represents a vote, and optionally, the corresponding proof.
@@ -210,5 +214,55 @@ public class ElgamalCiphertext {
         }
 
         return sb.toString();
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @return the S-Expression equivalent of this AdderInteger
+     */
+    public ASExpression toASE(){
+    	if(proof == null)
+    	return new ListExpression(StringExpression.makeString("elgamal-ciphertext"), 
+    			p.toASE(), 
+    			g.toASE(),
+    			h.toASE());
+    	
+    	return new ListExpression(StringExpression.makeString("elgamal-ciphertext"), 
+    			p.toASE(), 
+    			g.toASE(),
+    			h.toASE(),
+    			proof.toASE());
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @param ase - S-Expression representation of an ElgamalCiphertext
+     * @return the ElgamalCiphertext equivalent of ase
+     */
+    public static ElgamalCiphertext fromASE(ASExpression ase){
+    	ListExpression list = (ListExpression)ase;
+    	
+    	if(list.size() != 4 && list.size() != 5)
+    		throw new RuntimeException("Not an elgamal-ciphertext");
+    	
+    	if(!list.get(0).toString().equals("elgamal-ciphertext"))
+    		throw new RuntimeException("Not an elgamal-ciphertext");
+    	
+    	AdderInteger p = AdderInteger.fromASE(list.get(1));
+    	AdderInteger g = AdderInteger.fromASE(list.get(2));
+    	AdderInteger h = AdderInteger.fromASE(list.get(3));
+    	MembershipProof proof = null;
+    	
+    	if(list.size() == 5)
+    		proof = MembershipProof.fromASE(list.get(4));
+    	
+    	ElgamalCiphertext text = new ElgamalCiphertext(g,h,p);
+    	
+    	if(proof != null)
+    		text.setProof(proof);
+    	
+    	return text;
     }
 }
