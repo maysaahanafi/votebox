@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import sexpression.ASExpression;
+import sexpression.ListExpression;
+import sexpression.StringExpression;
+
 /**
  * Represents a private key.
  *
@@ -202,5 +206,40 @@ public class PrivateKey {
         sb.append(f.toString());
 
         return sb.toString();
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @return the S-Expression equivalent of this PrivateKey
+     */
+    public ASExpression toASE(){
+    	return new ListExpression(
+    		StringExpression.makeString("private-key"),
+    		p.toASE(),
+    		g.toASE(),
+    		x.toASE(),
+    		f.toASE()
+    	);
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @param ase - S-Expression representation of a PrivateKey
+     * @return the PrivateKey equivalent of ase
+     */
+    public static PrivateKey fromASE(ASExpression ase){
+    	ListExpression exp = (ListExpression)ase;
+    	
+    	if(!(exp.get(0).toString()).equals("private-key"))
+    		throw new RuntimeException("Not private-key");
+    	
+    	AdderInteger p = AdderInteger.fromASE(exp.get(1));
+    	AdderInteger g = AdderInteger.fromASE(exp.get(1));
+    	AdderInteger x = AdderInteger.fromASE(exp.get(1));
+    	AdderInteger f = AdderInteger.fromASE(exp.get(1));
+    	
+    	return new PrivateKey(p, g, x, f);
     }
 }

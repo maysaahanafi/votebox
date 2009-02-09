@@ -2,6 +2,10 @@ package edu.uconn.cse.adder;
 
 import java.math.BigInteger;
 
+import sexpression.ASExpression;
+import sexpression.ListExpression;
+import sexpression.StringExpression;
+
 /**
  * Arbitrary-precision integers for modular arithmetic.
  * Internally, Java's BigInteger class is used to represent the
@@ -573,5 +577,34 @@ public class AdderInteger implements Comparable/*<AdderInteger>*/ {
      */
     public String toString(int base) {
         return val.toString(base);
+    }
+ 
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @return the S-Expression equivalent of this AdderInteger
+     */
+    public ASExpression toASE(){
+    	return new ListExpression(StringExpression.makeString("adder-integer"), StringExpression.makeString(""+getValue()), StringExpression.makeString(""+getModulus()));
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @return the S-Expression equivalent of this AdderInteger
+     */
+    public static AdderInteger fromASE(ASExpression ase){
+    	ListExpression list = (ListExpression)ase;
+    	
+    	if(list.size() != 3)
+    		throw new RuntimeException("Not an adder-integer");
+    	
+    	if(!list.get(0).toString().equals("adder-integer"))
+    		throw new RuntimeException("Not an adder-integer");
+    	
+    	BigInteger v = new BigInteger(list.get(1).toString());
+    	BigInteger m = new BigInteger(list.get(2).toString());
+    	
+    	return new AdderInteger(v, m);
     }
 }

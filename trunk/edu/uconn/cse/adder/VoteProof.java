@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import sexpression.ASExpression;
+import sexpression.ListExpression;
+import sexpression.StringExpression;
+
 public class VoteProof {
     private AdderInteger p;
     private List<MembershipProof> proofList;
@@ -131,5 +135,42 @@ public class VoteProof {
         }
 
         return sb.toString();
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @return the S-Expression equivalent of this VoteProof
+     */
+    public ASExpression toASE(){
+    	List<ASExpression> proofListL = new ArrayList<ASExpression>();
+    	for(MembershipProof proof : proofList)
+    		proofListL.add(proof.toASE());
+    	
+    	return new ListExpression(StringExpression.makeString("vote-proof"), 
+    			sumProof.toASE(), 
+    			new ListExpression(proofListL));
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @param ase - S-Expression representation of a VoteProof
+     * @return the VoteProof equivalent of ase
+     */
+    public static VoteProof fromASE(ASExpression ase){
+    	ListExpression exp = (ListExpression)ase;
+    	if(!exp.get(0).toString().equals("vote-proof"))
+    		throw new RuntimeException("Not vote-proof");
+    	
+    	MembershipProof sumProof = MembershipProof.fromASE(exp.get(1));
+    	
+    	List<MembershipProof> proofList = new ArrayList<MembershipProof>();
+    	ListExpression proofListE = (ListExpression)exp.get(2);
+    	
+    	for(int i = 0; i < proofListE.size(); i++)
+    		proofList.add(MembershipProof.fromASE(proofListE.get(i)));
+    	
+    	return new VoteProof(sumProof, proofList);
     }
 }

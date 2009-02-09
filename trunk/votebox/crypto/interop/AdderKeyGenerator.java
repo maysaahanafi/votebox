@@ -49,8 +49,10 @@ public class AdderKeyGenerator {
 		FileOutputStream pubOut = new FileOutputStream(pubFile);
 		FileOutputStream privOut = new FileOutputStream(privFile);
 		
-		pubOut.write(pubKey.toString().getBytes());
-		privOut.write(privKey.toString().getBytes());
+		//pubOut.write(pubKey.toString().getBytes());
+		pubOut.write(pubKey.toASE().toVerbatim());
+		//privOut.write(privKey.toString().getBytes());
+		privOut.write(privKey.toASE().toVerbatim());
 		
 		pubOut.flush();
 		privOut.flush();

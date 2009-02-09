@@ -109,7 +109,8 @@ public class BallotEncrypter {
     	
     	for(int i = 0; i < ballot.size(); i++){
     		ListExpression choice = (ListExpression)ballot.get(i);
-    		value.add(new AdderInteger(choice.get(1).toString()));
+    		//value.add(new AdderInteger(choice.get(1).toString()));
+    		value.add(AdderInteger.fromASE(choice.get(1)));
     		valueIds.add(choice.get(0));
     	}//for
     	
@@ -129,13 +130,16 @@ public class BallotEncrypter {
 		proof.compute(vote, finalPubKey, value, 0, 1);
     	
 		ListExpression vList = new ListExpression(StringExpression.makeString("vote"),
-				StringExpression.makeString(vote.toString()));
+				//StringExpression.makeString(vote.toString()));
+				vote.toASE());
 		ListExpression idList = new ListExpression(StringExpression.makeString("vote-ids"),
 				new ListExpression(valueIds));
 		ListExpression pList = new ListExpression(StringExpression.makeString("proof"),
-				StringExpression.makeString(proof.toString()));
+				//StringExpression.makeString(proof.toString()));
+				proof.toASE());
 		ListExpression kList = new ListExpression(StringExpression.makeString("public-key"),
-				StringExpression.makeString(finalPubKey.toString()));
+				//StringExpression.makeString(finalPubKey.toString()));
+				finalPubKey.toASE());
 		
 		ListExpression ret = new ListExpression(vList, idList, pList, kList);
 		
@@ -221,9 +225,11 @@ public class BallotEncrypter {
     	
     	for(int i = 0; i < ballot.size(); i++){
     		ListExpression race = (ListExpression)ballot.get(i);
-    		Vote vote = Vote.fromString(((ListExpression)race.get(0)).get(1).toString());
+    		//Vote vote = Vote.fromString(((ListExpression)race.get(0)).get(1).toString());
+    		Vote vote = Vote.fromASE(((ListExpression)race.get(0)).get(1));
     		ListExpression voteIds = (ListExpression)((ListExpression)race.get(1)).get(1);
-    		PublicKey finalPubKey = PublicKey.fromString(((ListExpression)race.get(3)).get(1).toString());
+    		//PublicKey finalPubKey = PublicKey.fromString(((ListExpression)race.get(3)).get(1).toString());
+    		PublicKey finalPubKey = PublicKey.fromASE(((ListExpression)race.get(3)).get(1));
     		
     		idsToVote.put(voteIds.toString(), vote);
     		idsToRs.put(voteIds.toString(), rVals.get(i));
@@ -255,7 +261,8 @@ public class BallotEncrypter {
     			AdderInteger plaintext = plaintexts.get(i);
     			List<ASExpression> subList = new ArrayList<ASExpression>();
     			subList.add(id);
-    			subList.add(StringExpression.make(plaintext.toString()));
+    			//subList.add(StringExpression.make(plaintext.toString()));
+    			subList.add(plaintext.toASE());
     			subLists.add(new ListExpression(subList));
     		}
     	}

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import sexpression.ASExpression;
+import sexpression.ListExpression;
+import sexpression.StringExpression;
+
 public class Vote {
     private List<ElgamalCiphertext> cipherList;
 
@@ -70,5 +74,37 @@ public class Vote {
         }
 
         return sb.toString().trim();
+    }
+ 
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @return the S-Expression equivalent of this Vote
+     */
+    public ASExpression toASE(){
+    	List<ASExpression> cList = new ArrayList<ASExpression>();
+    	for(ElgamalCiphertext text : cipherList)
+    		cList.add(text.toASE());
+    	
+    	return new ListExpression(StringExpression.makeString("vote"), new ListExpression(cList));
+    }
+    
+    /**
+     * Method for interop with VoteBox's S-Expression system.
+     * 
+     * @param ase - S-Expression representation of a Vote
+     * @return the Vote equivalent of ase
+     */
+    public static Vote fromASE(ASExpression ase){
+    	ListExpression exp = (ListExpression)ase;
+    	if(!(exp.get(0)).equals("vote"))
+    		throw new RuntimeException("Not vote");
+    	
+    	ListExpression cListE = (ListExpression)exp.get(1);
+    	List<ElgamalCiphertext> cList = new ArrayList<ElgamalCiphertext>();
+    	for(int i = 0; i < cListE.size(); i++)
+    		cList.add(ElgamalCiphertext.fromASE(cListE.get(i)));
+    	
+    	return new Vote(cList);
     }
 }
