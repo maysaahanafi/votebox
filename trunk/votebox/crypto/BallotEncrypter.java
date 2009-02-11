@@ -109,8 +109,7 @@ public class BallotEncrypter {
     	
     	for(int i = 0; i < ballot.size(); i++){
     		ListExpression choice = (ListExpression)ballot.get(i);
-    		//value.add(new AdderInteger(choice.get(1).toString()));
-    		value.add(AdderInteger.fromASE(choice.get(1)));
+    		value.add(new AdderInteger(choice.get(1).toString()));
     		valueIds.add(choice.get(0));
     	}//for
     	
@@ -215,7 +214,7 @@ public class BallotEncrypter {
      * @param ballot
      * @param rVals
      * @param publicKey
-     * @return Decrypted ballot, of the form ((race-id plaintext-counter) ...)
+     * @return Decrypted ballot, of the form ((race-id [adder integer]) ...)
      */
     public ListExpression adderDecrypt(ListExpression ballot, List<List<AdderInteger>> rVals){
     	Map<String, Vote> idsToVote = new HashMap<String, Vote>();

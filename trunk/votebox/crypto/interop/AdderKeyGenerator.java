@@ -34,6 +34,8 @@ public class AdderKeyGenerator {
 			}
 		}
 		
+		
+		System.out.println("Generating keys");
 		PublicKey pubKey = PublicKey.makePartialKey(512);
 		PrivateKey privKey = pubKey.genKeyPair();
 		
