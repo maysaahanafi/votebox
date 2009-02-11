@@ -97,7 +97,7 @@ public class Vote {
      */
     public static Vote fromASE(ASExpression ase){
     	ListExpression exp = (ListExpression)ase;
-    	if(!(exp.get(0)).equals("vote"))
+    	if(!(exp.get(0)).toString().equals("vote"))
     		throw new RuntimeException("Not vote");
     	
     	ListExpression cListE = (ListExpression)exp.get(1);

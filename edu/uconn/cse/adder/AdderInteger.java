@@ -605,6 +605,9 @@ public class AdderInteger implements Comparable/*<AdderInteger>*/ {
     	BigInteger v = new BigInteger(list.get(1).toString());
     	BigInteger m = new BigInteger(list.get(2).toString());
     	
-    	return new AdderInteger(v, m);
+    	if(!m.equals(BigInteger.ZERO))
+    		return new AdderInteger(v, m);
+    	
+    	return new AdderInteger(v);
     }
 }

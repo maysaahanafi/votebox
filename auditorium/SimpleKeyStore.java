@@ -129,10 +129,11 @@ public class SimpleKeyStore implements IKeyStore {
 				//pubKey = PublicKey.fromString(str);
 				pubKey = PublicKey.fromASE(ASExpression.makeVerbatim(baos.toByteArray()));
 			}catch(Exception e){
+				e.printStackTrace();
 				try{
 					//privKey = PrivateKey.fromString(str);
 					privKey = PrivateKey.fromASE(ASExpression.makeVerbatim(baos.toByteArray()));
-				}catch(Exception f){}
+				}catch(Exception f){f.printStackTrace();}
 			}
 
 			if(pubKey != null)
