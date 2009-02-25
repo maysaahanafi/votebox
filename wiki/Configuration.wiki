@@ -124,3 +124,6 @@ Valid keys are:
  * DEFAULT_BALLOT_FILE
   * String, path to file
   * Default: "" (ignored, used by !ChallengeWebServer)
+ * ENABLE_NIZKS
+  * Boolean
+  * Default: false
