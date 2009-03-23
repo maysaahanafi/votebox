@@ -6,9 +6,18 @@
 <project name="votebox" default="jar-evil">
 	<description>votebox: previously ballotbox360</description>
 
-	<taskdef name="preprocess" classname="ant.PreProcessorTask"/>
-	<typedef name="define" classname="ant.Define"/>
-	<typedef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+	<taskdef name="preprocess"
+			 classname="ant.PreProcessorTask"
+			 classpath="ant/jpp.jar" />
+	<typedef name="define"
+			 classname="ant.Define"
+			 classpath="ant/jpp.jar" />
+	<taskdef name="jstub"
+			 classname="com.orangevolt.tools.ant.JStubTask"
+			 classpath="ant/orangevolt-ant-tasks-1.3.8.jar" />
+	<taskdef name="jarbundler"
+			 classname="net.sourceforge.jarbundler.JarBundler"
+			 classpath="ant/jarbundler-2.0.0.jar" />
 	
 	<!--
 	<taskdef name="doxygen" classname="org.doxygen.tools.DoxygenTask"/>
