@@ -1,3 +1,4 @@
+//#ifdef EVIL
 package votebox.middle.datacollection.evil;
 
 import java.util.ArrayList;
@@ -53,3 +54,4 @@ public class Flip4NoneOfTheAboveUndervoteTop implements EvilObserver {
 	}
 
 }
+//#endif

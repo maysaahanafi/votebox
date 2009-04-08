@@ -37,7 +37,9 @@ import auditorium.IKeyStore;
 
 import sexpression.ASExpression;
 import sexpression.ListExpression;
+//#ifdef EVIL
 import votebox.middle.datacollection.evil.EvilObserver;
+//#endif
 import votebox.middle.driver.Driver;
 import votebox.middle.view.AWTViewFactory;
 
@@ -72,8 +74,11 @@ public class Launcher {
      */
     public void launch(final String ballotLocation, String logDir,
 			String logFilename, boolean debug, final String vvpat, final int vvpatWidth,
-			final int vvpatHeight, final int printableWidth, final int printableHeight,
-			final EvilObserver evilObserver) {
+			final int vvpatHeight, final int printableWidth, final int printableHeight
+			//#ifdef EVIL
+			, final EvilObserver evilObserver
+			//#endif
+			) {
 
 		// Unzip the ballot to a temporary directory
 		File baldir;
@@ -216,7 +221,9 @@ public class Launcher {
 					public boolean getEnableNIZKs() { return false; }
 				};
 				
+				//#ifdef EVIL
 				vbcopy.registerForReview(evilObserver);
+				//#endif
 				
 		        // Register for the cast ballot event, and "review page encountered" event
 				vbcopy.run(new Observer(){
