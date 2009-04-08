@@ -49,10 +49,12 @@ import java.util.Observable;
 import javax.swing.JCheckBox;
 
 import votebox.middle.ballot.Ballot;
+//#ifdef EVIL
 import votebox.middle.datacollection.evil.EvilObserver;
 import votebox.middle.datacollection.evil.Flip4CandidateTop;
 import votebox.middle.datacollection.evil.Flip4NoneOfTheAboveUndervoteTop;
 import votebox.middle.datacollection.evil.Flip4UndervoteTop;
+//#endif
 import votebox.middle.driver.IAdapter;
 
 public class LauncherView extends JFrame {
@@ -166,6 +168,7 @@ public class LauncherView extends JFrame {
 			launchButton.setText("Launch");
 			launchButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					//#ifdef EVIL
 					parent
 							.launch(getBallotLocationField().getText(),
 									getDirectoryField().getText(),
@@ -176,13 +179,29 @@ public class LauncherView extends JFrame {
 									310,
 									190,
 									300,
-									getEvilObserver());
+									getEvilObserver()
+									);
+					//#endif
+					//#ifndef EVIL
+					parent
+					.launch(getBallotLocationField().getText(),
+							getDirectoryField().getText(),
+							getFilenameField().getText(),
+							getDebugCheckBox().isSelected(),
+							getVVPATField().getText(),
+							200,
+							310,
+							190,
+							300
+							);
+					//#endif
 				}
 			});
 		}
 		return launchButton;
 	}
 
+    //#ifdef EVIL
 	private EvilObserver getEvilObserver(){
 		
 		String selection = (String)getFlipField().getSelectedItem();
@@ -194,7 +213,7 @@ public class LauncherView extends JFrame {
 			public void setAdapter(IAdapter ballotAdapter, IAdapter viewAdapter, Ballot ballot) {}
 		};
 
-		//#ifdef EVIL
+		
 		if(selection.equals(FLIP_4_TO_CANDIDATE)){
 			obs = new Flip4CandidateTop();
 		}
@@ -205,10 +224,10 @@ public class LauncherView extends JFrame {
 		
 		if(selection.equals(FLIP_4_TO_NONE_OF_THE_ABOVE_UNDERVOTE ))
 			obs = new Flip4NoneOfTheAboveUndervoteTop();
-		//#endif
 
 		return obs;
 	}
+    //#endif
 	
 	/**
 	 * This method initializes centerPanel

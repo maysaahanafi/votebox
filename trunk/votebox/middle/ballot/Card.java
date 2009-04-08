@@ -270,9 +270,10 @@ public class Card {
 
         if (_elements.size() == 0)
             return getUniqueID();
-
+        
+        //#ifdef EVIL
         try {
-        	//#ifdef EVIL
+        	
         	if (_properties.contains(Properties.LIE))
         		if (_properties.getString(Properties.LIE).equals("non"))
         			return getSelectedElementEvilNon();
@@ -286,10 +287,12 @@ public class Card {
             else
             //#endif
                 return getSelectedElementNormal();
+        //#ifdef EVIL
         } catch (IncorrectTypeException e) {
             throw new CardException(this,
                     "The 'Lie' property for this card was not of type string.");
         }
+        //#endif
     }
     
     //#ifdef EVIL

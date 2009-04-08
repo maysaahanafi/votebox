@@ -60,7 +60,9 @@ import votebox.middle.ballot.BallotParserException;
 import votebox.middle.ballot.CardException;
 import votebox.middle.ballot.IBallotLookupAdapter;
 import votebox.middle.ballot.NonCardException;
+//#ifdef EVIL
 import votebox.middle.datacollection.evil.EvilObserver;
+//#endif
 import votebox.middle.view.IViewFactory;
 import votebox.middle.view.ViewManager;
 
@@ -76,8 +78,10 @@ public class Driver {
 	
 	private boolean _encryptionEnabled;
 
+	//#ifdef EVIL
 	private List<EvilObserver> _pendingRegisterForCastBallot = new ArrayList<EvilObserver>();
 	private List<EvilObserver> _pendingRegisterForReview = new ArrayList<EvilObserver>();
+	//#endif
 	
 	private IAdapter _viewAdapter = new IAdapter() {
 
@@ -183,6 +187,7 @@ public class Driver {
 		if(reviewScreenObserver != null)
 			_view.registerForReview(reviewScreenObserver);
 	
+		//#ifdef EVIL
 		for(EvilObserver o : _pendingRegisterForCastBallot){
 			o.setAdapter(_ballotAdapter, _viewAdapter, _ballot);
 			_view.registerForCastBallot(o);
@@ -196,10 +201,12 @@ public class Driver {
 		}//for
 		
 		_pendingRegisterForReview.clear();
+		//#endif
 		
 		_view.run();
 	}
 	
+	//#ifdef EVIL
 	public void registerForReview(EvilObserver o){
 		_pendingRegisterForReview.add(o);
 	}
@@ -207,6 +214,7 @@ public class Driver {
 	public void registerForCastBallot(EvilObserver o){
 		_pendingRegisterForCastBallot.add(o);
 	}
+	//#endif
 	
 	public void run(){
 		run(null, null);
