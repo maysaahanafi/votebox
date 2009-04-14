@@ -54,7 +54,9 @@ public class ChallengeDelayedTallier extends EncryptedTallier {
 		byte[] vote = _nonceToBallot.remove(nonce);
 		
 		if(vote == null){
-			throw new RuntimeException("Attempted to confirm an unknown vote, nonce = "+nonce);
+			throw new RuntimeException("Attempted to confirm an unknown vote, nonce = "
+				+ nonce
+				+ " -- perhaps the ballot is not designed to use the challenge model?");
 		}//if
 		
 		//Delegate actually tallying to the EncryptedTallier class
