@@ -795,7 +795,7 @@ public class VoteBox {
                         && Arrays.equals(e.getNonce(), nonce)) {
                     if (!committedBallot && _constants.getUseCommitChallengeModel())
                         throw new RuntimeException(
-                                "Someone said the ballot was received, but this machine hasn't committed it yet");
+                                "Someone said the ballot was received, but this machine hasn't committed it yet. Maybe the supervisor is misconfigured (not using challenge-commit model)?");
                     
                     if(!finishedVoting && !_constants.getUseCommitChallengeModel())
                     	throw new RuntimeException(
