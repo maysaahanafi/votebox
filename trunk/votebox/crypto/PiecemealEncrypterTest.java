@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import sexpression.ASExpression;
 import sexpression.ListExpression;
 import votebox.middle.Properties;
 import votebox.middle.ballot.Ballot;
@@ -207,6 +208,9 @@ public class PiecemealEncrypterTest {
 			for(Card card : cards){
 				List<String> contained = new ArrayList<String>();
 
+				for(SelectableCardElement elem : card.getElements())
+					contained.add(elem.getUniqueID());
+				
 				List<String> raceGroup = null;
 
 				for(List<String> group : raceGroups){
@@ -235,7 +239,10 @@ public class PiecemealEncrypterTest {
 				SelectableCardElement toSelect = elems.get(rand.nextInt(elems.size()));
 				toSelect.select();
 
-				PiecemealBallotEncrypter.SINGELTON.adderUpdate(card.getUniqueID(), card.getCastBallot(), raceGroup,  _adderPublicKey);
+				String uid = card.getUniqueID();
+				List<ASExpression> castBallot = card.getCastBallot();
+				
+				PiecemealBallotEncrypter.SINGELTON.adderUpdate(uid, castBallot, raceGroup,  _adderPublicKey);
 			}
 
 			ListExpression ballot = PiecemealBallotEncrypter.SINGELTON.getEncryptedBallot();
