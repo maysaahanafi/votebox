@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -309,6 +310,32 @@ public class VoteBox {
 				}
         		
         	});
+        	
+        	/**
+        	 * If we're using piecemeal encryption, we need to listen for each page change.
+        	 */
+        	if(_constants.getUsePiecemealEncryption()){
+        		currentDriver.getView().registerForPageChanged(new Observer(){
+        			public void update(Observable o, Object args){
+        				List<String> affectedUIDs = (List<String>)args;
+        				
+        				Map<String, List<ASExpression>> needUpdate = currentDriver.getBallotAdapter().getAffectedRaces(affectedUIDs);
+        				
+        				for(String uid : needUpdate.keySet()){
+        					if(!_constants.getEnableNIZKs()){
+        						try{
+        							PiecemealBallotEncrypter.SINGELTON.update(uid, needUpdate.get(uid), _constants.getKeyStore().loadKey("public"));
+        						}catch(AuditoriumCryptoException e){
+        							throw new RuntimeException(e);
+        						}
+        					}else{
+        						List<String> raceGroup = currentDriver.getBallotAdapter().getRaceGroupContaining(needUpdate.get(uid));
+        						PiecemealBallotEncrypter.SINGELTON.adderUpdate(uid, needUpdate.get(uid), raceGroup, (PublicKey)_constants.getKeyStore().loadAdderKey("public"));
+        					}
+        				}
+        			}
+        		});
+        	}
         }else{
         	//If we're not using the challenge-commit model, we still need to handle "cast" ui events.
         	//Here we role the commit triggered encryption in with casting (provided encryption is enabled).

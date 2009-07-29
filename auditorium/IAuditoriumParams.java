@@ -180,4 +180,19 @@ public interface IAuditoriumParams {
      * @return true if VoteBox should use NIZKs to confirm the wellformed-ness of ballots.
      */
     public boolean getEnableNIZKs();
+    
+    /**
+     * @return true if VoteBox should use piecemeal encryption to improve the user's perceived "time to vote".
+     */
+    public boolean getUsePiecemealEncryption();
+    
+    /**
+     * @return true if Supervisor should display the tally results in the simplest way it can.
+     */
+    public boolean getUseSimpleTallyView();
+    
+    /**
+     * @return true if Supervisor should display the tally results in a image-laden table, if possible.
+     */
+    public boolean getUseTableTallyView();
 }

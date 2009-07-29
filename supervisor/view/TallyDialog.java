@@ -64,6 +64,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 
 import tap.BallotImageHelper;
+import votebox.AuditoriumParams;
 
 /**
  * A dialog that goes along with {@link supervisor.model.tallier.Tallier}.  It is shown
@@ -99,10 +100,12 @@ public class TallyDialog extends JDialog {
         Map<String, Image> candidateImgMap = loadBallotRaces(ballot, languages);
         Map<String, Image> titleImgMap = BallotImageHelper.loadBallotTitles(ballot);
         
-        if(candidateImgMap == null)
+        AuditoriumParams params = new AuditoriumParams("supervisor.conf");
+        
+        if(candidateImgMap == null || params.getUseSimpleTallyView())
         	resultsField = createBasicTable(results);
         else{
-        	if(titleImgMap == null)
+        	if(titleImgMap == null || params.getUseTableTallyView())
         		resultsField = createFancyTable(results, candidateImgMap);
         	else
         		resultsField = createFancyTreeTable(results, candidateImgMap, titleImgMap);
