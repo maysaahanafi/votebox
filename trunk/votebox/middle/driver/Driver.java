@@ -151,6 +151,16 @@ public class Driver {
 		public List<List<String>> getRaceGroups() {
 			return _ballot.getRaceGroups();
 		}
+
+		public Map<String, List<ASExpression>> getAffectedRaces(List<String> affectedUIDs) {
+			//TODO: Implement remainder of piecemeal
+			throw new RuntimeException("Not implemented");
+		}
+
+		public List<String> getRaceGroupContaining(List<ASExpression> uids) {
+			//TODO: Implement remainder of piecemeal
+			throw new RuntimeException("Not implemented");
+		}
 	};
 
 	public Driver(String path, IViewFactory factory, boolean encryptionEnabled) {
@@ -231,6 +241,13 @@ public class Driver {
      */
     public ViewManager getView() {
         return _view;
+    }
+    
+    /**
+     * @return a reference to the current BallotLookupAdapter
+     */
+    public IBallotLookupAdapter getBallotAdapter(){
+    	return _ballotLookupAdapter;
     }
 
     /**

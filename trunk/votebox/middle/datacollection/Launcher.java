@@ -219,6 +219,12 @@ public class Launcher {
 					public int getViewRestartTimeout() {return 1;}
 
 					public boolean getEnableNIZKs() { return false; }
+					
+					public boolean getUsePiecemealEncryption() { return false; }
+
+					public boolean getUseSimpleTallyView() { return false; }
+
+					public boolean getUseTableTallyView() { return false; }
 				};
 				
 				//#ifdef EVIL

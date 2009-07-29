@@ -22,6 +22,7 @@
 
 package votebox.middle.view;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -307,5 +308,18 @@ public class RenderPage {
         for (IDrawable d : _children)
             d.initFromViewmanager( vmadapter, lookupadapter, ballotadapter,
                 factory, ballotvars );
+    }
+    
+    /**
+     * @return a list of all the unique ids of elements on this page
+     */
+    public List<String> getUniqueIDs(){
+    	List<String> ret = new ArrayList<String>();
+    	
+    	for(IDrawable child : _children){
+    		ret.add(child.getUniqueID());
+    	}
+    	
+    	return ret;
     }
 }

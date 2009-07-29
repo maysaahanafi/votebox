@@ -60,6 +60,7 @@ public class ViewManager implements IViewManager {
     private final ObservableEvent _overrideCastConfirm;
     private final ObservableEvent _overrideCastDeny;
     private final ObservableEvent _reviewScreenEncountered;
+    private final ObservableEvent _pageChanged;
 
     private IFocusable _currentFocusedElement = null;
     private Layout _layout = null;
@@ -103,6 +104,7 @@ public class ViewManager implements IViewManager {
         _overrideCastConfirm = new ObservableEvent();
         _overrideCastDeny = new ObservableEvent();
         _reviewScreenEncountered = new ObservableEvent();
+        _pageChanged = new ObservableEvent();
 
         registerQueues();
         setMediaSizes();
@@ -145,6 +147,14 @@ public class ViewManager implements IViewManager {
      */
     public void drawPage(int pagenum) {
         _view.clearDisplay();
+        
+        if(pagenum != _page)
+        {
+        	List<String> affectedUIDs = _layout.getPages().get(_page).getUniqueIDs();
+        	
+        	_pageChanged.notifyObservers(affectedUIDs);
+        }
+        
         _page = pagenum;
         setInitialFocus();
         _layout.initFromViewManager( _page, this, _ballotLookupAdapter,
@@ -383,6 +393,15 @@ public class ViewManager implements IViewManager {
     }
 
     /**
+     * Register for the page change event.
+     * 
+     * @param obs the observer
+     */
+    public void registerForPageChanged(Observer obs) {
+    	_pageChanged.addObserver(obs);
+    }
+    
+    /**
      * Register for the override cancel confirm event
      * 
      * @param obs
@@ -498,8 +517,7 @@ public class ViewManager implements IViewManager {
      */
     public void nextPage() {
         if (_page + 1 < _layout.getPages().size()) {
-            _page++;
-            drawPage( _page );
+            drawPage( _page + 1 );
         }
     }
 
@@ -509,8 +527,7 @@ public class ViewManager implements IViewManager {
      */
     public void previousPage() {
         if (_page - 1 >= 0) {
-            _page--;
-            drawPage( _page );
+            drawPage( _page - 1 );
         }
     }
 
@@ -778,8 +795,7 @@ public class ViewManager implements IViewManager {
         	public void handle(InputEvent event) throws BallotBoxViewException {
         		_ignoreMouseInput = false;
         	}
-        });
-        
+        });        
     }
 
     /**

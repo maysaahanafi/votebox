@@ -23,6 +23,7 @@
 package votebox.middle.ballot;
 
 import java.util.List;
+import java.util.Map;
 
 import sexpression.ASExpression;
 import votebox.middle.driver.UnknownUIDException;
@@ -115,4 +116,15 @@ public interface IBallotLookupAdapter {
 	 * @return a List of the groups of race-ids that make up each race.  Used to construct NIZKs.
 	 */
 	public List<List<String>> getRaceGroups();
+	
+	/**
+	 * @return a Map of each affected race (UID) to its cast ballot form.
+	 */
+	public Map<String, List<ASExpression>> getAffectedRaces(List<String> affectedUIDs);
+	
+	/**
+	 * @param uids - Cast ballot
+	 * @return the racegroup this cast ballot corresponds to.
+	 */
+	public List<String> getRaceGroupContaining(List<ASExpression> uids);
 }

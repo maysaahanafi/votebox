@@ -101,6 +101,13 @@ public class AuditoriumParams implements IAuditoriumParams,
     //By default, we don't enable NIZKs.
     public static final boolean ENABLE_NIZKS = false;
     
+    //By default, we don't enable Piecemeal Encryption
+    public static final boolean USE_PIECEMEAL_ENCRYPTION = false;
+    
+    //By default, we use the "fanciest" tally view possible
+    public static final boolean USE_SIMPLE_TALLY_VIEW = false;
+    public static final boolean USE_TABLE_TALLY_VIEW = false;
+    
     private final HashMap<String, String> _config;
 
     /**
@@ -305,6 +312,27 @@ public class AuditoriumParams implements IAuditoriumParams,
 		
 		return ENABLE_NIZKS;
 	}
+	
+	public boolean getUsePiecemealEncryption(){
+		if(_config.containsKey("USE_PIECEMEAL_ENCRYPTION"))
+			return Boolean.parseBoolean(_config.get("USE_PIECEMEAL_ENCRYPTION"));
+		
+		return USE_PIECEMEAL_ENCRYPTION;
+	}
+	
+	public boolean getUseSimpleTallyView(){
+		if(_config.containsKey("USE_SIMPLE_TALLY_VIEW"))
+			return Boolean.parseBoolean(_config.get("USE_SIMPLE_TALLY_VIEW"));
+		
+		return USE_SIMPLE_TALLY_VIEW;
+	}
+    
+    public boolean getUseTableTallyView(){
+    	if(_config.containsKey("USE_TABLE_TALLY_VIEW"))
+			return Boolean.parseBoolean(_config.get("USE_TABLE_TALLY_VIEW"));
+		
+		return USE_TABLE_TALLY_VIEW;
+    }
 	
     /**
      * Read from the configuration file.

@@ -63,6 +63,9 @@ public class TestParams implements IAuditoriumParams {
     public static final String DEFAULT_BALLOT_FILE = "";
     public static final String DEFAULT_PRINTER_FOR_VVPAT = "";
     public static final boolean DEFAULT_ENABLE_NIZKS = false;
+    public static final boolean DEFAULT_USE_PIECEMEAL_ENCRYPTION = false;
+    public static final boolean DEFAULT_USE_SIMPLE_TALLY_VIEW = false;
+    public static final boolean DEFAULT_USE_TABLE_TALLY_VIEW = false;
 
     public String getBroadcastAddress() {
         return BROADCAST_ADDRESS;
@@ -166,5 +169,18 @@ public class TestParams implements IAuditoriumParams {
 
 	public boolean getEnableNIZKs() {
 		return DEFAULT_ENABLE_NIZKS;
+	}
+	
+	public boolean getUsePiecemealEncryption()
+	{
+		return DEFAULT_USE_PIECEMEAL_ENCRYPTION;
+	}
+
+	public boolean getUseSimpleTallyView() {
+		return DEFAULT_USE_SIMPLE_TALLY_VIEW;
+	}
+
+	public boolean getUseTableTallyView() {
+		return DEFAULT_USE_TABLE_TALLY_VIEW;
 	}
 }
