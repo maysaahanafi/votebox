@@ -24,7 +24,7 @@ true
 #separates the ballot into a COMMIT, and then either a
 #CAST or a CHALLENGE
 USE_COMMIT_CHALLENGE_MODEL
-true
+false
 
 #changes the display mechanism
 #current options are SDL (Linux) and AWT (Windows)
@@ -54,7 +54,7 @@ true
 #separates the ballot into a COMMIT, and then either a
 #CAST or a CHALLENGE
 USE_COMMIT_CHALLENGE_MODEL
-true
+false
 }}}
 
 == Description ==
