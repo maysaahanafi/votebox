@@ -559,7 +559,7 @@ public class Model {
                             tempDir, "log" ) );
                     new votebox.middle.driver.Driver(
                             tempDir.getAbsolutePath(),
-                            new votebox.middle.view.AWTViewFactory( true ), false)
+                            new votebox.middle.view.AWTViewFactory( true, false ), false)
                             .run();
 
                     // Delete temporary directories

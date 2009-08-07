@@ -195,4 +195,14 @@ public interface IAuditoriumParams {
      * @return true if Supervisor should display the tally results in a image-laden table, if possible.
      */
     public boolean getUseTableTallyView();
+    
+    /**
+     * @return true if VoteBox should try and use a windows view.
+     */
+    public boolean getUseWindowedView();
+    
+    /**
+     * @return true if the AWT VoteBox UI should attempt to scale a ballot to fit the screen
+     */
+    public boolean getAllowUIScaling();
 }

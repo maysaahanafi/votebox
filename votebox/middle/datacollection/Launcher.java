@@ -148,7 +148,7 @@ public class Launcher {
 		_voteBox = null;
 		System.gc();
 		_voteBox = new Driver(baldir.getAbsolutePath(), new AWTViewFactory(
-				debug), false);
+				debug, false), false);
 		final Driver vbcopy = _voteBox;
         
 		_view.setRunning(true);
@@ -158,6 +158,10 @@ public class Launcher {
 				
 				final IAuditoriumParams constants = new IAuditoriumParams(){
 
+					public boolean getAllowUIScaling() { return true; }
+					
+					public boolean getUseWindowedView() {return true;}
+					
 					public String getBroadcastAddress() {return null;}
 
 					public boolean getCastBallotEncryptionEnabled() {return false;}

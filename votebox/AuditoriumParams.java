@@ -108,6 +108,11 @@ public class AuditoriumParams implements IAuditoriumParams,
     public static final boolean USE_SIMPLE_TALLY_VIEW = false;
     public static final boolean USE_TABLE_TALLY_VIEW = false;
     
+    //AWT view is windowed by default (as it may break if fullscreen
+    public static final boolean DEFAULT_USE_WINDOWED_VIEW = true;
+    
+    public static final boolean DEFAULT_ALLOW_UI_SCALING = true;
+    
     private final HashMap<String, String> _config;
 
     /**
@@ -332,6 +337,20 @@ public class AuditoriumParams implements IAuditoriumParams,
 			return Boolean.parseBoolean(_config.get("USE_TABLE_TALLY_VIEW"));
 		
 		return USE_TABLE_TALLY_VIEW;
+    }
+    
+    public boolean getUseWindowedView(){
+    	if(_config.containsKey("USE_WINDOWED_VIEW"))
+    		return Boolean.parseBoolean(_config.get("USE_WINDOWED_VIEW"));
+    	
+    	return DEFAULT_USE_WINDOWED_VIEW;
+    }
+    
+    public boolean getAllowUIScaling(){
+    	if(_config.containsKey("ALLOW_UI_SCALING"))
+    		return Boolean.parseBoolean(_config.get("ALLOW_UI_SCALING"));
+    	
+    	return DEFAULT_ALLOW_UI_SCALING;
     }
 	
     /**
