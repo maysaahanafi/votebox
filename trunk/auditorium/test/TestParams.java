@@ -66,6 +66,8 @@ public class TestParams implements IAuditoriumParams {
     public static final boolean DEFAULT_USE_PIECEMEAL_ENCRYPTION = false;
     public static final boolean DEFAULT_USE_SIMPLE_TALLY_VIEW = false;
     public static final boolean DEFAULT_USE_TABLE_TALLY_VIEW = false;
+    public static final boolean DEFAULT_USE_WINDOWED_VIEW = true;
+    public static final boolean DEFAULT_ALLOW_UI_SCALING = true;
 
     public String getBroadcastAddress() {
         return BROADCAST_ADDRESS;
@@ -182,5 +184,13 @@ public class TestParams implements IAuditoriumParams {
 
 	public boolean getUseTableTallyView() {
 		return DEFAULT_USE_TABLE_TALLY_VIEW;
+	}
+	
+	public boolean getUseWindowedView(){
+		return DEFAULT_USE_WINDOWED_VIEW;
+	}
+	
+	public boolean getAllowUIScaling(){
+		return DEFAULT_ALLOW_UI_SCALING;
 	}
 }

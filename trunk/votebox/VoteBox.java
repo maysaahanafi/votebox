@@ -123,8 +123,7 @@ public class VoteBox {
 
         if (_constants.getViewImplementation().equals("AWT")) {
             // run fullscreen on OSX only
-            _factory = new AWTViewFactory(
-            		!System.getProperty("os.name").equals("Mac OS X"));
+            _factory = new AWTViewFactory(_constants.getUseWindowedView(), _constants.getAllowUIScaling());
         } else if (_constants.getViewImplementation().equals("SDL")) {
         	_factory = new VoteboxSDLViewFactory(_constants);
         }else

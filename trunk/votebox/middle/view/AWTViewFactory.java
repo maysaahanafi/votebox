@@ -22,6 +22,10 @@
 
 package votebox.middle.view;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 /**
  * This is the factory for the AWTView. It constructs AWTView and AWTImage
  * instances.
@@ -32,14 +36,16 @@ package votebox.middle.view;
 public class AWTViewFactory implements IViewFactory {
 
     private final boolean _windowed;
+    private final boolean _allowScaling;
 
     /**
      * @param windowed
      *            Set this to true if the constructed views should be windowed
      *            rather than fullscreened.
      */
-    public AWTViewFactory(boolean windowed) {
+    public AWTViewFactory(boolean windowed, boolean allowScaling) {
         _windowed = windowed;
+        _allowScaling = allowScaling;
     }
 
     /**
@@ -53,6 +59,10 @@ public class AWTViewFactory implements IViewFactory {
      * @see votebox.middle.view.IViewFactory#makeView()
      */
     public IView makeView() {
-        return new AWTView( _windowed );
+    	GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gs = ge.getDefaultScreenDevice();
+        DisplayMode mode = gs.getDisplayMode();
+    	
+        return new AWTView( _windowed, _allowScaling, mode.getWidth(), mode.getHeight() );
     }
 }
